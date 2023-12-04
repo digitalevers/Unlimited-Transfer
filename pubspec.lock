@@ -151,7 +151,7 @@ packages:
       path: "."
       ref: HEAD
       resolved-ref: f16b6c529c6ea45c82b995fbff361fac95db16d2
-      url: "https://gitee.com/shuzibanshou/flutter_plugin_filepicker.git"
+      url: "https://gitee.com/digitalevers/flutter_plugin_filepicker"
     source: git
     version: "5.2.0"
   flutter:

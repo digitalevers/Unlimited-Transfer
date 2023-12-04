@@ -4,19 +4,20 @@
     // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
-            "name": "woniu",
+            "name": "ulimited-transfer",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "woniu (profile mode)",
+            "name": "ulimited-transfer (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "woniu (release mode)",
+            "name": "ulimited-transfer (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
