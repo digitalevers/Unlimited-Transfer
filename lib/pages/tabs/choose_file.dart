@@ -11,7 +11,7 @@ class _nameState extends State<ChooseFile> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: const Text("选择文件"),
+      child: const Text(""),
     );
   }
 }

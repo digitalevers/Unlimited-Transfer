@@ -24,6 +24,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
   // ignore: non_constant_identifier_names
   Icon _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
   List<String?>? chooseFiles = [];
+  String shortFileName = '';
   final List<Widget> _pages = [
     SendToApp(),
     SendToBrowser(),
@@ -104,14 +105,15 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
               icon: Icon(Icons.open_in_browser), label: "传浏览器"),
           BottomNavigationBarItem(
               icon: const Icon(Icons.file_copy),
-              label: chooseFiles!.isNotEmpty ? "清空" : "选择文件"),
+              label: chooseFiles!.isNotEmpty ? "点我清空" : "选择文件"),
           const BottomNavigationBarItem(
               icon: Icon(Icons.open_in_browser), label: "使用说明"),
           const BottomNavigationBarItem(
               icon: Icon(Icons.info_outline), label: "关于")
         ],
       ),
-      floatingActionButton: chooseFiles!.isNotEmpty ? 
+      floatingActionButton: 
+        chooseFiles!.isNotEmpty ? 
             Draggable(data: '',
               feedback: const Icon(Icons.file_copy, color: Colors.blue, size: 30),
               onDraggableCanceled: (Velocity velocity, Offset offset) {
@@ -137,38 +139,40 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
               child: Container(
                 width: 60,
                 height: 60,
-                padding: const EdgeInsets.all(5),
+                padding: const EdgeInsets.all(0),
                 margin: const EdgeInsets.only(top: 5),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
                 child: Stack(
+                  alignment: Alignment.bottomCenter,
                   children: [
                     buildRotationTransition(),
-                    IconButton(
-                        onPressed: () async {
-                          //选择文件
-                          // FlutterDocumentPickerParams? params = FlutterDocumentPickerParams();
-                          // String? path = await FlutterDocumentPicker.openDocument(
-                          //   params: params,
-                          // );
-
-                          // setState(() {
-                          //   isLoading = true;
-                          // });
-
-                          List<String?>? path = await Sender.handleSharing(context);
-                          chooseFiles?.addAll(path!);
-                          setState(() {
-                            //isLoading = false;
-                            if (chooseFiles?.length == 1) {
-                              _FloatingActionButtonIcon = const Icon(Icons.image, color: Colors.white);
-                            } else if ((chooseFiles?.length)! > 1) {
-                              _FloatingActionButtonIcon = const Icon(Icons.file_copy, color: Colors.white);
-                            } else {
-                              _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
-                            }
-                          });
-                        },
-                        icon: _FloatingActionButtonIcon
+                    Container(margin: const EdgeInsets.only(bottom: 5), 
+                              child: 
+                                IconButton(
+                                  alignment: Alignment.topCenter,
+                                  onPressed: () async {
+                                    //选择文件
+                                    List<String?>? path = await Sender.handleSharing(context);
+                                    chooseFiles?.addAll(path!);
+                                    //获取文件名在底部展示
+                                    //TODO
+                                    setState(() {
+                                      //isLoading = false;
+                                      if ((chooseFiles?.length)! > 0) {
+                                        _FloatingActionButtonIcon = const Icon(Icons.file_copy, color: Colors.white);
+                                      } else {
+                                        _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
+                                      }
+                                    });
+                                  },
+                                  icon: _FloatingActionButtonIcon
+                              ),
+                    ),
+                    Container(margin: const EdgeInsets.only(bottom: 5), 
+                              child: 
+                                const Text("231.jpg",textAlign:TextAlign.center,
+                                  style:TextStyle(fontSize:10,color:Colors.white),
+                                )
                     )
                   ],
                 )) 
@@ -185,22 +189,11 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     IconButton(
                         onPressed: () async {
                           //选择文件
-                          // FlutterDocumentPickerParams? params = FlutterDocumentPickerParams();
-                          // String? path = await FlutterDocumentPicker.openDocument(
-                          //   params: params,
-                          // );
-
-                          // setState(() {
-                          //   isLoading = true;
-                          // });
-
                           List<String?>? path = await Sender.handleSharing(context);
                           chooseFiles?.addAll(path!);
                           setState(() {
                             //isLoading = false;
-                            if (chooseFiles?.length == 1) {
-                              _FloatingActionButtonIcon = const Icon(Icons.image, color: Colors.white);
-                            } else if ((chooseFiles?.length)! > 1) {
+                            if ((chooseFiles?.length)! > 0) {
                               _FloatingActionButtonIcon = const Icon(Icons.file_copy, color: Colors.white);
                             } else {
                               _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
@@ -208,7 +201,8 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                           });
                         },
                         icon: _FloatingActionButtonIcon
-                    )
+                    ),
+                    
                   ],
                 )),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
