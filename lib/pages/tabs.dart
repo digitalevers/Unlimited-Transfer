@@ -10,6 +10,8 @@ import 'package:woniu/common/config.dart';
 import 'package:woniu/common/func.dart';
 import 'package:woniu/common/global_variable.dart';
 
+import 'package:showcaseview/showcaseview.dart';
+
 class Tabs extends StatefulWidget {
   const Tabs({super.key});
 
@@ -24,7 +26,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
   // ignore: non_constant_identifier_names
   Icon _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
   List<String?>? chooseFiles = [];
-  String shortFileName = '';
+  String showShortFileName = '';
   final List<Widget> _pages = [
     SendToApp(),
     SendToBrowser(),
@@ -34,11 +36,15 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
   ];
   //首页雷达扫描动画
   // ignore: prefer_typing_uninitialized_variables
-  var _indexSweepGradient;
+  SweepGradient? _indexSweepGradient;
   ///////////////
 
   /////动画控制器
-  late AnimationController _animationController;
+  AnimationController? _animationController;
+
+
+  final GlobalKey _one = GlobalKey();
+  late BuildContext myContext;
 
   @override
   void initState() {
@@ -49,8 +55,10 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
     //添加到事件队列中
     Future.delayed(Duration.zero, () {
       //动画重复执行
-      _animationController.repeat();
+      _animationController?.repeat();
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) =>ShowCaseWidget.of(myContext).startShowCase([_one]));
   }
 
   @override
@@ -62,14 +70,18 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     //销毁
-    _animationController.dispose();
+    _animationController?.dispose();
     super.dispose();
     print('tabs-dispose');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ShowCaseWidget(
+      builder: Builder(
+        builder: (context) {
+          myContext = context;
+          return Scaffold(
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -112,8 +124,27 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
               icon: Icon(Icons.info_outline), label: "关于")
         ],
       ),
-      floatingActionButton: 
-        chooseFiles!.isNotEmpty ? 
+      
+      floatingActionButton:
+        Showcase(
+            key: _one,
+            title:'点击选择文件',
+            description: '然后将文件拖拽至目标设备上',
+            targetShapeBorder: const CircleBorder(),
+            child:getFloatingActionButton()
+        ),
+      
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+        }));
+  }
+
+// ignore: slash_for_doc_comments
+/**
+ * 获取 floatingActionButton 位置的控件
+ */
+  Widget getFloatingActionButton(){
+    return chooseFiles!.isNotEmpty ? 
             Draggable(data: '',
               feedback: const Icon(Icons.file_copy, color: Colors.blue, size: 30),
               onDraggableCanceled: (Velocity velocity, Offset offset) {
@@ -152,10 +183,16 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                                   alignment: Alignment.topCenter,
                                   onPressed: () async {
                                     //选择文件
+                                    chooseFiles = [];
                                     List<String?>? path = await Sender.handleSharing(context);
+                                    //print(path);
                                     chooseFiles?.addAll(path!);
-                                    //获取文件名在底部展示
-                                    //TODO
+                                    List<String>? pathInfo = chooseFiles![0]?.split('.');
+                                    String? suffix = pathInfo![pathInfo.length - 1];
+                                    String? fileName = Uri.decodeComponent(pathInfo[pathInfo.length - 2]);
+                                    fileName = fileName.substring(fileName.length - 3);
+                                    showShortFileName = "...$fileName.$suffix";
+                                    //print(showShortFileName);
                                     setState(() {
                                       //isLoading = false;
                                       if ((chooseFiles?.length)! > 0) {
@@ -170,8 +207,8 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     ),
                     Container(margin: const EdgeInsets.only(bottom: 5), 
                               child: 
-                                const Text("231.jpg",textAlign:TextAlign.center,
-                                  style:TextStyle(fontSize:10,color:Colors.white),
+                                Text(showShortFileName,textAlign:TextAlign.center,
+                                  style:const TextStyle(fontSize:10,color:Colors.white),
                                 )
                     )
                   ],
@@ -204,16 +241,14 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     ),
                     
                   ],
-                )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
+                ));
   }
 
   RotationTransition buildRotationTransition() {
     //旋转动画
     return RotationTransition(
       //动画控制器
-      turns: _animationController,
+      turns: _animationController!,
       //圆形裁剪
       child: ClipOval(
         child: FloatingActionButton(

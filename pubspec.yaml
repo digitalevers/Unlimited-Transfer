@@ -55,6 +55,7 @@ dependencies:
         #https://github.com/abhi16180/flutter_file_picker.git
         https://gitee.com/digitalevers/flutter_plugin_filepicker
   step_progress_indicator: ^1.0.2
+  showcaseview: ^2.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
