@@ -120,6 +120,7 @@ progressPageWillPopDialog(context) async {
 
 sharePageAlertDialog(BuildContext context) async {
   SharedPreferences prefInst = await SharedPreferences.getInstance();
+  // ignore: use_build_context_synchronously
   showDialog(
     context: context,
     builder: (context) {

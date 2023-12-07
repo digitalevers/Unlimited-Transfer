@@ -6,6 +6,7 @@ import 'pages/tabs.dart';
 
 import 'common/config.dart';
 import 'common/global_variable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 // 重写HttpOverrides
@@ -22,7 +23,8 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();  //这一行很重要且必须放在第一行 放在 SharedPreferences 前面 否则运行会报错 暂不知原因
+  prefs = await SharedPreferences.getInstance();
   Hive.init((await getApplicationDocumentsDirectory()).path);
   // await Hive.openBox('appData');
   // Box box = Hive.box('appData');
@@ -45,11 +47,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: nav,
-      title: 'Flutter Demo',
+      title: '无界闪传',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'A Crossplatform File Transfer Tool'),
     );
   }
 }

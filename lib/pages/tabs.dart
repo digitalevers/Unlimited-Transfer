@@ -12,11 +12,14 @@ import 'package:woniu/common/global_variable.dart';
 
 import 'package:showcaseview/showcaseview.dart';
 
+
 class Tabs extends StatefulWidget {
   const Tabs({super.key});
 
   @override
-  State<Tabs> createState() => _nameState();
+  State<Tabs> createState()  { 
+    return  _nameState(); 
+  }
 }
 
 // ignore: camel_case_types
@@ -42,22 +45,17 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
   /////动画控制器
   AnimationController? _animationController;
 
-
+  //新手引导蒙层
   final GlobalKey _one = GlobalKey();
   late BuildContext myContext;
 
   @override
   void initState() {
     super.initState();
-
     //创建
     _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
     //添加到事件队列中
-    Future.delayed(Duration.zero, () {
-      //动画重复执行
-      _animationController?.repeat();
-    });
-
+    Future.delayed(Duration.zero, () {_animationController?.repeat();});
     WidgetsBinding.instance.addPostFrameCallback((_) =>ShowCaseWidget.of(myContext).startShowCase([_one]));
   }
 
@@ -76,67 +74,78 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return ShowCaseWidget(
       builder: Builder(
         builder: (context) {
           myContext = context;
           return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          setState(() {
-            if (index == 2) {
-              if (chooseFiles!.isNotEmpty) {
-                chooseFiles!.clear();
-                _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
-              }
-            } else {
-              _currentIndex = index;
-            }
-            //选中其他tab页 停止雷达扫描
-            if (index != 0) {
-              _indexSweepGradient = null;
-            } else {
-              _indexSweepGradient = SweepGradient(colors: [
-                Colors.white.withOpacity(0.2),
-                Colors.white.withOpacity(0.6),
-              ]);
-            }
+            body: _pages[_currentIndex],
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: _currentIndex,
+              type: BottomNavigationBarType.fixed,
+              onTap: (index) {
+                setState(() {
+                  if (index == 2) {
+                    if (chooseFiles!.isNotEmpty) {
+                      chooseFiles!.clear();
+                      _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
+                    }
+                  } else {
+                    _currentIndex = index;
+                  }
+                  //选中其他tab页 停止雷达扫描
+                  if (index != 0) {
+                    _indexSweepGradient = null;
+                  } else {
+                    _indexSweepGradient = SweepGradient(colors: [
+                      Colors.white.withOpacity(0.2),
+                      Colors.white.withOpacity(0.6),
+                    ]);
+                  }
 
-            // ignore: avoid_print
-            //print(this);
-          });
-        },
-        items: <BottomNavigationBarItem>[
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.phone_iphone), label: "传客户端"),
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.open_in_browser), label: "传浏览器"),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.file_copy),
-              label: chooseFiles!.isNotEmpty ? "点我清空" : "选择文件"),
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.open_in_browser), label: "使用说明"),
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.info_outline), label: "关于")
-        ],
-      ),
-      
-      floatingActionButton:
-        Showcase(
-            key: _one,
-            title:'点击选择文件',
-            description: '然后将文件拖拽至目标设备上',
-            targetShapeBorder: const CircleBorder(),
-            child:getFloatingActionButton()
-        ),
-      
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
+                  // ignore: avoid_print
+                  //print(this);
+                });
+              },
+              items: <BottomNavigationBarItem>[
+                const BottomNavigationBarItem(
+                    icon: Icon(Icons.phone_iphone), label: "传客户端"),
+                const BottomNavigationBarItem(
+                    icon: Icon(Icons.open_in_browser), label: "传浏览器"),
+                BottomNavigationBarItem(
+                    icon: const Icon(Icons.add),
+                    label: chooseFiles!.isNotEmpty ? "点我清空" : "选择文件"),
+                const BottomNavigationBarItem(
+                    icon: Icon(Icons.open_in_browser), label: "使用说明"),
+                const BottomNavigationBarItem(
+                    icon: Icon(Icons.info_outline), label: "关于")
+              ],
+            ),
+            //新手引导蒙层只在app安装时提示一次
+            floatingActionButton: newerShowOneTime(),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          );
         }));
+  }
+
+/**
+ * 新手引导蒙层只显示一次
+ */
+  Widget newerShowOneTime(){
+      bool newer = prefs?.getBool("newer") ?? true;
+      if(newer){
+        prefs?.setBool("newer", false);
+        return Showcase(
+                  key: _one,
+                  title:'点击选择文件',
+                  description: '然后将文件拖拽至目标设备上',
+                  targetShapeBorder: const CircleBorder(),
+                  child:getFloatingActionButton()
+              );
+      } else {
+        return getFloatingActionButton();
+      }
   }
 
 // ignore: slash_for_doc_comments
@@ -218,7 +227,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                 width: 60,
                 height: 60,
                 padding: const EdgeInsets.all(5),
-                margin: const EdgeInsets.only(top: 5),
+                //margin: const EdgeInsets.only(top: 5),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
                 child: Stack(
                   children: [

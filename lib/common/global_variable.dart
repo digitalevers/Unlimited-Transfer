@@ -1,6 +1,7 @@
 //接收文件 & 拒收文件
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum ServerIfReceiveFile{
   accept,
@@ -41,4 +42,6 @@ final GlobalKey<NavigatorState> nav = GlobalKey<NavigatorState>();
 final GlobalKey remoteDevicesKey = GlobalKey();
 
 Offset remoteDevicesOffset = Offset(0, 0);
+//缓存实例
+SharedPreferences? prefs;
 
