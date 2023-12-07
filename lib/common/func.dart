@@ -144,8 +144,10 @@ void sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String
   //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
   //request.headers.set("filename", p.basename(applist[0]!));
   await request.addStream(file.openRead());
+  
   HttpClientResponse response = await request.close();
   var result = await response.transform(utf8.decoder).join();
+
   Log(result, StackTrace.current);
   client.close();
 }

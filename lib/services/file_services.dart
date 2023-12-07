@@ -9,7 +9,7 @@ import 'package:hive/hive.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart' as path;
-import 'package:path_provider/path_provider.dart';
+//import 'package:path_provider/path_provider.dart';
 
 import 'package:woniu/models/file_model.dart';
 import 'package:woniu/models/sender_model.dart';
@@ -118,7 +118,7 @@ class FileMethods {
           var temp = Directory('/storage/emulated/0/Download/');
           (await temp.exists())
               ? directory = temp
-              : directory = await getApplicationDocumentsDirectory();
+              : directory = await path.getApplicationDocumentsDirectory();
           break;
 
         case "ios":

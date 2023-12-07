@@ -21,6 +21,8 @@ import 'package:path/path.dart' as p;
 import 'package:woniu/common/config.dart';
 import 'package:woniu/common/global_variable.dart';
 
+import 'package:uri_to_file/uri_to_file.dart';
+
 class Sender{
   //static final HttpClient _client = HttpClient() ;
   //static String? _address;
@@ -64,7 +66,9 @@ class Sender{
     } else {
       //Log(_client, StackTrace.current);
       fileList  = await FileMethods.pickFiles();
-      //print(fileList);   // /data/user/0/com.example.woniu/cache/file_picker/195.mp4
+      //fileList![0] = "/storage/emulated/0/DCIM/Camera/IMG_20220514_182017.jpg";
+      fileList![0] = (await toFile(fileList![0]!)).path;
+      //print(await toFile(fileList![0]!));   // /data/user/0/com.example.woniu/cache/file_picker/195.mp4
       //sendFileInfo(_client, fileList,context);
     }
     return fileList;

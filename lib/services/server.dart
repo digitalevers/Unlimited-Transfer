@@ -118,13 +118,16 @@ class Server {
             //3、流式写入文件 不会产生OOM
             //print('receive file');
             const uploadDirectory = './upload';
-            var filename = request.headers['filename']![0];
-            var file = File('$uploadDirectory/$filename');
+            //String filename = request.headers['filename']![0];
+            String filename = 'test123.jpg';
+            //File file = File('$uploadDirectory/$filename');
+            File file = File('/storage/emulated/0/Download/$filename');
+            //print(file);
             var sink = file.openWrite(mode: FileMode.append);
             await sink.addStream(request);
-            // await for (Uint8List data in request) {
-            //   sink.write(data);
-            // }
+                    // await for (Uint8List data in request) {
+                    //   sink.write(data);
+                    // }
             await sink.flush();
             await sink.close();
           } else {
