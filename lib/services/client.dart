@@ -64,8 +64,8 @@ class Sender{
     } else {
       //Log(_client, StackTrace.current);
       fileList  = await FileMethods.pickFiles();
-      //print(_fileList);   // /data/user/0/com.example.woniu/cache/file_picker/195.mp4
-      //sendFileInfo(_client, _fileList,context);
+      //print(fileList);   // /data/user/0/com.example.woniu/cache/file_picker/195.mp4
+      //sendFileInfo(_client, fileList,context);
     }
     return fileList;
   }

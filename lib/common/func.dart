@@ -137,7 +137,8 @@ void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<St
 
 //发送文件
 void sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String?>? filelist_) async {
-  var file = File(filelist_![0]!); 
+  String filePath = Uri.decodeComponent(filelist_![0]!);
+  var file = File(filePath); 
   var uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
   HttpClientRequest request = await  client.postUrl(uri);
   //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
