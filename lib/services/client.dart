@@ -54,7 +54,12 @@ class Sender{
     // }
   }
 
-    //分享文件 包括外部意图和内部主动选择文件进行分享
+    // ignore: slash_for_doc_comments
+    /**
+     * 分享文件 包括外部意图和内部主动选择文件进行分享
+     * /storage/emulated/0/
+     * /data/data/0/com.example.woniu/files/uri_to_files
+     */
   static Future<List<String?>?> share(context, { bool externalIntent = false, List<String> appList = const <String>[]}) async {
     if (externalIntent) {
       List<SharedMediaFile> sharedMediaFiles = await ReceiveSharingIntent.getInitialMedia();
@@ -64,12 +69,10 @@ class Sender{
       //Future<Map<String, dynamic>> res = _startServer(_fileList, context);
       //return await res;
     } else {
-      //Log(_client, StackTrace.current);
       fileList  = await FileMethods.pickFiles();
-      //fileList![0] = "/storage/emulated/0/DCIM/Camera/IMG_20220514_182017.jpg";
-      fileList![0] = (await toFile(fileList![0]!)).path;
-      //print(await toFile(fileList![0]!));   // /data/user/0/com.example.woniu/cache/file_picker/195.mp4
-      //sendFileInfo(_client, fileList,context);
+      for(int i = 0; i < fileList!.length; i++){
+        fileList![i] = (await toFile(fileList![i]!)).path;
+      }
     }
     return fileList;
   }

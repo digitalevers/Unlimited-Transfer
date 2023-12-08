@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:math';
 
 // String _data = "0";
 
@@ -65,12 +66,22 @@ import 'dart:io';
 // }
 
 void main() async {//注意：需要添加async，因为await必须在async方法内才有效
-  print('0');
+  //  print('0');
 
-  await testasync().then((param)=>{print(param)});
-  print('end');
+  //  await testasync().then((param)=>{print(param)});
+  //  print('end');
+  print(fommatFileSize(1055053899));
 }
 
+String fommatFileSize(int fileSizeBytes){
+  int power = 0;
+  List<String> units = ['Bytes','KB','MB','GB','TB'];
+  int numLength = fileSizeBytes.toString().length;
+  power = (numLength - 1) ~/ 3;
+  num divisor = pow(1000,power);
+  String formatedFileSize = (fileSizeBytes / divisor).toStringAsFixed(1);
+  return "$formatedFileSize${units[power]}";
+}
 
 Future<int> testasync() async{
   var userInfo = await _loadUserFromSQL();

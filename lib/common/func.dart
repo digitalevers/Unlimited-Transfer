@@ -1,4 +1,6 @@
 // ignore: slash_for_doc_comments
+import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 import 'package:get_it/get_it.dart';
@@ -104,10 +106,26 @@ void preSendFile(){
 
 }
 
+String fommatFileSize(int fileSizeBytes){
+  int power = 0;
+  List<String> units = ['Bytes','KB','MB','GB','TB'];
+  int numLength = fileSizeBytes.toString().length;
+  power = (numLength - 1) ~/ 3;
+  num divisor = pow(1000,power);
+  String formatedFileSize = (fileSizeBytes / divisor).toStringAsFixed(1);
+  return "$formatedFileSize${units[power]}";
+}
+
 //发送文件信息
 void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<String?>? fileList_, context_) async {
-  int fileSize = 1;   //待发送文件大小 单位M
-  int fileCount = 10;  //待发送文件数量
+  
+  int fileCount = fileList_!.length;  //待发送文件数量
+  int fileSize = 0;                   //待发送文件大小 单位M
+  for(int i = 0;i < fileCount;i++){
+    File _tempFile = File(fileList_[i]!);
+    fileSize += _tempFile.lengthSync();
+  }
+  
   String url = "http://$serverIP_:$serverPort_/fileinfo";
   String formBody = "fileSize=$fileSize&fileCount=$fileCount";
 
@@ -116,21 +134,24 @@ void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<St
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();
   Log(result, StackTrace.current);
-  //分析服务端响应 如果同意接收则开始发送文件
-  Map resMap = jsonDecode(result);
-  if(resMap['code'] == HttpResponseCode.acceptFile){
-    preSendFile();
-    sendFile(client_, serverIP_, serverPort_, fileList_);
+  if(result == ""){
+    print("服务器无返回");
   } else {
-    CherryToast.warning(
-      title:  Text(HttpResponseCodeMsg[resMap['code']]!),
-      toastPosition: Position.bottom,
-      displayCloseButton:false,
-      actionHandler:(){},
-      //animationDuration: const Duration(milliseconds:  500),
-    ).show(context_);
+    //分析服务端响应 如果同意接收则开始发送文件
+    Map resMap = jsonDecode(result);
+    if(resMap['code'] == HttpResponseCode.acceptFile){
+      preSendFile();
+      sendFile(client_, serverIP_, serverPort_, fileList_);
+    } else {
+      CherryToast.warning(
+        title:  Text(HttpResponseCodeMsg[resMap['code']]!),
+        toastPosition: Position.bottom,
+        displayCloseButton:false,
+        actionHandler:(){},
+        //animationDuration: const Duration(milliseconds:  500),
+      ).show(context_);
+    }
   }
-  
   //client.close();// 这里若关闭了 就不能再次发送请求了
 }
 

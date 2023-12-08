@@ -10,6 +10,8 @@ import 'package:url_launcher/url_launcher.dart' as ulaunch;
 import 'package:woniu/controllers/controllers.dart';
 import 'package:woniu/common/global_variable.dart';
 
+import '../common/func.dart';
+
 void privacyPolicyDialog(BuildContext context, String data) async {
   SharedPreferences prefInst = await SharedPreferences.getInstance();
   // ignore: use_build_context_synchronously
@@ -355,12 +357,13 @@ credits(context) async {
 // }
 
 Future<ServerIfReceiveFile> ifReceiveFile(context,fileCount,fileSize) async {
+  String formatedFileSize = fommatFileSize(fileSize);
   var res = await showCupertinoDialog(
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
           //title: Text('这是标题'),
-          content: Text("您有$fileCount个新的文件等待接收,大小${fileSize}M"),
+          content: Text("您有$fileCount个新的文件等待接收,大小$formatedFileSize"),
           actions: <Widget>[
             CupertinoButton(
               child: const Text("拒收"),
