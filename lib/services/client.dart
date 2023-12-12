@@ -81,10 +81,11 @@ class Sender{
         //print(fileList![i]);
         const platform = MethodChannel("AndroidApi");
         String originFilePath = await platform.invokeMethod("getOriginFilePathByUri",[fileList![i]]);
+        print(originFilePath);
         fileList![i] = originFilePath;
 
         //fileList![i] = fileList![i]?.replaceAll("content://com.android.externalstorage.documents/document/primary:", "/storage/emulated/0/");
-        //print(fileList![i]);
+
       }
       
     }

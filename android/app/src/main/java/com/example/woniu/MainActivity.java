@@ -53,6 +53,7 @@ public class MainActivity extends FlutterActivity {
 
 
     public static String getOriginFilePathByUri(Uri uri,Context context) {
+        //System.out.println(uri);
         String path = null;
         // 以 file:// 开头的
         if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
@@ -86,12 +87,26 @@ public class MainActivity extends FlutterActivity {
                         return path;
                     }
                 } else if (isDownloadsDocument(uri)) {
-                    // DownloadsProvider
+                    
+                    // DownloadsProvider  content://com.android.providers.downloads.documents/document/1198  content://downloads/public_downloads
                     final String id = DocumentsContract.getDocumentId(uri);
-                    final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),
-                            Long.valueOf(id));
-                    path = getDataColumn(context, contentUri, null, null);
+                    final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://com.android.providers.downloads.documents/document/msf:"), 164577);
+                    //System.out.println(contentUri);
+
+                    Cursor cursor = context.getContentResolver().query(Uri.parse("content://com.android.providers.downloads.documents/document/164577"), null, null, null, null);
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            int columnIndex = cursor.getColumnIndexOrThrow("_display_name");
+                            path = cursor.getString(columnIndex);
+                        }
+                        cursor.close();
+                    }
+
+
+                    //path = getDataColumn(context, contentUri, null, null);
+
                     return path;
+
                 } else if (isMediaDocument(uri)) {
                     // MediaProvider
                     final String docId = DocumentsContract.getDocumentId(uri);
@@ -109,6 +124,13 @@ public class MainActivity extends FlutterActivity {
                     final String[] selectionArgs = new String[]{split[1]};
                     path = getDataColumn(context, contentUri, selection, selectionArgs);
                     return path;
+                }
+            } else {
+                System.out.println(2);
+                // content://com.android.externalstorage.documents/document/primary:Download
+                String sUri = uri.toString();
+                if (sUri.contains("content://com.android.externalstorage.documents")) {
+                    return sUri.replace("content://com.android.externalstorage.documents/document/primary:", "/storage/emulated/0/");
                 }
             }
         }
@@ -131,6 +153,7 @@ public class MainActivity extends FlutterActivity {
         }
         return null;
     }
+
 
     private static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
