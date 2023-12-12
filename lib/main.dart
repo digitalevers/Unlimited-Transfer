@@ -32,7 +32,6 @@ void main() async {
   // box.get('username') ?? box.put('username', '${Platform.localHostname} user');
   // box.get('queryPackages') ?? box.put('queryPackages', false);
   // GetIt getIt = GetIt.instance;
-
   if(useProxy){
     HttpOverrides.global = MyHttpOverrides(); // 使用自己的HttpOverrides
   }

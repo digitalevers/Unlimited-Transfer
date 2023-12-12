@@ -1,7 +1,7 @@
 bool debug = true;
 bool useProxy = false;
-String PROXY = "192.168.2.109:8888";
-//String testServer = "192.168.2.106";
+String PROXY = "192.168.2.109:8888";    //172.16.29.226
+//String testServer = "192.168.2.109";
 int httpServerPort = 8888;
 //UDP广播和接收数据端口
 int udpPort = 10000;
