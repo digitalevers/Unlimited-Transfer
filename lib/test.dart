@@ -72,7 +72,8 @@ void main() async {//注意：需要添加async，因为await必须在async方�
 
   //  await testasync().then((param)=>{print(param)});
   //  print('end');
-  print(formatFileSize2(1210000674));
+  print(recursionFormatFileSize(1210000674));
+  print(recursionFormatFileSize(2565));
 }
 
 String formatFileSize(int fileSizeBytes){
@@ -85,7 +86,7 @@ String formatFileSize(int fileSizeBytes){
   return "$formatedFileSize${units[power]}";
 }
 
-String formatFileSize2(double fileSizeBytes,{int deep = 0}){
+String recursionFormatFileSize(double fileSizeBytes,{int deep = 0}){
   List<String> units = ['Bytes','KB','MB','GB','TB'];
   
   if(fileSizeBytes < 1000){
@@ -93,7 +94,7 @@ String formatFileSize2(double fileSizeBytes,{int deep = 0}){
   } else {
     ++deep;
     double temp = double.parse((fileSizeBytes / 1000).toStringAsFixed(1));
-    return formatFileSize2(temp,deep: deep);
+    return recursionFormatFileSize(temp,deep: deep);
   }
 }
 
