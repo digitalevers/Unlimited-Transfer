@@ -116,7 +116,6 @@ class Server {
             // }
 
             //3、流式写入文件 不会产生OOM
-            //print('receive file');
             const uploadDirectory = './upload';
             //String filename = request.headers['filename']![0];
             String filename = 'test123.jpg';

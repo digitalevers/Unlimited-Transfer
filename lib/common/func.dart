@@ -157,10 +157,11 @@ void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<St
 
 
 //发送文件
+//TODO 发送多个文件
 void sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String?>? filelist_) async {
   String filePath = Uri.decodeComponent(filelist_![0]!);
-  var file = File(filePath); 
-  var uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
+  File file = File(filePath); 
+  Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
   HttpClientRequest request = await  client.postUrl(uri);
   //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
   //request.headers.set("filename", p.basename(applist[0]!));
@@ -170,7 +171,7 @@ void sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String
   var result = await response.transform(utf8.decoder).join();
 
   Log(result, StackTrace.current);
-  client.close();
+  //client.close();
 }
 
 

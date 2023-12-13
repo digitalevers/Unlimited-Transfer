@@ -2,6 +2,7 @@ package com.example.woniu;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.res.AssetFileDescriptor;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +16,12 @@ import android.provider.MediaStore;
 import android.webkit.MimeTypeMap;
 import android.provider.OpenableColumns;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -88,26 +95,45 @@ public class MainActivity extends FlutterActivity {
                         return path;
                     }
                 } else if (isDownloadsDocument(uri)) {
-                    
-                    // DownloadsProvider  content://com.android.providers.downloads.documents/document/1198  content://downloads/public_downloads
+                    // DownloadsProvider 
                     final String id = DocumentsContract.getDocumentId(uri);
-                    final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://com.android.providers.downloads.documents/document/msf:"), 164577);
-                    //System.out.println(contentUri);
-
-                    Cursor cursor = context.getContentResolver().query(Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A164577"), null, null, null, null);
-                    if (cursor != null) {
-                        if (cursor.moveToFirst()) {
-                            int columnIndex = cursor.getColumnIndexOrThrow("_display_name");
-                            path = cursor.getString(columnIndex);
+                    //Android12 适配(只能返回文件名 无法获取文件路径 但是可以使用 openAssetFileDescriptor 直接读取文件文件 参见flutter插件 uri_to_file 的Android源代码)
+                    //Android12及以上 都先复制到私域空间然后返回以/data/data开头的私域路径
+                    if(Build.VERSION.SDK_INT >= 31){
+                        //System.out.println(uri);
+                        Uri contentUri = null;
+                        if(id.contains(":")){
+                            String[] split = id.split(":");
+                            contentUri = Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A"+split[1]);
+                        } else {
+                            contentUri = ContentUris.withAppendedId(Uri.parse("content://com.android.providers.downloads.documents/document"), Long.valueOf(id));
+                        } 
+                        //System.out.println(contentUri);
+                        Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                int columnIndex = cursor.getColumnIndexOrThrow("_display_name");
+                                String fileName = cursor.getString(columnIndex);
+                                //System.out.println(fileName);
+                                if(fileName != null && !fileName.isEmpty()) {
+                                    String name = fileName.substring(0, fileName.lastIndexOf('.'));
+                                    String ext = fileName.substring(fileName.lastIndexOf('.'));
+                                    try {
+                                        path = copyFileToPrivateSpace(context, contentUri, name, ext);
+                                    } catch (Exception e){
+                                        System.out.println(e.getMessage());
+                                    }
+                                } else {
+                                    System.out.println("file name is empty");
+                                }
+                            }
+                            cursor.close();
                         }
-                        cursor.close();
+                    } else {
+                        final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(id));
+                        path = getDataColumn(context, contentUri, null, null);
                     }
-
-
-                    //path = getDataColumn(context, contentUri, null, null);
-
                     return path;
-
                 } else if (isMediaDocument(uri)) {
                     // MediaProvider
                     final String docId = DocumentsContract.getDocumentId(uri);
@@ -127,7 +153,6 @@ public class MainActivity extends FlutterActivity {
                     return path;
                 }
             } else {
-                System.out.println(2);
                 // content://com.android.externalstorage.documents/document/primary:Download
                 String sUri = uri.toString();
                 if (sUri.contains("content://com.android.externalstorage.documents")) {
@@ -156,6 +181,35 @@ public class MainActivity extends FlutterActivity {
     }
 
 
+    /**
+     * copy file from /downloads to /data/data
+     */
+    private static String copyFileToPrivateSpace(Context context,Uri uri,String name,String ext) throws IOException {
+        AssetFileDescriptor assetFileDescriptor = context.getContentResolver().openAssetFileDescriptor(uri, "r");
+        //System.out.println(assetFileDescriptor.getFileDescriptor().toString());
+        FileChannel inputChannel = new FileInputStream(assetFileDescriptor.getFileDescriptor()).getChannel();
+
+        File parent = new File(context.getFilesDir() + File.separator + "uri_to_file");
+        parent.mkdirs();
+
+        File file = new File(context.getFilesDir() + File.separator + "uri_to_file" + File.separator + name + ext);
+        file.deleteOnExit();
+
+        FileChannel outputChannel = new FileOutputStream(file).getChannel();
+
+        long bytesTransferred = 0;
+        while (bytesTransferred < inputChannel.size()) {
+            bytesTransferred += outputChannel.transferFrom(inputChannel, bytesTransferred, inputChannel.size());
+        }
+
+        final String filepath = file.getCanonicalPath();
+        if(filepath != null && !filepath.isEmpty()) {
+            return filepath;
+        } else {
+            throw new IOException("Unable to fetch filepath");
+        }
+    }
+
     private static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
@@ -166,70 +220,5 @@ public class MainActivity extends FlutterActivity {
 
     private static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
-    }
-
-
-    public void fromUri(MethodChannel.Result result, String uriString) {
-        try {
-            if(uriString != null) {
-                Uri uri = parseUri(uriString);
-                if (uri != null) {
-                    String scheme = uri.getScheme();
-                    if (scheme != null && scheme.equals(ContentResolver.SCHEME_CONTENT)) {
-                        String fileName = getFileName(uri);
-                        //copyFile(result, uri, fileName);
-                    } else {
-                        //sendUnsupportedUriMessage(result);
-                    }
-                } else {
-                    //sendUnsupportedUriMessage(result);
-                }
-            } else {
-                //sendUnsupportedUriMessage(result);
-            }
-        } catch (Exception ex) {
-            //sendErrorMessage(result, ex.getMessage());
-        }
-    }
-
-    private Uri parseUri(String uriString) {
-        try {
-            return Uri.parse(uriString);
-        } catch (Exception ex) {
-            //Log.e(TAG, "Failed to parse uri: " + ex.toString());
-        }
-        return null;
-    }
-
-    private String getFileName(Uri uri) {
-        String filename = null;
-
-        try {
-            Cursor cursor = getApplicationContext().getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                    if (index != -1) {
-                        filename = cursor.getString(index);
-                    }
-                }
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
-            }
-
-            if(filename == null || filename.isEmpty()) {
-                filename = uri.getLastPathSegment();
-            }
-        } catch (Exception ex) {
-            //Log.e(TAG, "Failed to get file name: " + ex.toString());
-        }
-
-        if (filename == null || filename.isEmpty()) {
-            filename = "" + new Random().nextInt(100000);
-        }
-
-        return filename;
     }
 }
