@@ -16,6 +16,7 @@ import android.webkit.MimeTypeMap;
 import android.provider.OpenableColumns;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import io.flutter.embedding.android.FlutterActivity;    //新版SDK
 //import io.flutter.app.FlutterActivity;    //旧版SDK
@@ -93,7 +94,7 @@ public class MainActivity extends FlutterActivity {
                     final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://com.android.providers.downloads.documents/document/msf:"), 164577);
                     //System.out.println(contentUri);
 
-                    Cursor cursor = context.getContentResolver().query(Uri.parse("content://com.android.providers.downloads.documents/document/164577"), null, null, null, null);
+                    Cursor cursor = context.getContentResolver().query(Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A164577"), null, null, null, null);
                     if (cursor != null) {
                         if (cursor.moveToFirst()) {
                             int columnIndex = cursor.getColumnIndexOrThrow("_display_name");
@@ -166,5 +167,69 @@ public class MainActivity extends FlutterActivity {
     private static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
- 
+
+
+    public void fromUri(MethodChannel.Result result, String uriString) {
+        try {
+            if(uriString != null) {
+                Uri uri = parseUri(uriString);
+                if (uri != null) {
+                    String scheme = uri.getScheme();
+                    if (scheme != null && scheme.equals(ContentResolver.SCHEME_CONTENT)) {
+                        String fileName = getFileName(uri);
+                        //copyFile(result, uri, fileName);
+                    } else {
+                        //sendUnsupportedUriMessage(result);
+                    }
+                } else {
+                    //sendUnsupportedUriMessage(result);
+                }
+            } else {
+                //sendUnsupportedUriMessage(result);
+            }
+        } catch (Exception ex) {
+            //sendErrorMessage(result, ex.getMessage());
+        }
+    }
+
+    private Uri parseUri(String uriString) {
+        try {
+            return Uri.parse(uriString);
+        } catch (Exception ex) {
+            //Log.e(TAG, "Failed to parse uri: " + ex.toString());
+        }
+        return null;
+    }
+
+    private String getFileName(Uri uri) {
+        String filename = null;
+
+        try {
+            Cursor cursor = getApplicationContext().getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (index != -1) {
+                        filename = cursor.getString(index);
+                    }
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+
+            if(filename == null || filename.isEmpty()) {
+                filename = uri.getLastPathSegment();
+            }
+        } catch (Exception ex) {
+            //Log.e(TAG, "Failed to get file name: " + ex.toString());
+        }
+
+        if (filename == null || filename.isEmpty()) {
+            filename = "" + new Random().nextInt(100000);
+        }
+
+        return filename;
+    }
 }
