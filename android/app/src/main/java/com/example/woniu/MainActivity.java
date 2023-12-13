@@ -84,17 +84,20 @@ public class MainActivity extends FlutterActivity {
         }
         // 4.4及之后的 是以 content:// 开头的，比如 content://com.android.providers.media.documents/document/image%3A235700
         if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme()) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (DocumentsContract.isDocumentUri(context, uri)) {
+            //if (DocumentsContract.isDocumentUri(context, uri)) {
                 if (isExternalStorageDocument(uri)) {
+                    ///System.out.println("isExternalStorageDocument-"+uri.toString());
                     // ExternalStorageProvider
                     final String docId = DocumentsContract.getDocumentId(uri);
-                    final String[] split = docId.split(":");
-                    final String type = split[0];
-                    if ("primary".equalsIgnoreCase(type)) {
-                        path = Environment.getExternalStorageDirectory() + "/" + split[1];
+                    final String[] docIdSplit = docId.split(":");
+                    final String[] uriSplit = uri.toString().split(":");
+                    if ("primary".equalsIgnoreCase(docIdSplit[0])) {
+                        path = Environment.getExternalStorageDirectory() + "/" + uriSplit[2];
                         return path;
                     }
+                    
                 } else if (isDownloadsDocument(uri)) {
+                    System.out.println("isDownloadsDocument-"+uri.toString());
                     // DownloadsProvider 
                     final String id = DocumentsContract.getDocumentId(uri);
                     //Android12 适配(只能返回文件名 无法获取文件路径 但是可以使用 openAssetFileDescriptor 直接读取文件文件 参见flutter插件 uri_to_file 的Android源代码)
@@ -135,6 +138,7 @@ public class MainActivity extends FlutterActivity {
                     }
                     return path;
                 } else if (isMediaDocument(uri)) {
+                    System.out.println("isMediaDocument-"+uri.toString());
                     // MediaProvider
                     final String docId = DocumentsContract.getDocumentId(uri);
                     final String[] split = docId.split(":");
@@ -152,13 +156,9 @@ public class MainActivity extends FlutterActivity {
                     path = getDataColumn(context, contentUri, selection, selectionArgs);
                     return path;
                 }
-            } else {
-                // content://com.android.externalstorage.documents/document/primary:Download
-                String sUri = uri.toString();
-                if (sUri.contains("content://com.android.externalstorage.documents")) {
-                    return sUri.replace("content://com.android.externalstorage.documents/document/primary:", "/storage/emulated/0/");
-                }
-            }
+//            } else {
+
+//            }
         }
         return null;
     }

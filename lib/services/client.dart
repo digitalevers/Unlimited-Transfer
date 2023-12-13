@@ -78,14 +78,15 @@ class Sender{
         //print(fileList![i]);
 
         //第二种方式 使用 Android Api 转译地址来访问文件
+ 
         fileList![i] = Uri.decodeComponent(fileList![i]!);
         const platform = MethodChannel("AndroidApi");
         String originFilePath = await platform.invokeMethod("getOriginFilePathByUri",[fileList![i]]);
         fileList![i] = originFilePath;
-        //print(originFilePath);
+        //print(fileList![i]!);
       }
-      
     }
+  
     return fileList;
   }
 

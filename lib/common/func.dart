@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
+import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:woniu/controllers/controllers.dart';
@@ -143,7 +144,17 @@ void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<St
     Map resMap = jsonDecode(result);
     if(resMap['code'] == HttpResponseCode.acceptFile){
       preSendFile();
-      sendFile(client_, serverIP_, serverPort_, fileList_);
+      sendFile(client_, serverIP_, serverPort_, fileList_).then((value) {
+        //TODO 删除复制到 /data/data 目录的文件
+        //print("发送完毕");
+        CherryToast.warning(
+          title:  const Text("发送完毕"),
+          toastPosition: Position.top,
+          displayCloseButton:false,
+          actionHandler:(){},
+          animationDuration: const Duration(milliseconds:  500),
+        ).show(context_);
+      });
     } else {
       CherryToast.warning(
         title:  Text(HttpResponseCodeMsg[resMap['code']]!),
@@ -160,7 +171,7 @@ void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<St
 
 //发送文件
 //TODO 发送多个文件
-void sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String?>? filelist_) async {
+Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String?>? filelist_) async {
   String filePath = Uri.decodeComponent(filelist_![0]!);
   File file = File(filePath); 
   Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
@@ -170,9 +181,10 @@ void sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String
   await request.addStream(file.openRead());
   
   HttpClientResponse response = await request.close();
-  var result = await response.transform(utf8.decoder).join();
+  String result = await response.transform(utf8.decoder).join();
 
   Log(result, StackTrace.current);
+  return result;
   //client.close();
 }
 
