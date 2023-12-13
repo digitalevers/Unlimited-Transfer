@@ -6,6 +6,8 @@ import 'dart:math';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:woniu/controllers/controllers.dart';
+import 'package:path/path.dart' as p;
+
 import 'commclass.dart';
 import 'config.dart';
 import 'dart:convert';
@@ -164,7 +166,7 @@ void sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String
   Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
   HttpClientRequest request = await  client.postUrl(uri);
   //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
-  //request.headers.set("filename", p.basename(applist[0]!));
+  request.headers.set("filename", p.basename(filePath));
   await request.addStream(file.openRead());
   
   HttpClientResponse response = await request.close();

@@ -63,10 +63,10 @@ class Server {
                 //弹出提示框
                 ServerIfReceiveFile res = await ifReceiveFile(key.currentContext,fileCount,fileSize);
                 if(res == ServerIfReceiveFile.reject){
-                  request.response.write(jsonEncode({'code': HttpResponseCode.rejectFile})); //向客户端发送拒收消息
+                  request.response.write(jsonEncode({'code': HttpResponseCode.rejectFile})); //告知客户端 "拒收"
                   _serverStatus = ServerStatus.idle;
                 } else {
-                  request.response.write(jsonEncode({'code': HttpResponseCode.acceptFile})); //向客户端发送接收消息
+                  request.response.write(jsonEncode({'code': HttpResponseCode.acceptFile})); //告知客户端 "接收"
                   _serverStatus = ServerStatus.waiting;
                 }
               }
@@ -117,18 +117,16 @@ class Server {
 
             //3、流式写入文件 不会产生OOM
             const uploadDirectory = './upload';
-            //String filename = request.headers['filename']![0];
-            String filename = 'test123.jpg';
+            String filename = request.headers['filename']![0];
             //File file = File('$uploadDirectory/$filename');
             File file = File('/storage/emulated/0/Download/$filename');
-            //print(file);
-            var sink = file.openWrite(mode: FileMode.append);
+
+            IOSink sink = file.openWrite(mode: FileMode.append);
             await sink.addStream(request);
-                    // await for (Uint8List data in request) {
-                    //   sink.write(data);
-                    // }
             await sink.flush();
             await sink.close();
+            //文件传输完毕 服务器置为空闲状态
+            _serverStatus = ServerStatus.idle;
           } else {
             // print("server");
             // //uri should be in format http://ip:port/secretcode/file-index
