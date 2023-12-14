@@ -1,5 +1,7 @@
 package com.example.woniu;
 
+import static android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY;
+
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.res.AssetFileDescriptor;
@@ -12,6 +14,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.DocumentsContract;
+import android.provider.DocumentsProvider;
 import android.provider.MediaStore;
 import android.webkit.MimeTypeMap;
 import android.provider.OpenableColumns;
@@ -106,12 +109,12 @@ public class MainActivity extends FlutterActivity {
                 } else if (isDownloadsDocument(uri)) {
                     System.out.println("isDownloadsDocument-"+uri.toString());
                     // DownloadsProvider 
-                    final String id = DocumentsContract.getDocumentId(uri);
+                    String id = DocumentsContract.getDocumentId(uri);
                     //Android12 适配(只能返回文件名 无法获取文件路径 但是可以使用 openAssetFileDescriptor 直接读取文件文件 参见flutter插件 uri_to_file 的Android源代码)
                     //Android12及以上 都先复制到私域空间然后返回以/data/data开头的私域路径
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
                         //System.out.println(uri);
-                        Uri contentUri = null;
+                        /*Uri contentUri = null;
                         if(id.contains(":")){
                             String[] split = id.split(":");
                             contentUri = Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A"+split[1]);
@@ -139,7 +142,44 @@ public class MainActivity extends FlutterActivity {
                                 }
                             }
                             cursor.close();
+                        }*/
+
+                        if(id.contains("msf:")){
+                            id = id.replaceAll("msf:","");
                         }
+                        Cursor cursor = context.getContentResolver().query(
+                                //MediaStore.Downloads.getContentUri("internal"),
+                                Uri.parse("content://com.android.providers.downloads.documents/document"),
+                                null,
+                                null,
+                                null,
+                                null
+                        );
+                        /*if (cursor != null && cursor.moveToFirst()) {
+                            for(int i = 0;;i++) {
+                                int _id_index = cursor.getColumnIndexOrThrow("_id");
+                                int _data_index = cursor.getColumnIndexOrThrow("_data");
+                                int document_id_index = cursor.getColumnIndexOrThrow("bucket_id");
+                                System.out.println(cursor.getInt(_id_index) +
+                                        "-" + cursor.getString(_data_index) +
+                                        "-" + cursor.getString(document_id_index)
+                                );
+                                boolean move = cursor.moveToNext();
+                                if(move == false){
+                                    break;
+                                }
+                            }
+                        }*/
+
+                        /*for(int index = 0; index < cursor.getColumnCount(); index++){
+                            System.out.println(cursor.getString(index) + "||");
+                        }*/
+
+                        String[] name = cursor.getColumnNames();
+                        for (int i = 0; i < name.length; i ++){
+                            System.out.println(name[i]);
+                        }
+
                     } else {
                         //content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/34d4724ef96b1088.jpg
                         String[] idSplit = id.split(":");
