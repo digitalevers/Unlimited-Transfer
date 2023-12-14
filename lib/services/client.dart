@@ -83,7 +83,7 @@ class Sender{
         const platform = MethodChannel("AndroidApi");
         String originFilePath = await platform.invokeMethod("getOriginFilePathByUri",[fileList![i]]);
         fileList![i] = originFilePath;
-        //print(fileList![i]!);
+        print(fileList![i]!);
       }
     }
   

@@ -62,7 +62,7 @@ public class MainActivity extends FlutterActivity {
 
     public static String getOriginFilePathByUri(Uri uri,Context context) {
         //System.out.println(uri);
-        String path = null;
+        String path = "";
         // 以 file:// 开头的
         if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
             path = uri.getPath();
@@ -89,20 +89,27 @@ public class MainActivity extends FlutterActivity {
                     ///System.out.println("isExternalStorageDocument-"+uri.toString());
                     // ExternalStorageProvider
                     final String docId = DocumentsContract.getDocumentId(uri);
+                    //System.out.println(uri);
                     final String[] docIdSplit = docId.split(":");
                     final String[] uriSplit = uri.toString().split(":");
+                    String basename = "";
+                    for(int i = 2;i < uriSplit.length; i++){
+                        basename += uriSplit[i];
+                    }
                     if ("primary".equalsIgnoreCase(docIdSplit[0])) {
-                        path = Environment.getExternalStorageDirectory() + "/" + uriSplit[2];
+                        path = Environment.getExternalStorageDirectory() + "/" + basename;
+                        return path;
+                    } else if("home".equalsIgnoreCase(docIdSplit[0])){
+                        path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/" + basename;
                         return path;
                     }
-                    
                 } else if (isDownloadsDocument(uri)) {
                     System.out.println("isDownloadsDocument-"+uri.toString());
                     // DownloadsProvider 
                     final String id = DocumentsContract.getDocumentId(uri);
                     //Android12 适配(只能返回文件名 无法获取文件路径 但是可以使用 openAssetFileDescriptor 直接读取文件文件 参见flutter插件 uri_to_file 的Android源代码)
                     //Android12及以上 都先复制到私域空间然后返回以/data/data开头的私域路径
-                    if(Build.VERSION.SDK_INT >= 31){
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
                         //System.out.println(uri);
                         Uri contentUri = null;
                         if(id.contains(":")){
@@ -113,6 +120,7 @@ public class MainActivity extends FlutterActivity {
                         } 
                         //System.out.println(contentUri);
                         Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
+
                         if (cursor != null) {
                             if (cursor.moveToFirst()) {
                                 int columnIndex = cursor.getColumnIndexOrThrow("_display_name");
@@ -133,8 +141,16 @@ public class MainActivity extends FlutterActivity {
                             cursor.close();
                         }
                     } else {
-                        final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(id));
-                        path = getDataColumn(context, contentUri, null, null);
+                        //content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/34d4724ef96b1088.jpg
+                        String[] idSplit = id.split(":");
+                        String[] uriSplit = uri.toString().split(":");
+                        if("raw".equalsIgnoreCase(idSplit[0])){
+                            for(int i = 2; i < uriSplit.length; i++){
+                                path += uriSplit[i];
+                            }
+                        }
+                        //final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(id));
+                        //path = getDataColumn(context, contentUri, null, null);
                     }
                     return path;
                 } else if (isMediaDocument(uri)) {
