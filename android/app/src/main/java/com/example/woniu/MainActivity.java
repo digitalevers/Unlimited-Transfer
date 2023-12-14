@@ -148,15 +148,15 @@ public class MainActivity extends FlutterActivity {
                             id = id.replaceAll("msf:","");
                         }
                         Cursor cursor = context.getContentResolver().query(
-                                //MediaStore.Downloads.getContentUri("internal"),
-                                Uri.parse("content://com.android.providers.downloads.documents/document"),
+                                //MediaStore.Files.getContentUri("external"),
+                                Uri.parse("content://com.android.providers.downloads.documents/document/9"),
                                 null,
                                 null,
                                 null,
                                 null
                         );
-                        /*if (cursor != null && cursor.moveToFirst()) {
-                            for(int i = 0;;i++) {
+                        if (cursor != null && cursor.moveToFirst()) {
+                            /*for(int i = 0;;i++) {
                                 int _id_index = cursor.getColumnIndexOrThrow("_id");
                                 int _data_index = cursor.getColumnIndexOrThrow("_data");
                                 int document_id_index = cursor.getColumnIndexOrThrow("bucket_id");
@@ -168,29 +168,66 @@ public class MainActivity extends FlutterActivity {
                                 if(move == false){
                                     break;
                                 }
-                            }
-                        }*/
-
-                        /*for(int index = 0; index < cursor.getColumnCount(); index++){
-                            System.out.println(cursor.getString(index) + "||");
-                        }*/
-
-                        String[] name = cursor.getColumnNames();
+                            }*/
+                            /*for(int index = 0; index < cursor.getColumnCount(); index++){
+                                System.out.println(cursor.getString(index) + "||");
+                            }*/
+                        }
+                        /*String[] name = cursor.getColumnNames();
                         for (int i = 0; i < name.length; i ++){
                             System.out.println(name[i]);
-                        }
-
+                        }*/
                     } else {
-                        //content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/34d4724ef96b1088.jpg
-                        String[] idSplit = id.split(":");
-                        String[] uriSplit = uri.toString().split(":");
-                        if("raw".equalsIgnoreCase(idSplit[0])){
-                            for(int i = 2; i < uriSplit.length; i++){
-                                path += uriSplit[i];
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                            //Android 10
+                            //content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/34d4724ef96b1088.jpg
+                            String[] idSplit = id.split(":");
+                            String[] uriSplit = uri.toString().split(":");
+                            if("raw".equalsIgnoreCase(idSplit[0])){
+                                for(int i = 2; i < uriSplit.length; i++){
+                                    path += uriSplit[i];
+                                }
                             }
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                            //Android 7
+                            //final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://com.android.providers.downloads.documents/document/"),Long.valueOf(id));
+                            //path = getDataColumn(context, contentUri, null, null);
+                            Cursor cursor = context.getContentResolver().query(
+                                    //MediaStore.Files.getContentUri("internal"),
+                                    ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(9)),
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                            );
+
+                            if (cursor != null && cursor.moveToFirst()) {
+                                /*for(int i = 0;;i++) {
+                                    int _id_index = cursor.getColumnIndexOrThrow("_id");
+                                    int _data_index = cursor.getColumnIndexOrThrow("_data");
+                                    int document_id_index = cursor.getColumnIndexOrThrow("bucket_id");
+                                    System.out.println(cursor.getInt(_id_index) +
+                                            "-" + cursor.getString(_data_index) +
+                                            "-" + cursor.getString(document_id_index)
+                                    );
+                                    boolean move = cursor.moveToNext();
+                                    if(move == false){
+                                        break;
+                                    }
+                                }*/
+                                for(int index = 0; index < cursor.getColumnCount(); index++){
+                                    System.out.println(cursor.getString(index) + "||");
+                                }
+                            } else {
+                                System.out.println("cursor is null");
+                            }
+
+                            /*String[] name = cursor.getColumnNames();
+                            for (int i = 0; i < name.length; i ++){
+                                System.out.println(name[i]);
+                            }*/
+                            //System.out.println(cursor.getColumnCount());
                         }
-                        //final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(id));
-                        //path = getDataColumn(context, contentUri, null, null);
                     }
                     return path;
                 } else if (isMediaDocument(uri)) {
