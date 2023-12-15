@@ -148,15 +148,17 @@ public class MainActivity extends FlutterActivity {
                             id = id.replaceAll("msf:","");
                         }
                         Cursor cursor = context.getContentResolver().query(
-                                //MediaStore.Files.getContentUri("external"),
-                                Uri.parse("content://com.android.providers.downloads.documents/document/9"),
-                                null,
-                                null,
-                                null,
+                                Uri.parse("content://mediaDocument/external/file"), //content://media/external/file
+                                //Uri.parse("content://com.android.providers.downloads.documents/document/9"),
+                                new String[] { DocumentsContract.Document.COLUMN_FLAGS },
+                                null,    //"_id=?"
+                                null,   //new String[]{id}
                                 null
                         );
+                        //System.out.println(id);
+
                         if (cursor != null && cursor.moveToFirst()) {
-                            /*for(int i = 0;;i++) {
+                            for(int i = 0;;i++) {
                                 int _id_index = cursor.getColumnIndexOrThrow("_id");
                                 int _data_index = cursor.getColumnIndexOrThrow("_data");
                                 int document_id_index = cursor.getColumnIndexOrThrow("bucket_id");
@@ -168,10 +170,12 @@ public class MainActivity extends FlutterActivity {
                                 if(move == false){
                                     break;
                                 }
-                            }*/
+                            }
                             /*for(int index = 0; index < cursor.getColumnCount(); index++){
                                 System.out.println(cursor.getString(index) + "||");
                             }*/
+                        } else {
+                            System.out.println("cursor is null");
                         }
                         /*String[] name = cursor.getColumnNames();
                         for (int i = 0; i < name.length; i ++){
@@ -192,41 +196,7 @@ public class MainActivity extends FlutterActivity {
                             //Android 7
                             //final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://com.android.providers.downloads.documents/document/"),Long.valueOf(id));
                             //path = getDataColumn(context, contentUri, null, null);
-                            Cursor cursor = context.getContentResolver().query(
-                                    //MediaStore.Files.getContentUri("internal"),
-                                    ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(9)),
-                                    null,
-                                    null,
-                                    null,
-                                    null
-                            );
 
-                            if (cursor != null && cursor.moveToFirst()) {
-                                /*for(int i = 0;;i++) {
-                                    int _id_index = cursor.getColumnIndexOrThrow("_id");
-                                    int _data_index = cursor.getColumnIndexOrThrow("_data");
-                                    int document_id_index = cursor.getColumnIndexOrThrow("bucket_id");
-                                    System.out.println(cursor.getInt(_id_index) +
-                                            "-" + cursor.getString(_data_index) +
-                                            "-" + cursor.getString(document_id_index)
-                                    );
-                                    boolean move = cursor.moveToNext();
-                                    if(move == false){
-                                        break;
-                                    }
-                                }*/
-                                for(int index = 0; index < cursor.getColumnCount(); index++){
-                                    System.out.println(cursor.getString(index) + "||");
-                                }
-                            } else {
-                                System.out.println("cursor is null");
-                            }
-
-                            /*String[] name = cursor.getColumnNames();
-                            for (int i = 0; i < name.length; i ++){
-                                System.out.println(name[i]);
-                            }*/
-                            //System.out.println(cursor.getColumnCount());
                         }
                     }
                     return path;
