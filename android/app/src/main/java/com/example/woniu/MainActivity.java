@@ -147,24 +147,36 @@ public class MainActivity extends FlutterActivity {
                         if(id.contains("msf:")){
                             id = id.replaceAll("msf:","");
                         }
+                        
                         Cursor cursor = context.getContentResolver().query(
-                                Uri.parse("content://mediaDocument/external/file"), //content://media/external/file
+                                Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A163919"), //content://media/external/file
                                 //Uri.parse("content://com.android.providers.downloads.documents/document/9"),
-                                new String[] { DocumentsContract.Document.COLUMN_FLAGS },
+                                null,
                                 null,    //"_id=?"
                                 null,   //new String[]{id}
                                 null
                         );
-                        //System.out.println(id);
+                        /*String[] name = cursor.getColumnNames();
+                        for (int i = 0; i < name.length; i ++){
+                            System.out.println(name[i]);
+                        }*/
 
                         if (cursor != null && cursor.moveToFirst()) {
                             for(int i = 0;;i++) {
-                                int _id_index = cursor.getColumnIndexOrThrow("_id");
-                                int _data_index = cursor.getColumnIndexOrThrow("_data");
-                                int document_id_index = cursor.getColumnIndexOrThrow("bucket_id");
-                                System.out.println(cursor.getInt(_id_index) +
-                                        "-" + cursor.getString(_data_index) +
-                                        "-" + cursor.getString(document_id_index)
+                                int _id_index = cursor.getColumnIndexOrThrow("document_id");
+                                int _data_index = cursor.getColumnIndexOrThrow("mime_type");
+                                int document_id_index = cursor.getColumnIndexOrThrow("_display_name");
+                                int summary = cursor.getColumnIndexOrThrow("summary");
+                                int last_modified = cursor.getColumnIndexOrThrow("last_modified");
+                                int flags = cursor.getColumnIndexOrThrow("flags");
+                                int _size = cursor.getColumnIndexOrThrow("_size");
+                                System.out.println(cursor.getString(_id_index) +
+                                        "||" + cursor.getString(_data_index) +
+                                        "||" + cursor.getString(document_id_index) +
+                                        "||" + cursor.getString(summary) +
+                                        "||" + cursor.getString(last_modified) +
+                                        "||" + cursor.getString(flags) +
+                                        "||" + cursor.getString(_size)
                                 );
                                 boolean move = cursor.moveToNext();
                                 if(move == false){
@@ -177,10 +189,7 @@ public class MainActivity extends FlutterActivity {
                         } else {
                             System.out.println("cursor is null");
                         }
-                        /*String[] name = cursor.getColumnNames();
-                        for (int i = 0; i < name.length; i ++){
-                            System.out.println(name[i]);
-                        }*/
+                        
                     } else {
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
                             //Android 10
