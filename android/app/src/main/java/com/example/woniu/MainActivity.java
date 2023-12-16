@@ -1,5 +1,6 @@
 package com.example.woniu;
 
+import static android.database.Cursor.FIELD_TYPE_BLOB;
 import static android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY;
 
 import android.content.ContentResolver;
@@ -147,10 +148,12 @@ public class MainActivity extends FlutterActivity {
                         if(id.contains("msf:")){
                             id = id.replaceAll("msf:","");
                         }
-                        
                         Cursor cursor = context.getContentResolver().query(
-                                Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A163919"), //content://media/external/file
-                                //Uri.parse("content://com.android.providers.downloads.documents/document/9"),
+                                //Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A163919"),
+                                //Uri.parse("content://media/external_primary/files"),
+                                //MediaStore.Downloads.INTERNAL_CONTENT_URI,
+                                //Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A32"),
+                                Uri.parse("content://com.android.providers.media.documents/"),
                                 null,
                                 null,    //"_id=?"
                                 null,   //new String[]{id}
@@ -160,10 +163,9 @@ public class MainActivity extends FlutterActivity {
                         for (int i = 0; i < name.length; i ++){
                             System.out.println(name[i]);
                         }*/
-
                         if (cursor != null && cursor.moveToFirst()) {
                             for(int i = 0;;i++) {
-                                int _id_index = cursor.getColumnIndexOrThrow("document_id");
+                                /*int _id_index = cursor.getColumnIndexOrThrow("document_id");
                                 int _data_index = cursor.getColumnIndexOrThrow("mime_type");
                                 int document_id_index = cursor.getColumnIndexOrThrow("_display_name");
                                 int summary = cursor.getColumnIndexOrThrow("summary");
@@ -179,13 +181,28 @@ public class MainActivity extends FlutterActivity {
                                         "||" + cursor.getString(_size)
                                 );
                                 boolean move = cursor.moveToNext();
-                                if(move == false){
+                                if (move == false) {
+                                    break;
+                                }*/
+                                String line = "";
+                                for(int index = 0; index < cursor.getColumnCount(); index++){
+                                    if(cursor.getType(index) == FIELD_TYPE_BLOB){
+                                        continue;
+                                    } else if (cursor.getString(index) == null) {
+                                        continue;
+                                    }
+                                    /*if(!cursor.getColumnName(index).equals("_id") && !cursor.getColumnName(index).equals("_data")){
+                                        continue;
+                                    }*/
+                                    line += cursor.getString(index) + "--" + cursor.getColumnName(index) + "||";
+                                }
+                                System.out.println(line);
+                                //System.out.println(cursor.getColumnIndexOrThrow("_id") + "||"+cursor.getColumnIndexOrThrow("_data"));
+                                boolean move = cursor.moveToNext();
+                                if (move == false) {
                                     break;
                                 }
                             }
-                            /*for(int index = 0; index < cursor.getColumnCount(); index++){
-                                System.out.println(cursor.getString(index) + "||");
-                            }*/
                         } else {
                             System.out.println("cursor is null");
                         }
