@@ -26,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import io.flutter.embedding.android.FlutterActivity;    //新版SDK
@@ -88,11 +90,10 @@ public class MainActivity extends FlutterActivity {
         // 4.4及之后的 是以 content:// 开头的，比如 content://com.android.providers.media.documents/document/image%3A235700
         if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme()) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //if (DocumentsContract.isDocumentUri(context, uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
                 if (isExternalStorageDocument(uri)) {
                     ///System.out.println("isExternalStorageDocument-"+uri.toString());
                     // ExternalStorageProvider
-                    final String docId = DocumentsContract.getDocumentId(uri);
-                    //System.out.println(uri);
                     final String[] docIdSplit = docId.split(":");
                     final String[] uriSplit = uri.toString().split(":");
                     String basename = "";
@@ -108,111 +109,29 @@ public class MainActivity extends FlutterActivity {
                     }
                 } else if (isDownloadsDocument(uri)) {
                     System.out.println("isDownloadsDocument-"+uri.toString());
-                    // DownloadsProvider 
-                    String id = DocumentsContract.getDocumentId(uri);
-                    //Android12 适配(只能返回文件名 无法获取文件路径 但是可以使用 openAssetFileDescriptor 直接读取文件文件 参见flutter插件 uri_to_file 的Android源代码)
-                    //Android12及以上 都先复制到私域空间然后返回以/data/data开头的私域路径
+                    // DownloadsProvider
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
-                        //System.out.println(uri);
-                        /*Uri contentUri = null;
-                        if(id.contains(":")){
-                            String[] split = id.split(":");
-                            contentUri = Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A"+split[1]);
-                        } else {
-                            contentUri = ContentUris.withAppendedId(Uri.parse("content://com.android.providers.downloads.documents/document"), Long.valueOf(id));
-                        } 
-                        //System.out.println(contentUri);
-                        Cursor cursor = context.getContentResolver().query(contentUri, null, null, null, null);
-
-                        if (cursor != null) {
-                            if (cursor.moveToFirst()) {
-                                int columnIndex = cursor.getColumnIndexOrThrow("_display_name");
-                                String fileName = cursor.getString(columnIndex);
-                                //System.out.println(fileName);
-                                if(fileName != null && !fileName.isEmpty()) {
-                                    String name = fileName.substring(0, fileName.lastIndexOf('.'));
-                                    String ext = fileName.substring(fileName.lastIndexOf('.'));
-                                    try {
-                                        path = copyFileToPrivateSpace(context, contentUri, name, ext);
-                                    } catch (Exception e){
-                                        System.out.println(e.getMessage());
-                                    }
-                                } else {
-                                    System.out.println("file name is empty");
-                                }
-                            }
-                            cursor.close();
-                        }*/
-
-                        if(id.contains("msf:")){
-                            id = id.replaceAll("msf:","");
-                        }
-                        
-                        Cursor cursor = context.getContentResolver().query(
-                                Uri.parse("content://com.android.providers.downloads.documents/document/msf%3A163919"), //content://media/external/file
-                                //Uri.parse("content://com.android.providers.downloads.documents/document/9"),
-                                null,
-                                null,    //"_id=?"
-                                null,   //new String[]{id}
-                                null
-                        );
-                        /*String[] name = cursor.getColumnNames();
-                        for (int i = 0; i < name.length; i ++){
-                            System.out.println(name[i]);
-                        }*/
-
-                        if (cursor != null && cursor.moveToFirst()) {
-                            for(int i = 0;;i++) {
-                                int _id_index = cursor.getColumnIndexOrThrow("document_id");
-                                int _data_index = cursor.getColumnIndexOrThrow("mime_type");
-                                int document_id_index = cursor.getColumnIndexOrThrow("_display_name");
-                                int summary = cursor.getColumnIndexOrThrow("summary");
-                                int last_modified = cursor.getColumnIndexOrThrow("last_modified");
-                                int flags = cursor.getColumnIndexOrThrow("flags");
-                                int _size = cursor.getColumnIndexOrThrow("_size");
-                                System.out.println(cursor.getString(_id_index) +
-                                        "||" + cursor.getString(_data_index) +
-                                        "||" + cursor.getString(document_id_index) +
-                                        "||" + cursor.getString(summary) +
-                                        "||" + cursor.getString(last_modified) +
-                                        "||" + cursor.getString(flags) +
-                                        "||" + cursor.getString(_size)
-                                );
-                                boolean move = cursor.moveToNext();
-                                if(move == false){
-                                    break;
-                                }
-                            }
-                            /*for(int index = 0; index < cursor.getColumnCount(); index++){
-                                System.out.println(cursor.getString(index) + "||");
-                            }*/
-                        } else {
-                            System.out.println("cursor is null");
-                        }
-                        
+                        path = getDocumentPrivateData(context, uri, docId);
                     } else {
+                        //Android 10 - content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/34d4724ef96b1088.jpg
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                            //Android 10
-                            //content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/34d4724ef96b1088.jpg
-                            String[] idSplit = id.split(":");
+                            String[] idSplit = docId.split(":");
                             String[] uriSplit = uri.toString().split(":");
-                            if("raw".equalsIgnoreCase(idSplit[0])){
-                                for(int i = 2; i < uriSplit.length; i++){
+                            if("raw".equalsIgnoreCase(idSplit[0])) {
+                                for (int i = 2; i < uriSplit.length; i++) {
                                     path += uriSplit[i];
                                 }
                             }
+                            //Android 7  content://com.android.providers.downloads.documents/document/123
                         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                            //Android 7
-                            //final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://com.android.providers.downloads.documents/document/"),Long.valueOf(id));
-                            //path = getDataColumn(context, contentUri, null, null);
-
+                            path = getDocumentPrivateData(context, uri, docId);
                         }
                     }
                     return path;
                 } else if (isMediaDocument(uri)) {
                     System.out.println("isMediaDocument-"+uri.toString());
                     // MediaProvider
-                    final String docId = DocumentsContract.getDocumentId(uri);
+                    //System.out.println(docId);
                     final String[] split = docId.split(":");
                     final String type = split[0];
                     Uri contentUri = null;
@@ -222,6 +141,10 @@ public class MainActivity extends FlutterActivity {
                         contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
                     } else if ("audio".equals(type)) {
                         contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                    } else if("document".equals(type)){
+                        //Android12 文档Uri content://com.android.providers.media.documents/document/document%3A129396 的处理
+                        path = getDocumentPrivateData(context, uri, docId);
+                        return path;
                     }
                     final String selection = "_id=?";
                     final String[] selectionArgs = new String[]{split[1]};
@@ -231,6 +154,9 @@ public class MainActivity extends FlutterActivity {
 //            } else {
 
 //            }
+        } else {
+            //4.4之前
+
         }
         return null;
     }
@@ -254,6 +180,52 @@ public class MainActivity extends FlutterActivity {
 
 
     /**
+     * Android12 适配(只能返回文件名 无法获取文件路径 但是可以使用 openAssetFileDescriptor 直接读取文件文件 参见flutter插件 uri_to_file 的Android源代码)
+     *
+     * 针对Android12 和 Android7 访问“下载内容”
+     * 返回的Uri形式为 content://com.android.providers.downloads.documents/document/1412
+     *             或content://com.android.providers.downloads.documents/document/msf:163919
+     * 以及Android12 访问"文档"
+     * 返回的Uri形式为 content://com.android.providers.media.documents/document/document:129396
+     * 这几种Uri形式都无法通过 provider 查询获得真正的file path，仅能获取到文件名
+     * 所以这个函数的目的就是使用Uri打开文件流，将文件复制到/data/data私域目录，然后返回私域目的的path file
+     *
+     * return 文件在私域中的路径
+     */
+    private static String getDocumentPrivateData(Context context,Uri uri,String docId){
+        String documentPrivateData = "";
+        uri = Uri.parse(uri.toString().replaceAll(docId,"") + Uri.encode(docId));
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int columnIndex = cursor.getColumnIndexOrThrow("_display_name");
+                String fileName = cursor.getString(columnIndex);
+                if(fileName != null && !fileName.isEmpty()) {
+                    String name = fileName.substring(0, fileName.lastIndexOf('.'));
+                    String ext = fileName.substring(fileName.lastIndexOf('.'));
+                    try {
+                        documentPrivateData = copyFileToPrivateSpace(context, uri, name, ext);
+                    } catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
+                } else {
+                    System.out.println("file name is empty");
+                }
+            }
+            cursor.close();
+        }
+
+        return documentPrivateData;
+    }
+
+    /**
+     * 针对Android12 和 Android7 访问“下载内容”
+     * 返回的Uri形式为 content://com.android.providers.downloads.documents/document/1412
+     *             或content://com.android.providers.downloads.documents/document/msf:163919
+     * 以及Android12 访问"文档"
+     * 返回的Uri形式为 content://com.android.providers.media.documents/document/document:129396
+     * 这几种Uri形式都无法通过 provider 查询获得真正的file path，仅能获取到文件名
+     * 所以这个函数的目的就是使用Uri打开文件流，将文件复制到/data/data私域目录，然后返回私域目的的path file
      * copy file from /downloads to /data/data
      */
     private static String copyFileToPrivateSpace(Context context,Uri uri,String name,String ext) throws IOException {
