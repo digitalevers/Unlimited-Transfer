@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:cherry_toast/resources/arrays.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +63,7 @@ class Server {
               if(fileCount > 0 && fileSize > 0){
                 _serverStatus = ServerStatus.decision;
                 //弹出提示框
-                ServerIfReceiveFile res = await ifReceiveFile(key.currentContext,fileCount,fileSize);
+                ServerIfReceiveFile res = await ifReceiveFile(key.currentContext, fileCount, fileSize);
                 if(res == ServerIfReceiveFile.reject){
                   request.response.write(jsonEncode({'code': HttpResponseCode.rejectFile})); //告知客户端 "拒收"
                   _serverStatus = ServerStatus.idle;
@@ -125,8 +127,15 @@ class Server {
             await sink.addStream(request);
             await sink.flush();
             await sink.close();
-            //文件传输完毕 服务器置为空闲状态
+            //文件传输完毕 服务器置为空闲状态 并弹窗接收完成提示
             _serverStatus = ServerStatus.idle;
+            CherryToast.info(
+              title:  const Text("接收完毕"),
+              toastPosition: Position.bottom,
+              displayCloseButton:false,
+              actionHandler:(){},
+              animationDuration: const Duration(milliseconds:  500),
+            ).show(key.currentContext as BuildContext);
           } else {
             // print("server");
             // //uri should be in format http://ip:port/secretcode/file-index

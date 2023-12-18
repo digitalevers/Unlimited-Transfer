@@ -106,7 +106,7 @@ bool pointInsideRect(Offset point,double top,double left,double itemWidth,double
 
 //发送文件的一些修饰工作
 void preSendFile(){
-
+  
 }
 
 String fommatFileSize(int fileSizeBytes){
@@ -120,8 +120,7 @@ String fommatFileSize(int fileSizeBytes){
 }
 
 //发送文件信息 客户端发送到服务端
-void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<String?>? fileList_, context_) async {
-  
+Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<String?>? fileList_, context_) async {
   int fileCount = fileList_!.length;  //待发送文件数量
   int fileSize = 0;                   //待发送文件大小 单位M
   for(int i = 0;i < fileCount;i++){
@@ -162,7 +161,7 @@ void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<St
         toastPosition: Position.bottom,
         displayCloseButton:false,
         actionHandler:(){},
-        //animationDuration: const Duration(milliseconds:  500),
+        //animationDuration: const Duration(milliseconds:  200),
       ).show(context_);
     }
   }

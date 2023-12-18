@@ -7,6 +7,7 @@ import 'pages/tabs.dart';
 import 'common/config.dart';
 import 'common/global_variable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 
 // 重写HttpOverrides
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'A Crossplatform File Transfer Tool'),
+      builder: BotToastInit(),  //bot_toast
     );
   }
 }

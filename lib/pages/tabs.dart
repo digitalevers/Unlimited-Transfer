@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'tabs/send_to_app.dart';
 import 'tabs/send_to_browser.dart';
@@ -129,9 +130,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
         }));
   }
 
-/**
- * 新手引导蒙层只显示一次
- */
+  /// 新手引导蒙层只显示一次
   Widget newerShowOneTime(){
       bool newer = prefs?.getBool("newer") ?? true;
       if(newer){
@@ -168,7 +167,9 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                   double left_ = remoteDevicesData[key]!['left'] + remoteDevicesOffset.dx;
                   if(pointInsideRect(offset, top_, left_, remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight)){
                     //print(key);
+                    BotToast.showText(text:"等待对方接收");
                     sendFileInfo(client, key, httpServerPort, fileList, myContext);
+                    ///cancel();
                     break;
                   }
                 }
