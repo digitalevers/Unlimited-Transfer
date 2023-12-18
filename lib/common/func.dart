@@ -119,7 +119,7 @@ String fommatFileSize(int fileSizeBytes){
   return "$formatedFileSize${units[power]}";
 }
 
-//发送文件信息
+//发送文件信息 客户端发送到服务端
 void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<String?>? fileList_, context_) async {
   
   int fileCount = fileList_!.length;  //待发送文件数量
@@ -147,9 +147,10 @@ void sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<St
       sendFile(client_, serverIP_, serverPort_, fileList_).then((value) {
         //TODO 删除复制到 /data/data 目录的文件
         //print("发送完毕");
-        CherryToast.warning(
+        //print(context_);
+        CherryToast.info(
           title:  const Text("发送完毕"),
-          toastPosition: Position.top,
+          toastPosition: Position.bottom,
           displayCloseButton:false,
           actionHandler:(){},
           animationDuration: const Duration(milliseconds:  500),

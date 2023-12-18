@@ -62,7 +62,8 @@ class _SendToAppState extends State<SendToApp>
   //如果显示widget重叠了 尝试重新生成widget的次数
   int createWidgetCount = 2;
   //本地设备和网络信息
-  Map deviceInfo = {'model': '', 'lanIP': '', 'networkText': ''};
+  Map deviceInfo = {'model': '', 'lanIP': '', 'networkText': '', 'deviceType': ''};
+  //Map deviceInfo = {};
 
   //动画控制器
   late AnimationController _animationController;
@@ -71,8 +72,7 @@ class _SendToAppState extends State<SendToApp>
   void initState() {
     super.initState();
     ////////////////创建动画
-    _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 2000));
+    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
     //添加到事件队列中
     Future.delayed(Duration.zero, () {
       //动画重复执行
@@ -82,14 +82,13 @@ class _SendToAppState extends State<SendToApp>
     initEnv();
     //界面build完成后执行回调函数
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      RenderBox renderBox =
-          remoteDevicesKey.currentContext?.findRenderObject() as RenderBox;
+      RenderBox renderBox = remoteDevicesKey.currentContext?.findRenderObject() as RenderBox;
       remoteDevicesOffset = renderBox.localToGlobal(Offset.zero);
       //print(positionRed);
     });
   }
 
-  void initEnv() async {
+  Future<void> initEnv() async {
     deviceInfo = await initGetInfo(listenConnectivityChanged);
     if (deviceInfo['network']['type'] == 'nowifi') {
       deviceInfo['networkText'] = '未接入WiFi';
@@ -99,8 +98,7 @@ class _SendToAppState extends State<SendToApp>
     if (deviceInfo['lanIP'].isEmpty) {
       deviceInfo['lanIP'] = "无法获取ip";
     }
-    if (deviceInfo['network']['type'] == 'wifi' &&
-        deviceInfo['lanIP'].isNotEmpty) {
+    if (deviceInfo['network']['type'] == 'wifi' && deviceInfo['lanIP'].isNotEmpty) {
       startUDP();
     }
     //启动HTTP SERVER并传入key 便于在server类中获取context
@@ -153,6 +151,26 @@ class _SendToAppState extends State<SendToApp>
     });
   }
 
+  //根据remote deviceType显示不同的系统icon(android ios windows)
+  IconData getRemoteDeviceTypeIcon(String? deviceType){
+    switch(deviceType){
+      case 'linux':
+        return Icons.computer;
+      case 'macos':
+        return Icons.computer;
+      case 'windows':
+        return Icons.window_sharp;
+      case 'android':
+        return Icons.android;
+      case 'ios':
+        return Icons.phone_iphone;
+      case 'fuchsia':
+        return Icons.computer;
+      default:
+        return Icons.question_mark_sharp;
+    }
+  }
+
   //将远程设备的item添加到显示区内
   void addRemoteDeviceToWidget(Map<String, dynamic> map) {
     remoteDeviceShowFlexibleSize ??=
@@ -198,14 +216,11 @@ class _SendToAppState extends State<SendToApp>
     map['top'] = top_;
     map['left'] = left_;
     remoteDevicesData[map['lanIP']] = map;
-
     //print(remoteDevicesData);
-
     //使用Dragtarget包裹 Positioned 报错. 但将 Positioned 改为 Container.则不再报错 but why?
     // Widget remoteDeviceWidget = Container(
     //   child: const Text("avbc",style: TextStyle(fontSize: 80),),
     // );
-
     Widget remoteDeviceWidget = Positioned(
         top: top_,
         left: left_,
@@ -220,58 +235,62 @@ class _SendToAppState extends State<SendToApp>
               borderRadius: BorderRadius.circular(16),
             ),
             child: Stack(children: [
-              Positioned(child: StepProgressIndicator(
-                      fallbackLength: 120,
-                      totalSteps: 100,
-                      currentStep: 10,
-                      size: 32,        //进度指示条的高度
-                      padding: 0,
-                      selectedColor: Colors.transparent,
-                      unselectedColor: Colors.grey,
-                      roundedEdges: Radius.circular(16),
-                    ),left: 0,top: 0),
-              Positioned(child: Row(
-                children: [
-                  Container(
-                    height: 32,
-                    width: 32,
-                    //margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
-                    decoration: const BoxDecoration(
-                        //color: Colors.blue,
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(16),
-                            topLeft: Radius.circular(16))
-                        // borderRadius:
-                        //     BorderRadius.all(Radius.circular(16))
-                        ),
-                    child: const Icon(
-                      Icons.phone_iphone,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        map['deviceName'],
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
+              const Positioned(
+                left: 0,
+                top: 0,
+                child: StepProgressIndicator(
+                    fallbackLength: 120,
+                    totalSteps: 100,
+                    currentStep: 0,
+                    size: 32,        //进度指示条的高度
+                    padding: 0,
+                    selectedColor: Colors.transparent,
+                    unselectedColor: Colors.grey,
+                    roundedEdges: Radius.circular(16),
+                  )),
+              Positioned(
+                left: 0,
+                top: 0, 
+                child: Row(
+                  children: [
+                    Container(
+                      height: 32,
+                      width: 32,
+                      //margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                      decoration: const BoxDecoration(
+                          //color: Colors.blue,
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(16),
+                              topLeft: Radius.circular(16))
+                          // borderRadius:
+                          //     BorderRadius.all(Radius.circular(16))
+                          ),
+                      child: Icon(
+                        getRemoteDeviceTypeIcon(map['deviceType']),
+                        color: Colors.white,
                       ),
-                      Text(
-                        map['lanIP'],
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          map['deviceName'],
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                ],
-              ),left: 0,top: 0),
-              
-              
+                        Text(
+                          map['lanIP'],
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                )),
             ])));
 
     // DragTarget remoteDeviceWidget_ = DragTarget(onAccept: (data) {
@@ -286,8 +305,10 @@ class _SendToAppState extends State<SendToApp>
   //初始化获取设备和wifi信息
   Future<Map> initGetInfo(Function func) async {
     Map deviceInfo_ = await DeviceInfoApi.getDeviceInfo();
+    //print(deviceInfo_);
     deviceInfo_['lanIP'] = await DeviceInfoApi.getDeviceLocalIP();
     deviceInfo_['network'] = await DeviceInfoApi.getNetworkInfo(func);
+    deviceInfo_['deviceType'] = Platform.operatingSystem;
     return deviceInfo_;
   }
 
@@ -307,7 +328,7 @@ class _SendToAppState extends State<SendToApp>
     Map broadMap = {
       'lanIP': deviceInfo['lanIP'],
       'deviceName': deviceInfo['model'],
-      'deviceType': deviceInfo['version.baseOS']
+      'deviceType': deviceInfo['deviceType']
     };
     String broadJson = json.encode(broadMap);
 
@@ -340,7 +361,6 @@ class _SendToAppState extends State<SendToApp>
               //remoteDevices.add(_json);
               //print('${remoteDeviceShowFlexible.currentContext?.size?.height}');
               //判断设备是否已经添加进显示区
-
               if (!remoteDevicesData.containsKey(_json['lanIP'])) {
                 //print(_json['lanIP']);
                 setState(() {
@@ -376,9 +396,7 @@ class _SendToAppState extends State<SendToApp>
     });
   }
 
-  /**
-   * 停止UDP广播
-   */
+  /// 停止UDP广播
   void stopUDP() {
     //Log("stopUDP", StackTrace.current);
     socket?.close();
@@ -388,26 +406,27 @@ class _SendToAppState extends State<SendToApp>
 
   @override
   Widget build(BuildContext context) {
+    //print(deviceInfo);
     return Container(
         key: sendToAppKey,
         color: Colors.blue,
         child: Column(
           children: [
             Padding(
-                padding: EdgeInsets.fromLTRB(0, 35, 0, 0),
+                padding: const EdgeInsets.fromLTRB(0, 35, 0, 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.android,
+                        Icon(
+                          getRemoteDeviceTypeIcon(deviceInfo['deviceType']),
                           size: 16,
                           color: Colors.white,
                         ),
                         Text(
                           deviceInfo['model'],
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ],
                     ),
@@ -420,7 +439,7 @@ class _SendToAppState extends State<SendToApp>
                         ),
                         Text(
                           deviceInfo['lanIP'],
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         )
                       ],
                     ),
@@ -433,7 +452,7 @@ class _SendToAppState extends State<SendToApp>
                         ),
                         Text(
                           deviceInfo['networkText'],
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         )
                       ],
                     ),

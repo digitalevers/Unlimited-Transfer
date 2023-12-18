@@ -168,7 +168,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                   double left_ = remoteDevicesData[key]!['left'] + remoteDevicesOffset.dx;
                   if(pointInsideRect(offset, top_, left_, remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight)){
                     //print(key);
-                    sendFileInfo(client, key, httpServerPort, fileList, nav.currentContext);
+                    sendFileInfo(client, key, httpServerPort, fileList, myContext);
                     break;
                   }
                 }
