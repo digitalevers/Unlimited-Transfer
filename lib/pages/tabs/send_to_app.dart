@@ -157,7 +157,7 @@ class _SendToAppState extends State<SendToApp>
       case 'linux':
         return Icons.computer;
       case 'macos':
-        return Icons.computer;
+        return Icons.laptop_mac;
       case 'windows':
         return Icons.window_sharp;
       case 'android':

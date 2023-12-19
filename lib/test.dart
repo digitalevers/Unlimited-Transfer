@@ -72,8 +72,10 @@ void main() async {//注意：需要添加async，因为await必须在async方�
 
   //  await testasync().then((param)=>{print(param)});
   //  print('end');
-  print(recursionFormatFileSize(1210000674));
-  print(recursionFormatFileSize(2565));
+  // print(recursionFormatFileSize(1210000674));
+  // print(recursionFormatFileSize(2565));
+   String? est = "hello";
+   print(est.length);
 }
 
 String formatFileSize(int fileSizeBytes){
