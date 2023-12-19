@@ -151,6 +151,11 @@ class _SendToAppState extends State<SendToApp>
     });
   }
 
+  //从SharedPreferences中读取接收文件记录
+  List<String>? getReceiveFilesLog(){
+    return prefs!.getStringList("key");
+  }
+
   //根据remote deviceType显示不同的系统icon(android ios windows)
   IconData getRemoteDeviceTypeIcon(String? deviceType){
     switch(deviceType){
