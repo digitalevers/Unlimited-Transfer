@@ -20,6 +20,7 @@ import 'package:woniu/common/func.dart';
 import 'package:woniu/components/dialogs.dart';
 import 'package:woniu/common/global_variable.dart';
 import 'package:woniu/common/config.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 class Server {
   static ServerStatus _serverStatus = ServerStatus.idle;
@@ -118,6 +119,7 @@ class Server {
             // }
 
             //3、流式写入文件 不会产生OOM
+            //TODO 同名文件处理
             const uploadDirectory = './upload';
             String filename = request.headers['filename']![0];
             //File file = File('$uploadDirectory/$filename');
@@ -129,13 +131,15 @@ class Server {
             await sink.close();
             //文件传输完毕 服务器置为空闲状态 并弹窗接收完成提示
             _serverStatus = ServerStatus.idle;
-            CherryToast.info(
-              title:  const Text("接收完毕"),
-              toastPosition: Position.bottom,
-              displayCloseButton:false,
-              actionHandler:(){},
-              animationDuration: const Duration(milliseconds:  500),
-            ).show(key.currentContext as BuildContext);
+            //print("接收完毕");
+            // CherryToast.info(
+            //   title:  const Text("接收完毕"),
+            //   toastPosition: Position.bottom,
+            //   displayCloseButton:false,
+            //   actionHandler:(){},
+            //   animationDuration: const Duration(milliseconds:  500),
+            // ).show(key.currentContext as BuildContext);
+            BotToast.showText(text:"接收完毕");
           } else {
             // print("server");
             // //uri should be in format http://ip:port/secretcode/file-index

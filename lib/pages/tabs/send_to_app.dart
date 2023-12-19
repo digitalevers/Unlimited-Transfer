@@ -464,7 +464,7 @@ class _SendToAppState extends State<SendToApp>
                 color: Colors.blue,
                 alignment: Alignment.center,
                 child: const Text(
-                  '文件接收区',
+                  '接收文件记录',
                   style: TextStyle(color: Colors.white),
                 ),
               ),

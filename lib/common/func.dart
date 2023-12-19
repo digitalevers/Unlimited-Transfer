@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'global_variable.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:cherry_toast/resources/arrays.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 
 // ignore: slash_for_doc_comments
@@ -147,22 +148,24 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
         //TODO 删除复制到 /data/data 目录的文件
         //print("发送完毕");
         //print(context_);
-        CherryToast.info(
-          title:  const Text("发送完毕"),
-          toastPosition: Position.bottom,
-          displayCloseButton:false,
-          actionHandler:(){},
-          animationDuration: const Duration(milliseconds:  500),
-        ).show(context_);
+        // CherryToast.info(
+        //   title:  const Text("发送完毕"),
+        //   toastPosition: Position.bottom,
+        //   displayCloseButton:false,
+        //   actionHandler:(){},
+        //   animationDuration: const Duration(milliseconds:  500),
+        // ).show(context_);
+        BotToast.showText(text:"发送完毕");
       });
     } else {
-      CherryToast.warning(
-        title:  Text(HttpResponseCodeMsg[resMap['code']]!),
-        toastPosition: Position.bottom,
-        displayCloseButton:false,
-        actionHandler:(){},
-        //animationDuration: const Duration(milliseconds:  200),
-      ).show(context_);
+      // CherryToast.warning(
+      //   title:  Text(HttpResponseCodeMsg[resMap['code']]!),
+      //   toastPosition: Position.bottom,
+      //   displayCloseButton:false,
+      //   actionHandler:(){},
+      //   //animationDuration: const Duration(milliseconds:  200),
+      // ).show(context_);
+      BotToast.showText(text:"对方${HttpResponseCodeMsg[resMap['code']]!}");
     }
   }
   //client.close();// 这里若关闭了 就不能再次发送请求了

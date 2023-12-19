@@ -44,4 +44,6 @@ final GlobalKey remoteDevicesKey = GlobalKey();
 Offset remoteDevicesOffset = Offset(0, 0);
 //缓存实例
 SharedPreferences? prefs;
+//接收文件记录
+List<String> receiveFileLog = [];
 
