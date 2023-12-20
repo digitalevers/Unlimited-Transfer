@@ -24,12 +24,12 @@ import 'package:bot_toast/bot_toast.dart';
 /**
  * 打印日志 输出所在文件及所在行
  */
-void Log(var msg, StackTrace st) {
+void log(var msg, [StackTrace? st]) {
+  st ??= StackTrace.current;
   if (debug) {
     CustomPrint customPrint = CustomPrint(st);
-    // ignore: avoid_print
-    print(
-        "打印信息:$msg, 所在文件:${customPrint.fileName},所在行:${customPrint.lineNumber}");
+      // ignore: avoid_print
+    print("打印信息:$msg, 所在文件:${customPrint.fileName},所在行:${customPrint.lineNumber}");
   }
 }
 
@@ -136,9 +136,9 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
   request.add(utf8.encode(formBody));
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();
-  Log(result, StackTrace.current);
+  log(result, StackTrace.current);
   if(result == ""){
-    print("服务器无返回");
+    log("服务器无返回");
   } else {
     //分析服务端响应 如果同意接收则开始发送文件
     Map resMap = jsonDecode(result);
@@ -186,7 +186,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();
 
-  Log(result, StackTrace.current);
+  log(result, StackTrace.current);
   return result;
   //client.close();
 }

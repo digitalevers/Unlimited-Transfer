@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:cherry_toast/resources/arrays.dart';
 import 'package:dio/dio.dart';
@@ -28,7 +29,7 @@ class Server {
   static Map<String, String>? fileList;
   static HttpServer? _server;
   //启动httpserver
-  static Future<Map<String, dynamic>> startServer(GlobalKey key) async {
+  static Future<Map<String, dynamic>> startServer(GlobalKey key,GlobalKey receiveFilesLogKey) async {
     try {
       _server = await HttpServer.bind('0.0.0.0', httpServerPort);
     } catch (e) {
@@ -119,18 +120,42 @@ class Server {
             // }
 
             //3、流式写入文件 不会产生OOM
-            //TODO 同名文件处理
-            const uploadDirectory = './upload';
-            String filename = request.headers['filename']![0];
+            //const uploadDirectory = './upload';
             //File file = File('$uploadDirectory/$filename');
-            File file = File('/storage/emulated/0/Download/$filename');
+            String filename = request.headers['filename']![0];
+            String filenameWithoutExtension = p.withoutExtension(filename);
+            String extension  = p.extension(filename);
+            
 
+            String downloadDir = "/storage/emulated/0/Download/";
+            String filePath = downloadDir + filename;
+            File file = File(filePath);
+            //有同名文件 则在源文件后追加一个随机文件名生成一个新的文件名
+            if(file.existsSync()){
+              String randomFileSuffix = (100 + Random().nextInt(999 - 100)).toString();
+              filePath = "$downloadDir${filenameWithoutExtension}_$randomFileSuffix$extension";
+              file = File(filePath);
+              if(file.existsSync()){
+                throw const FileSystemException("The file have exist already");
+              }
+            }
             IOSink sink = file.openWrite(mode: FileMode.append);
             await sink.addStream(request);
             await sink.flush();
             await sink.close();
             //文件传输完毕 服务器置为空闲状态 并弹窗接收完成提示
             _serverStatus = ServerStatus.idle;
+            //文件接收完毕 将文件路径写入SharedPreferences作为接收记录 
+            List<String>? receviceFilesLog = prefs!.getStringList("receviceFilesLog");
+            receviceFilesLog!.add(filePath);
+            //log(receiveFilesLogKey,StackTrace.current);
+            prefs!.setStringList("receviceFilesLog", receviceFilesLog).then((value){
+              //log(receiveFilesLogKey.currentState,StackTrace.current);
+            });
+            // ignore: invalid_use_of_protected_member
+            // 更新接收文件记录显示区的UI界面
+            
+
             //print("接收完毕");
             // CherryToast.info(
             //   title:  const Text("接收完毕"),

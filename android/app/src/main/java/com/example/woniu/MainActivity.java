@@ -110,24 +110,22 @@ public class MainActivity extends FlutterActivity {
                 } else if (isDownloadsDocument(uri)) {
                     System.out.println("isDownloadsDocument-"+uri.toString());
                     // DownloadsProvider
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
-                        path = getDocumentPrivateData(context, uri, docId);
-                    } else {
-                        //Android 10 - content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/34d4724ef96b1088.jpg
-                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                            String[] idSplit = docId.split(":");
-                            String[] uriSplit = uri.toString().split(":");
-                            if("raw".equalsIgnoreCase(idSplit[0])) {
-                                for (int i = 2; i < uriSplit.length; i++) {
-                                    path += uriSplit[i];
-                                }
+                    if(uri.toString().contains("raw:/storage/emulated")){
+                        //content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/34d4724ef96b1088.jpg
+                        String[] idSplit = docId.split(":");
+                        String[] uriSplit = uri.toString().split(":");
+                        if("raw".equalsIgnoreCase(idSplit[0])) {
+                            for (int i = 2; i < uriSplit.length; i++) {
+                                path += uriSplit[i];
                             }
-                            //Android 7  content://com.android.providers.downloads.documents/document/123
-                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                            path = getDocumentPrivateData(context, uri, docId);
                         }
+                    } else {
+                        //content://com.android.providers.downloads.documents/document/1412
+                        path = getDocumentPrivateData(context, uri, docId);
                     }
+                    System.out.println(path);
                     return path;
+
                 } else if (isMediaDocument(uri)) {
                     System.out.println("isMediaDocument-"+uri.toString());
                     // MediaProvider

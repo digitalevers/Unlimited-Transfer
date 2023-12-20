@@ -16,7 +16,7 @@ import 'package:woniu/common/global_variable.dart';
 
 class SendToApp extends StatefulWidget {
   SendToApp({super.key}) {
-    print("SendToApp构造成功");
+    log("send_to_app页初始化完成");
   }
 
   @override
@@ -34,6 +34,8 @@ class _SendToAppState extends State<SendToApp>
   final GlobalKey sendToAppKey = GlobalKey();
   //远程设备显示区的globalkey
   final GlobalKey remoteDeviceShowFlexible = GlobalKey();
+  //接收文件记录显示区的globalkey
+  final GlobalKey receiveFilesLogKey = GlobalKey();
   //远程设备显示区的size
   Size? remoteDeviceShowFlexibleSize;
 
@@ -56,9 +58,8 @@ class _SendToAppState extends State<SendToApp>
   //远程设备的显示widget + 水波纹动画(初始化的时候仅有水波纹动画)
   List<Widget> remoteDevicesWidgetPlus = <Widget>[_waterRipple];
   //List<Widget> remoteDevicesWidgetPlus = <Widget>[dt];
-//远程设备的显示widget 的最大尺寸
-  Size remoteDevicesWidgetMaxSize =
-      Size(remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight);
+  //远程设备的显示widget 的最大尺寸
+  Size remoteDevicesWidgetMaxSize = Size(remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight);
   //如果显示widget重叠了 尝试重新生成widget的次数
   int createWidgetCount = 2;
   //本地设备和网络信息
@@ -80,11 +81,13 @@ class _SendToAppState extends State<SendToApp>
     });
 
     initEnv();
+    
     //界面build完成后执行回调函数
     WidgetsBinding.instance.addPostFrameCallback((_) {
       RenderBox renderBox = remoteDevicesKey.currentContext?.findRenderObject() as RenderBox;
       remoteDevicesOffset = renderBox.localToGlobal(Offset.zero);
       //print(positionRed);
+      log(receiveFilesLogKey.currentState,StackTrace.current);
     });
   }
 
@@ -102,7 +105,8 @@ class _SendToAppState extends State<SendToApp>
       startUDP();
     }
     //启动HTTP SERVER并传入key 便于在server类中获取context
-    await Server.startServer(sendToAppKey);
+    await Server.startServer(sendToAppKey,receiveFilesLogKey);
+
     // setState(() {
     //     deviceInfo = deviceInfo_;
     // });
@@ -113,13 +117,13 @@ class _SendToAppState extends State<SendToApp>
   void dispose() {
     _animationController.dispose();
     super.dispose();
-    print('sendtoapp==dispose');
+    log('sendtoapp==dispose');
   }
 
   @override
   void deactivate() {
     super.deactivate();
-    print('sendtoapp==deactivate');
+    log('sendtoapp==deactivate');
   }
 
   // ignore: slash_for_doc_comments
@@ -178,8 +182,7 @@ class _SendToAppState extends State<SendToApp>
 
   //将远程设备的item添加到显示区内
   void addRemoteDeviceToWidget(Map<String, dynamic> map) {
-    remoteDeviceShowFlexibleSize ??=
-        remoteDeviceShowFlexible.currentContext?.size;
+    remoteDeviceShowFlexibleSize ??= remoteDeviceShowFlexible.currentContext?.size;
     final GlobalKey remoteDeviceWidgetKey = GlobalKey();
     map['remoteDeviceWidgetKey'] = remoteDeviceWidgetKey;
     //约束在 district范围内随机生成top和left值 并尽可能不与之前的矩阵重叠
@@ -187,18 +190,8 @@ class _SendToAppState extends State<SendToApp>
     double left_ = 0.0;
     for (int i = 0; i < createWidgetCount; i++) {
       //top > 10 以免紧贴窗口边缘渲染widget
-      top_ = randomInt(
-              10,
-              (remoteDeviceShowFlexibleSize!.height -
-                      2 * remoteDevicesWidgetMaxSize.height)
-                  .toInt())
-          .toDouble();
-      left_ = randomInt(
-              10,
-              (remoteDeviceShowFlexibleSize!.width -
-                      remoteDevicesWidgetMaxSize.width)
-                  .toInt())
-          .toDouble();
+      top_ = randomInt(10,(remoteDeviceShowFlexibleSize!.height - 2 * remoteDevicesWidgetMaxSize.height).toInt()).toDouble();
+      left_ = randomInt(10,(remoteDeviceShowFlexibleSize!.width - remoteDevicesWidgetMaxSize.width).toInt()).toDouble();
       bool inside = false;
       remoteDevicesData.forEach((key, value) {
         if (rectInRect(
@@ -327,7 +320,7 @@ class _SendToAppState extends State<SendToApp>
 
     socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, udpPort);
     socket?.broadcastEnabled = true;
-    Log('UDP Echo ready to receive', StackTrace.current);
+    log('UDP Echo ready to receive', StackTrace.current);
     const timeout = Duration(seconds: 3);
     //构造广播json数据
     Map broadMap = {
@@ -339,8 +332,7 @@ class _SendToAppState extends State<SendToApp>
 
     timer = Timer.periodic(timeout, (timer) {
       //[0x44, 0x48, 0x01, 0x01]
-      socket?.send(
-          broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
+      socket?.send(broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
     });
     //print('${socket.address.address}:${socket.port}');
     socket?.listen((RawSocketEvent e) {
@@ -379,22 +371,22 @@ class _SendToAppState extends State<SendToApp>
           break;
         case RawSocketEvent.write:
           {
-            print('RawSocketEvent.write');
+            log('RawSocketEvent.write');
           }
           break;
         case RawSocketEvent.readClosed:
           {
-            print('RawSocketEvent.readClosed');
+            log('RawSocketEvent.readClosed');
           }
           break;
         case RawSocketEvent.closed:
           {
-            print('RawSocketEvent.closed');
+            log('RawSocketEvent.closed');
           }
           break;
       }
     }, onError: (error) {
-      print(error);
+      log(error);
     }, onDone: () {
       socket?.close();
       //socket = Null as RawDatagramSocket;
@@ -409,9 +401,16 @@ class _SendToAppState extends State<SendToApp>
     timer?.cancel();
   }
 
+  //初始化"接收文件记录"数据
+  //读取 SharedPreferences 中保存的接收文件数据 然后遍历目录查看文件是否存在 若不存在 则从记录中剔除
+  List getRceiveFilesLog(){
+    prefs!.getStringList("receviceFilesLog");
+    return [];
+  }
+
   @override
   Widget build(BuildContext context) {
-    //print(deviceInfo);
+    log("send_to_app页渲染完成");
     return Container(
         key: sendToAppKey,
         color: Colors.blue,
@@ -465,14 +464,24 @@ class _SendToAppState extends State<SendToApp>
                 )),
             Flexible(
               flex: 10,
-              child: Container(
-                color: Colors.blue,
-                alignment: Alignment.center,
-                child: const Text(
-                  '接收文件记录',
-                  style: TextStyle(color: Colors.white),
+              child: 
+              // Container(
+              //   color: Colors.blue,
+              //   alignment: Alignment.center,
+              //   child: const Text(
+              //     '接收文件记录',
+              //     style: TextStyle(color: Colors.white),
+              //   ),
+              // ),
+              ListView.builder(
+                  key: receiveFilesLogKey,
+                  itemCount: 1,
+                  itemBuilder: (BuildContext context, int index) {
+                    return const ListTile(
+                      title: Text("接收文件记录"),
+                    );
+                  },
                 ),
-              ),
             ),
             Flexible(
               flex: 1,

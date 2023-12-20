@@ -27,9 +27,10 @@ class HttpResponseCode{
   static const acceptFile = 1;
   static const serverBusy = 2;
 }
-
+//日志开关
+bool LogFlag = true;
+//服务器返回标识
 Map<int,String> HttpResponseCodeMsg = { 0 : '已拒收',1 : '接收文件',2 : '服务器繁忙' };
-
 //远程设备数据
 Map<String, Map<String, dynamic>> remoteDevicesData = {};
 //发送文件的客户端
@@ -44,6 +45,9 @@ final GlobalKey remoteDevicesKey = GlobalKey();
 Offset remoteDevicesOffset = Offset(0, 0);
 //缓存实例
 SharedPreferences? prefs;
-//接收文件记录
-List<String> receiveFileLog = [];
+
+class GlobalVariable{
+  //static const bool _logDebug = false;
+  //static get logDebug => _logDebug;
+}
 
