@@ -31,7 +31,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
   List<String?>? chooseFiles = [];
   String showShortFileName = '';
   final List<Widget> _pages = [
-    SendToApp(),
+    SendToApp(GlobalKey()),
     SendToBrowser(),
     ChooseFile(),
     Instruction(),

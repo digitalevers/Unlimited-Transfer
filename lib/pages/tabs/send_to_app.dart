@@ -15,16 +15,16 @@ import 'package:woniu/common/config.dart';
 import 'package:woniu/common/global_variable.dart';
 
 class SendToApp extends StatefulWidget {
-  SendToApp({super.key}) {
-    log("send_to_app页初始化完成");
-  }
+  final GlobalKey _key;
+  SendToApp(this._key):super(key:_key);
 
   @override
-  State<SendToApp> createState() => _SendToAppState();
+  State<SendToApp> createState() => _SendToAppState(_key);
 }
 
-class _SendToAppState extends State<SendToApp>
-    with SingleTickerProviderStateMixin {
+class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMixin {
+  final GlobalKey _key;
+  _SendToAppState(this._key);
   //UDP socket
   RawDatagramSocket? socket;
   Timer? timer;
@@ -40,10 +40,7 @@ class _SendToAppState extends State<SendToApp>
   Size? remoteDeviceShowFlexibleSize;
 
   //水波纹动画Widget
-  static const SizedBox _waterRipple = SizedBox(
-      height: double.infinity,
-      width: double.infinity,
-      child: WaterRipple(count: 5));
+  static const SizedBox _waterRipple = SizedBox(height:double.infinity, width:double.infinity, child:WaterRipple(count: 5));
   // static DragTarget dt = DragTarget(onAccept: (data) {
   //               ;
   //             }, builder: (context,candidateData,rejectData){
@@ -87,7 +84,7 @@ class _SendToAppState extends State<SendToApp>
       RenderBox renderBox = remoteDevicesKey.currentContext?.findRenderObject() as RenderBox;
       remoteDevicesOffset = renderBox.localToGlobal(Offset.zero);
       //print(positionRed);
-      log(receiveFilesLogKey.currentState,StackTrace.current);
+      
     });
   }
 
@@ -194,14 +191,8 @@ class _SendToAppState extends State<SendToApp>
       left_ = randomInt(10,(remoteDeviceShowFlexibleSize!.width - remoteDevicesWidgetMaxSize.width).toInt()).toDouble();
       bool inside = false;
       remoteDevicesData.forEach((key, value) {
-        if (rectInRect(
-            Rectangle(left_, top_, remoteDevicesWidgetMaxSize.width,
-                remoteDevicesWidgetMaxSize.height) as Rect,
-            Rectangle(
-                value['left'].toInt() as int,
-                value['top'].toInt() as int,
-                remoteDevicesWidgetMaxSize.width,
-                remoteDevicesWidgetMaxSize.height) as Rect)) {
+        if (rectInRect(Rectangle(left_, top_, remoteDevicesWidgetMaxSize.width, remoteDevicesWidgetMaxSize.height) as Rect,
+            Rectangle(value['left'].toInt() as int, value['top'].toInt() as int, remoteDevicesWidgetMaxSize.width, remoteDevicesWidgetMaxSize.height) as Rect)) {
           inside = true;
         }
       });
@@ -465,6 +456,7 @@ class _SendToAppState extends State<SendToApp>
             Flexible(
               flex: 10,
               child: 
+
               // Container(
               //   color: Colors.blue,
               //   alignment: Alignment.center,
@@ -473,15 +465,24 @@ class _SendToAppState extends State<SendToApp>
               //     style: TextStyle(color: Colors.white),
               //   ),
               // ),
-              ListView.builder(
-                  key: receiveFilesLogKey,
-                  itemCount: 1,
-                  itemBuilder: (BuildContext context, int index) {
-                    return const ListTile(
-                      title: Text("接收文件记录"),
-                    );
-                  },
-                ),
+
+              // ListView.builder(
+              //     key: receiveFilesLogKey,
+              //     itemCount: 1,
+              //     itemBuilder: (BuildContext context, int index) {
+              //       return const ListTile(
+              //         title: Text("接收文件记录"),
+              //       );
+              //     },
+              //   ),
+              ListView(
+                key: receiveFilesLogKey,
+                children: const [
+                  ListTile(
+                    title: Text("ceshi"),
+                  )
+              ])
+
             ),
             Flexible(
               flex: 1,

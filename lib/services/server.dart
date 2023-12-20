@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:hive/hive.dart';
 import 'package:woniu/models/sender_model.dart';
+import 'package:woniu/pages/tabs/send_to_app.dart';
 import 'package:woniu/services/file_services.dart';
 import 'package:woniu/controllers/controllers.dart';
 import 'package:http/http.dart' as http;
@@ -150,7 +151,7 @@ class Server {
             receviceFilesLog!.add(filePath);
             //log(receiveFilesLogKey,StackTrace.current);
             prefs!.setStringList("receviceFilesLog", receviceFilesLog).then((value){
-              //log(receiveFilesLogKey.currentState,StackTrace.current);
+              log(key.currentState,StackTrace.current);
             });
             // ignore: invalid_use_of_protected_member
             // 更新接收文件记录显示区的UI界面
