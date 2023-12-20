@@ -14,6 +14,8 @@ import 'package:woniu/services/server.dart';
 import 'package:woniu/common/config.dart';
 import 'package:woniu/common/global_variable.dart';
 
+import '../modules/receive_files_log.dart';
+
 class SendToApp extends StatefulWidget {
   final GlobalKey _key;
   SendToApp(this._key):super(key:_key);
@@ -31,7 +33,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   //UDP 启动锁确保只启动一次
   bool startUDPLock = false;
   //当前页面的 globalKey
-  final GlobalKey sendToAppKey = GlobalKey();
+  final GlobalKey sendToAppBodyKey = GlobalKey();
   //远程设备显示区的globalkey
   final GlobalKey remoteDeviceShowFlexible = GlobalKey();
   //接收文件记录显示区的globalkey
@@ -102,7 +104,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
       startUDP();
     }
     //启动HTTP SERVER并传入key 便于在server类中获取context
-    await Server.startServer(sendToAppKey,receiveFilesLogKey);
+    await Server.startServer(sendToAppBodyKey,receiveFilesLogKey);
 
     // setState(() {
     //     deviceInfo = deviceInfo_;
@@ -403,7 +405,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     log("send_to_app页渲染完成");
     return Container(
-        key: sendToAppKey,
+        key: sendToAppBodyKey,
         color: Colors.blue,
         child: Column(
           children: [
@@ -453,36 +455,28 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
                     ),
                   ],
                 )),
-            Flexible(
+             Flexible(
               flex: 10,
               child: 
+                // Container(
+                //   color: Colors.blue,
+                //   alignment: Alignment.center,
+                //   child: const Text(
+                //     '接收文件记录',
+                //     style: TextStyle(color: Colors.white),
+                //   ),
+                // ),
 
-              // Container(
-              //   color: Colors.blue,
-              //   alignment: Alignment.center,
-              //   child: const Text(
-              //     '接收文件记录',
-              //     style: TextStyle(color: Colors.white),
-              //   ),
-              // ),
-
-              // ListView.builder(
-              //     key: receiveFilesLogKey,
-              //     itemCount: 1,
-              //     itemBuilder: (BuildContext context, int index) {
-              //       return const ListTile(
-              //         title: Text("接收文件记录"),
-              //       );
-              //     },
-              //   ),
-              ListView(
-                key: receiveFilesLogKey,
-                children: const [
-                  ListTile(
-                    title: Text("ceshi"),
-                  )
-              ])
-
+                // ListView.builder(
+                //     key: receiveFilesLogKey,
+                //     itemCount: 1,
+                //     itemBuilder: (BuildContext context, int index) {
+                //       return const ListTile(
+                //         title: Text("接收文件记录"),
+                //       );
+                //     },
+                //   ),
+                ReceiveFilesLog(receiveFilesLogKey)
             ),
             Flexible(
               flex: 1,

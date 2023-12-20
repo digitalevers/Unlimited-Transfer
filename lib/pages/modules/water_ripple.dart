@@ -22,9 +22,7 @@ class _WaterRippleState extends State<WaterRipple>
 
   @override
   void initState() {
-    _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 2000))
-      ..repeat();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000))..repeat();
     super.initState();
   }
 
