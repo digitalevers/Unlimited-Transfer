@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import '../../common/global_variable.dart';
+import 'package:path/path.dart' as p;
+import 'package:woniu/common/func.dart';
 
 
 //组件单独放在一个文件里则无法访问到 _ReceiveFilesLogState 该类为文件私有
@@ -22,26 +25,46 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
     return ListView.builder(
       itemCount: receviceFilesLog.length,
       itemBuilder: (BuildContext context, int index) {
-        return ListTile(
-            title: Text(receviceFilesLog[index]),
-        );
+        return 
+          ListTile(
+            tileColor:Colors.grey,
+            selectedColor:Colors.grey,
+            textColor:Colors.white,
+            //isThreeLine: true,    //子item的是否为三行
+            dense: false,
+            //leading: const CircleAvatar(),//左侧首字母图标显示，不显示则传null
+            title: Text(receviceFilesLog[index]),//子item的标题
+            //subtitle:  const Text('123'),//子item的内容
+            // trailing:  SizedBox(
+            //   //height: 100,
+            //   width: 200,
+            //   child: Row(
+            //       children: [
+            //         ElevatedButton(onPressed: (){}, child: const Text("打开")),
+            //         TextButton(onPressed: (){}, child: const Text("删除"))
+            //       ]
+            //   )
+            // ),//显示右侧的箭头，不显示则传null
+          );
       },
     );
   }
 
-
   void insertFilesLog(String filePath) async {
-    List<String>? log = prefs!.getStringList("receviceFilesLog") ?? [];
-    log.add(filePath);
+    List<String>? filesLog = prefs!.getStringList("receviceFilesLog") ?? [];
+    filesLog.add(filePath);
     //遍历文件是否存在
-    for(int i = 0; i < log.length; i++){
-      bool fileExist = await File(log[i]).exists();
+    for(int i = 0; i < filesLog.length; i++){
+      bool fileExist = await File(filesLog[i]).exists();
       if(fileExist == false){
-        log.removeAt(i);
+        filesLog.removeAt(i);
+      } else {
+        filesLog[i] = p.basename(filesLog[i]);
       }
     }
-    receviceFilesLog = log;
-    await prefs!.setStringList("receviceFilesLog", log);
+    receviceFilesLog = filesLog;
+    log(receviceFilesLog.length);
+    await prefs!.setStringList("receviceFilesLog", filesLog);
     setState(() {});
   }
 
@@ -67,6 +90,8 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
       bool fileExist = await File(log[i]).exists();
       if(fileExist == false){
         log.removeAt(i);
+      } else {
+        log[i] = p.basename(log[i]);
       }
     }
     receviceFilesLog = log;
