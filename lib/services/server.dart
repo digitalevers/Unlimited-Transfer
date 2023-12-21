@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:hive/hive.dart';
 import 'package:woniu/models/sender_model.dart';
@@ -32,7 +33,7 @@ class Server {
   static Map<String, String>? fileList;
   static HttpServer? _server;
   //启动httpserver
-  static Future<Map<String, dynamic>> startServer(GlobalKey key,GlobalKey receiveFilesLogKey) async {
+  static Future<Map<String, dynamic>> startServer(GlobalKey key, GlobalKey<ReceiveFilesLogState> receiveFilesLogKey) async {
     try {
       _server = await HttpServer.bind('0.0.0.0', httpServerPort);
     } catch (e) {
@@ -153,11 +154,11 @@ class Server {
             receviceFilesLog.add(filePath);
             //log(receiveFilesLogKey,StackTrace.current);
             prefs!.setStringList("receviceFilesLog", receviceFilesLog).then((value){
-              log(receiveFilesLogKey.currentState,StackTrace.current);
+              receiveFilesLogKey.currentState!.test111();
             });
             
             // 更新接收文件记录显示区的UI界面
-            
+
 
             //print("接收完毕");
             // CherryToast.info(

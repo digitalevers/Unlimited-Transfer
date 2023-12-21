@@ -5,13 +5,13 @@ class ReceiveFilesLog extends StatefulWidget {
   final GlobalKey _key;
   const ReceiveFilesLog(this._key):super(key:_key);
 
-
   @override
-  State<ReceiveFilesLog> createState() => _ReceiveFilesLogState();
+  State<ReceiveFilesLog> createState() => ReceiveFilesLogState();
+
 }
 
 // ignore: camel_case_types
-class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
+class ReceiveFilesLogState extends State<ReceiveFilesLog> {
   List<ListTile> ls = const [
         ListTile(
             title: Text("HI"),
@@ -25,7 +25,6 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
       ];
 
   
-  
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +33,9 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
     );
   }
 
-  void test() {
+  void test111() {
     
   }
+
+  
 }

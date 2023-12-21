@@ -37,7 +37,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   //远程设备显示区的globalkey
   final GlobalKey remoteDeviceShowFlexible = GlobalKey();
   //接收文件记录显示区的globalkey
-  final GlobalKey receiveFilesLogKey = GlobalKey();
+  final GlobalKey<ReceiveFilesLogState> receiveFilesLogKey = GlobalKey();
   //远程设备显示区的size
   Size? remoteDeviceShowFlexibleSize;
 
