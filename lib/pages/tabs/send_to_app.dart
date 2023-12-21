@@ -37,7 +37,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   //远程设备显示区的globalkey
   final GlobalKey remoteDeviceShowFlexible = GlobalKey();
   //接收文件记录显示区的globalkey
-  final GlobalKey<ReceiveFilesLogState> receiveFilesLogKey = GlobalKey();
+  final GlobalKey receiveFilesLogKey = GlobalKey();
   //远程设备显示区的size
   Size? remoteDeviceShowFlexibleSize;
 
@@ -217,9 +217,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
         left: left_,
         key: remoteDeviceWidgetKey,
         child: Container(
-            constraints: BoxConstraints(
-                maxWidth: remoteDevicesWidgetMaxSize.width,
-                maxHeight: remoteDevicesWidgetMaxSize.height),
+            constraints: BoxConstraints( maxWidth: remoteDevicesWidgetMaxSize.width, maxHeight: remoteDevicesWidgetMaxSize.height),
             //padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
             decoration: BoxDecoration(
               color: const Color.fromARGB(255, 255, 126, 90),
@@ -514,3 +512,5 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
         ));
   }
 }
+
+

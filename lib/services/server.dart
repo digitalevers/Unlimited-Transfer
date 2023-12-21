@@ -25,7 +25,6 @@ import 'package:woniu/common/global_variable.dart';
 import 'package:woniu/common/config.dart';
 import 'package:bot_toast/bot_toast.dart';
 
-import 'package:woniu/pages/modules/receive_files_log.dart';
 
 class Server {
   static ServerStatus _serverStatus = ServerStatus.idle;
@@ -33,7 +32,7 @@ class Server {
   static Map<String, String>? fileList;
   static HttpServer? _server;
   //启动httpserver
-  static Future<Map<String, dynamic>> startServer(GlobalKey key, GlobalKey<ReceiveFilesLogState> receiveFilesLogKey) async {
+  static Future<Map<String, dynamic>> startServer(GlobalKey key,dynamic receiveFilesLogKey) async {
     try {
       _server = await HttpServer.bind('0.0.0.0', httpServerPort);
     } catch (e) {
@@ -149,17 +148,9 @@ class Server {
             await sink.close();
             //文件传输完毕 服务器置为空闲状态 并弹窗接收完成提示
             _serverStatus = ServerStatus.idle;
-            //文件接收完毕 将文件路径写入SharedPreferences作为接收记录 
-            List<String>? receviceFilesLog = prefs!.getStringList("receviceFilesLog") ?? [];
-            receviceFilesLog.add(filePath);
-            //log(receiveFilesLogKey,StackTrace.current);
-            prefs!.setStringList("receviceFilesLog", receviceFilesLog).then((value){
-              receiveFilesLogKey.currentState!.test111();
-            });
-            
             // 更新接收文件记录显示区的UI界面
-
-
+            receiveFilesLogKey.currentState!.insertFilesLog(filePath);
+            
             //print("接收完毕");
             // CherryToast.info(
             //   title:  const Text("接收完毕"),
