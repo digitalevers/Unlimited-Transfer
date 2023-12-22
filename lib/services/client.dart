@@ -11,6 +11,7 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 //import 'package:hive/hive.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:cherry_toast/resources/arrays.dart';
+import 'package:woniu/controllers/controllers.dart';
 
 //import 'package:woniu/components/dialogs.dart';
 //import 'package:woniu/components/snackbar.dart';
@@ -69,7 +70,7 @@ class Sender{
       //return await res;
     } else {
       fileList  = await FileMethods.pickFiles();
-      //print(fileList);
+      //log(fileList,StackTrace.current);
       if(Platform.isIOS){
         
       } else if(Platform.isAndroid){
@@ -82,7 +83,6 @@ class Sender{
           const platform = MethodChannel("AndroidApi");
           String originFilePath = await platform.invokeMethod("getOriginFilePathByUri",[fileList![i]]);
           fileList![i] = originFilePath;
-          //print(fileList![i]!);
         }
       }
     }

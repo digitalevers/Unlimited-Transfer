@@ -192,22 +192,26 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
   //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
   String fileNameWithExtension = p.basename(filePath);
-  request.headers.set("filename", fileNameWithExtension);
+  request.headers.set("filename", "pubspec_123.lock");
   try{
     await request.addStream(file.openRead());
   } on FileSystemException catch(e) {
     const platform = MethodChannel("AndroidApi");
     String fileNameWithoutExtension = p.withoutExtension(filePath);
     String fileExtension = p.extension(filePath);
-    String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filePath,fileNameWithoutExtension,fileExtension]);
-
-    await request.addStream(File(newPrivatePath).openRead());
-    log(newPrivatePath, StackTrace.current);
+    filePath = "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fpubspec_123.lock";
+    String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filePath,"pubspec_123",fileExtension]);
+    File newFile = File(newPrivatePath);
+    await request.addStream(newFile.openRead());
   }
-  
+
+
+  // File newFile = File("/data/data/com.example.woniu/files/uri_to_file/pubspec_123.lock");
+  // await request.addStream(newFile.openRead());
+
+
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();
-
   log(result, StackTrace.current);
   return result;
   //client.close();
