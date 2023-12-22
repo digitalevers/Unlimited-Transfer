@@ -3,9 +3,11 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
+import 'package:uri_to_file/uri_to_file.dart';
 import 'package:woniu/controllers/controllers.dart';
 import 'package:path/path.dart' as p;
 
@@ -187,9 +189,21 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
   HttpClientRequest request = await  client.postUrl(uri);
   //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
-  request.headers.set("filename", p.basename(filePath));
-  //await request.addStream(file.openRead());
-  file.open(mode: FileMode.read);
+  //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
+  //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
+  String fileNameWithExtension = p.basename(filePath);
+  request.headers.set("filename", fileNameWithExtension);
+  try{
+    await request.addStream(file.openRead());
+  } on FileSystemException catch(e) {
+    const platform = MethodChannel("AndroidApi");
+    String fileNameWithoutExtension = p.withoutExtension(filePath);
+    String fileExtension = p.extension(filePath);
+    String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filePath,fileNameWithoutExtension,fileExtension]);
+
+    await request.addStream(File(newPrivatePath).openRead());
+    log(newPrivatePath, StackTrace.current);
+  }
   
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();

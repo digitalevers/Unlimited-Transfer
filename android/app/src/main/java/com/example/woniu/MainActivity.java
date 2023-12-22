@@ -55,6 +55,15 @@ public class MainActivity extends FlutterActivity {
                         if (call.method.equals("getOriginFilePathByUri")) {
                             String uri = (String) (((ArrayList) call.arguments).get(0));
                             result.success(getOriginFilePathByUri(Uri.parse(uri), getApplicationContext()));
+                        } else if(call.method.equals("copyFileToPrivateSpace")){
+                            String uri = (String) (((ArrayList) call.arguments).get(0));
+                            String name = (String) (((ArrayList) call.arguments).get(1));
+                            String ext = (String) (((ArrayList) call.arguments).get(2));
+                            try {
+                                result.success(copyFileToPrivateSpace(getApplicationContext(), Uri.parse(uri), name, ext));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         } else {
                             result.notImplemented();
                         }
