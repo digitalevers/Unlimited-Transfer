@@ -110,6 +110,7 @@ void preSendFile(){
   
 }
 
+//转换文件大小的规格
 String fommatFileSize(int fileSizeBytes){
   int power = 0;
   List<String> units = ['Bytes','KB','MB','GB','TB'];
@@ -118,6 +119,13 @@ String fommatFileSize(int fileSizeBytes){
   num divisor = pow(1000,power);
   String formatedFileSize = (fileSizeBytes / divisor).toStringAsFixed(1);
   return "$formatedFileSize${units[power]}";
+}
+
+//获取文件名的简略形式 以免文件名过长
+//params limLengh 限制的简略文件名字符长度（包含后缀）
+String getShortFileName(String fileNameWithExtension,[int limLengh = 6]){
+  fileNameWithExtension = fileNameWithExtension.substring(fileNameWithExtension.length - limLengh);
+  return "...$fileNameWithExtension";
 }
 
 //发送文件信息 客户端发送到服务端
@@ -180,7 +188,8 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   HttpClientRequest request = await  client.postUrl(uri);
   //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
   request.headers.set("filename", p.basename(filePath));
-  await request.addStream(file.openRead());
+  //await request.addStream(file.openRead());
+  file.open(mode: FileMode.read);
   
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();

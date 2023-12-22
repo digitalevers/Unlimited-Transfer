@@ -196,12 +196,13 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                                     List<String?>? path = await Sender.handleSharing(context);
                                     //print(path);
                                     chooseFiles?.addAll(path!);
-                                    List<String>? pathInfo = chooseFiles![0]?.split('.');
-                                    String? suffix = pathInfo![pathInfo.length - 1];
-                                    String? fileName = Uri.decodeComponent(pathInfo[pathInfo.length - 2]);
-                                    fileName = fileName.substring(fileName.length - 3);
-                                    showShortFileName = "...$fileName.$suffix";
+                                    // List<String>? pathInfo = chooseFiles![0]?.split('.');
+                                    // String? suffix = pathInfo![pathInfo.length - 1];
+                                    // String? fileName = Uri.decodeComponent(pathInfo[pathInfo.length - 2]);
+                                    // fileName = fileName.substring(fileName.length - 3);
+                                    // showShortFileName = "...$fileName.$suffix";
                                     //print(showShortFileName);
+                                    showShortFileName = getShortFileName(chooseFiles![0]!);
                                     setState(() {
                                       //isLoading = false;
                                       if ((chooseFiles?.length)! > 0) {

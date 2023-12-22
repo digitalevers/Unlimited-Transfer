@@ -42,6 +42,7 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      reverse: false,
       itemCount: receviceFilesLog.length,
       itemBuilder: (BuildContext context, int index) {
         return
@@ -56,7 +57,7 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
               //focusColor:Color.fromARGB(255, 197, 30, 30),
               //hoverColor:Color.fromARGB(255, 185, 28, 216),
               //splashColor: Color.fromARGB(255, 62, 204, 44),
-              title: Text(receviceFilesLog[index]),
+              title: Text(getShortFileName(receviceFilesLog[index],15)),
               subtitle: Text("From"),
               trailing: SizedBox(
                 width: 100,
