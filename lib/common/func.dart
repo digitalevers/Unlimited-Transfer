@@ -171,7 +171,6 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
   //client.close();// 这里若关闭了 就不能再次发送请求了
 }
 
-
 //发送文件
 //TODO 发送多个文件
 Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String?>? filelist_) async {
@@ -191,86 +190,84 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   //client.close();
 }
 
+// getEstimatedTime(receivedBits, totalBits, currentSpeed) {
+//   ///speed in [mega bits  x * 10^6 bits ]
+//   double estBits = (totalBits - receivedBits) / 1000000;
+//   int estTimeInInt = (estBits ~/ currentSpeed);
+//   int mins = 0;
+//   int seconds = 0;
+//   int hours = 0;
+//   hours = estTimeInInt ~/ 3600;
+//   mins = (estTimeInInt % 3600) ~/ 60;
+//   seconds = ((estTimeInInt % 3600) % 60);
+//   if (hours == 0) {
+//     if (mins == 0) {
+//       return 'About $seconds seconds left';
+//     }
+//     return 'About $mins m and $seconds s left';
+//   }
+//   return 'About $hours h $mins m $seconds s left';
+// }
+
+// storeHistory(Box box, String savePath) {
+//   if (box.get('fileInfo') == null) {
+//     box.put('fileInfo', []);
+//   }
+//   List fileInfo = box.get('fileInfo') as List;
+//   fileInfo.insert(
+//     0,
+//     {
+//       'fileName': savePath.split(Platform.pathSeparator).last,
+//       'date': DateTime.now(),
+//       'filePath': savePath
+//     },
+//   );
+
+//   box.put('fileInfo', fileInfo);
+// }
+
+// int getRandomNumber() {
+//   Random rnd;
+//   try {
+//     rnd = Random.secure();
+//   } catch (_) {
+//     rnd = Random();
+//   }
+//   return rnd.nextInt(10000);
+// }
 
 
-getEstimatedTime(receivedBits, totalBits, currentSpeed) {
-  ///speed in [mega bits  x * 10^6 bits ]
-  double estBits = (totalBits - receivedBits) / 1000000;
-  int estTimeInInt = (estBits ~/ currentSpeed);
-  int mins = 0;
-  int seconds = 0;
-  int hours = 0;
-  hours = estTimeInInt ~/ 3600;
-  mins = (estTimeInInt % 3600) ~/ 60;
-  seconds = ((estTimeInInt % 3600) % 60);
-  if (hours == 0) {
-    if (mins == 0) {
-      return 'About $seconds seconds left';
-    }
-    return 'About $mins m and $seconds s left';
-  }
-  return 'About $hours h $mins m $seconds s left';
-}
+// processReceiversData(Map<String, dynamic> newReceiverData) {
+//   var inst = GetIt.I.get<ReceiverDataController>();
+//   inst.receiverMap.addAll(
+//     {
+//       "${newReceiverData["receiverID"]}": {
+//         "hostName": newReceiverData["hostName"],
+//         "os": newReceiverData["os"],
+//         "currentFileName": newReceiverData["currentFileName"],
+//         "currentFileNumber": newReceiverData["currentFileNumber"],
+//         "filesCount": newReceiverData['filesCount'],
+//         "isCompleted": newReceiverData["isCompleted"],
+//       }
+//     },
+//   );
+// }
 
-storeHistory(Box box, String savePath) {
-  if (box.get('fileInfo') == null) {
-    box.put('fileInfo', []);
-  }
-  List fileInfo = box.get('fileInfo') as List;
-  fileInfo.insert(
-    0,
-    {
-      'fileName': savePath.split(Platform.pathSeparator).last,
-      'date': DateTime.now(),
-      'filePath': savePath
-    },
-  );
+// Future<void> storeSentFileHistory(List<String?> files) async {
+//   Box box = await Hive.openBox('appData');
+//   if (box.get('sentHistory') == null) {
+//     box.put('sentHistory', []);
+//   }
+//   List sentFiles = box.get('sentHistory');
 
-  box.put('fileInfo', fileInfo);
-}
-
-int getRandomNumber() {
-  Random rnd;
-  try {
-    rnd = Random.secure();
-  } catch (_) {
-    rnd = Random();
-  }
-  return rnd.nextInt(10000);
-}
-
-
-processReceiversData(Map<String, dynamic> newReceiverData) {
-  var inst = GetIt.I.get<ReceiverDataController>();
-  inst.receiverMap.addAll(
-    {
-      "${newReceiverData["receiverID"]}": {
-        "hostName": newReceiverData["hostName"],
-        "os": newReceiverData["os"],
-        "currentFileName": newReceiverData["currentFileName"],
-        "currentFileNumber": newReceiverData["currentFileNumber"],
-        "filesCount": newReceiverData['filesCount'],
-        "isCompleted": newReceiverData["isCompleted"],
-      }
-    },
-  );
-}
-
-Future<void> storeSentFileHistory(List<String?> files) async {
-  Box box = await Hive.openBox('appData');
-  if (box.get('sentHistory') == null) {
-    box.put('sentHistory', []);
-  }
-  List sentFiles = box.get('sentHistory');
-
-  sentFiles.insertAll(
-    0,
-    files
-        .map((e) => {
-              "fileName": e!.split(Platform.pathSeparator).last,
-              "date": DateTime.now(),
-              "filePath": e
-            })
-        .toList(),
-  );
-}
+//   sentFiles.insertAll(
+//     0,
+//     files
+//         .map((e) => {
+//               "fileName": e!.split(Platform.pathSeparator).last,
+//               "date": DateTime.now(),
+//               "filePath": e
+//             })
+//         .toList(),
+//   );
+// }
