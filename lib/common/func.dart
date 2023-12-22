@@ -187,34 +187,42 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   String filePath = Uri.decodeComponent(filelist_![0]!);
   File file = File(filePath); 
   Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
-  HttpClientRequest request = await  client.postUrl(uri);
+  HttpClientRequest request = await client_.postUrl(uri);
   //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
   //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
   //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
-  log(filePath,StackTrace.current);
-  String fileNameWithExtension = p.basename(filePath);
-  request.headers.set("filename", "pubspec_123.lock");
+  //log(filePath,StackTrace.current);
+  String basename = p.basename(filePath);
+  request.headers.set("filename", basename);
+
   try{
     await request.addStream(file.openRead());
-  } on FileSystemException catch(e) {
+    HttpClientResponse response = await request.close();
+    String result = await response.transform(utf8.decoder).join();
+    log(result, StackTrace.current);
+    return result;
+  } on FileSystemException {
+    //这里一定要关闭request 并重新打开一个request
+    request.close();
+
+    request = await client_.postUrl(uri);
+    request.headers.set("filename", basename);
+
     const platform = MethodChannel("AndroidApi");
-    String fileNameWithoutExtension = p.withoutExtension(filePath);
-    String fileExtension = p.extension(filePath);
+    String fileNameWithoutExtension = p.withoutExtension(basename);
+    String fileExtension = p.extension(basename);
     filePath = "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fpubspec_123.lock";
-    String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filePath,"pubspec_123",fileExtension]);
+    
+    String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filePath,fileNameWithoutExtension,fileExtension]);
+
     File newFile = File(newPrivatePath);
+    //log(newFile,StackTrace.current);
     await request.addStream(newFile.openRead());
+    HttpClientResponse response = await request.close();
+    String result = await response.transform(utf8.decoder).join();
+    log(result, StackTrace.current);
+    return result;
   }
-
-
-  // File newFile = File("/data/data/com.example.woniu/files/uri_to_file/pubspec_123.lock");
-  // await request.addStream(newFile.openRead());
-
-
-  HttpClientResponse response = await request.close();
-  String result = await response.transform(utf8.decoder).join();
-  log(result, StackTrace.current);
-  return result;
   //client.close();
 }
 

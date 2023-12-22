@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:path/path.dart' as p;
-import 'package:woniu/common/func.dart';
+
 
 // String _data = "0";
 
@@ -77,10 +77,10 @@ void main() {//注意：需要添加async，因为await必须在async方法内�
   // print(recursionFormatFileSize(1210000674));
   // print(recursionFormatFileSize(2565));
 
-   String path = "/storage/emulated/0/Download/pubspec_123.lock";
-   log(p.basename(path));
-   log(p.withoutExtension(path));
-   log(p.extension(path));
+   String path = "/storage/emulated/0/Download/pubspe.c_123.lock";
+   String basename = p.basename(path);
+   print(p.withoutExtension(basename));
+   print(p.extension(basename));
 }
 
 String formatFileSize(int fileSizeBytes){
