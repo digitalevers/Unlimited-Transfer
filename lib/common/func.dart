@@ -191,6 +191,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
   //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
   //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
+  log(filePath,StackTrace.current);
   String fileNameWithExtension = p.basename(filePath);
   request.headers.set("filename", "pubspec_123.lock");
   try{

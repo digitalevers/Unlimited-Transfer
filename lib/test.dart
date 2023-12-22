@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:path/path.dart' as p;
+import 'package:woniu/common/func.dart';
 
 // String _data = "0";
 
@@ -67,15 +69,18 @@ import 'dart:math';
 
 
 
-void main() async {//注意：需要添加async，因为await必须在async方法内才有效
+void main() {//注意：需要添加async，因为await必须在async方法内才有效
   //  print('0');
 
   //  await testasync().then((param)=>{print(param)});
   //  print('end');
   // print(recursionFormatFileSize(1210000674));
   // print(recursionFormatFileSize(2565));
-   String? est = "hello";
-   print(est.length);
+
+   String path = "/storage/emulated/0/Download/pubspec_123.lock";
+   log(p.basename(path));
+   log(p.withoutExtension(path));
+   log(p.extension(path));
 }
 
 String formatFileSize(int fileSizeBytes){
