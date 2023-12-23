@@ -198,12 +198,7 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
 //发送文件
 //TODO 发送多个文件
 Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, List<Map<String,String>> filelist_) async {
-  String filePath = "";
-  if(filelist_[0]["storageUri"]!.isEmpty){
-    filePath = Uri.decodeComponent(filelist_[0]["privateUri"]!);
-  } else {
-    filePath = Uri.decodeComponent(filelist_[0]["storageUri"]!);
-  }
+  String filePath = Uri.decodeComponent(filelist_[0]["originUri"]!);
   File file = File(filePath); 
   Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
   HttpClientRequest request = await client_.postUrl(uri);
@@ -221,9 +216,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
     request = await client_.postUrl(uri);
     request.headers.set("baseName", filelist_[0]["baseName"]!);
     const platform = MethodChannel("AndroidApi");
-
-    //filePath = "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fpubspec_123.lock";
- 
+    
     String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filelist_[0]["contentUri"], filelist_[0]["fileName"], filelist_[0]["extension"]]);
     File newFile = File(newPrivatePath);
     log(newFile,StackTrace.current);

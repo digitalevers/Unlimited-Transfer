@@ -4,6 +4,7 @@ import static android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.provider.DocumentsProvider;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.webkit.MimeTypeMap;
 import android.provider.OpenableColumns;
 
@@ -74,8 +76,21 @@ public class MainActivity extends FlutterActivity {
 
 
 
-    public static String getOriginFilePathByUri(Uri uri,Context context) {
-        //System.out.println(uri);
+    public String getOriginFilePathByUri(Uri uri, Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            System.out.println("-----------------------"+Environment.isExternalStorageManager());
+        }
+        final int REQUEST_MANAGE_FILES_ACCESS = 2;
+        //2023-12-23 22:00 add
+        //请求所有文件权限 才能调用intent打开文件
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if(!Environment.isExternalStorageManager()){
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, REQUEST_MANAGE_FILES_ACCESS);
+            }
+        }
+
         String path = "";
         // 以 file:// 开头的
         if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {

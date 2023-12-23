@@ -58,6 +58,7 @@ dependencies:
   showcaseview: ^2.0.3
   shared_preferences: ^2.2.2
   uri_to_file: ^0.2.0
+  open_file: ^3.3.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
