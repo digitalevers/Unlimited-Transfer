@@ -36,7 +36,7 @@ Map<String, Map<String, dynamic>> remoteDevicesData = {};
 //发送文件的客户端
 final HttpClient client = HttpClient();    
 //待发送的文件列表
-List<String?>? fileList = []; //_fileList 前面加_会让变量私有 从而无法全局引用
+List<Map<String,String>> fileList = []; //_fileList 前面加_会让变量私有 从而无法全局引用
 //全局key - nav(MaterialApp)
 final GlobalKey<NavigatorState> nav = GlobalKey<NavigatorState>();
 //全局key - stack 远程设备item容器

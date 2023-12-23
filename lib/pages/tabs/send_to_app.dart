@@ -456,15 +456,6 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
              Flexible(
               flex: 10,
               child: 
-                // Container(
-                //   color: Colors.blue,
-                //   alignment: Alignment.center,
-                //   child: const Text(
-                //     '接收文件记录',
-                //     style: TextStyle(color: Colors.white),
-                //   ),
-                // ),
-
                 // ListView.builder(
                 //     key: receiveFilesLogKey,
                 //     itemCount: 1,

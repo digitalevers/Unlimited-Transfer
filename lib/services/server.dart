@@ -29,7 +29,7 @@ import 'package:bot_toast/bot_toast.dart';
 class Server {
   static ServerStatus _serverStatus = ServerStatus.idle;
   static Map<String, Object>? serverInf;
-  static Map<String, String>? fileList;
+  //static Map<String, String>? fileList;
   static HttpServer? _server;
   //启动httpserver
   static Future<Map<String, dynamic>> startServer(GlobalKey key,dynamic receiveFilesLogKey) async {
@@ -125,18 +125,16 @@ class Server {
             //3、流式写入文件 不会产生OOM
             //const uploadDirectory = './upload';
             //File file = File('$uploadDirectory/$filename');
-            String filename = request.headers['filename']![0];
-            String filenameWithoutExtension = p.withoutExtension(filename);
-            String extension  = p.extension(filename);
-            
-
+            String basename = request.headers['baseName']![0];
+            String fileName = p.withoutExtension(basename);
+            String extension  = p.extension(basename);
             String downloadDir = "/storage/emulated/0/Download/";
-            String filePath = downloadDir + filename;
+            String filePath = downloadDir + basename;
             File file = File(filePath);
             //有同名文件 则在源文件后追加一个随机文件名生成一个新的文件名
             if(file.existsSync()){
               String randomFileSuffix = (100 + Random().nextInt(999 - 100)).toString();
-              filePath = "$downloadDir${filenameWithoutExtension}_$randomFileSuffix$extension";
+              filePath = "$downloadDir${fileName}_$randomFileSuffix$extension";
               file = File(filePath);
               if(file.existsSync()){
                 throw const FileSystemException("The file have exist already");

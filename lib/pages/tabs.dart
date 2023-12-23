@@ -28,7 +28,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   // ignore: non_constant_identifier_names
   Icon _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
-  List<String?>? chooseFiles = [];
+  List<Map<String,String>> chooseFiles = [];
   String showShortFileName = '';
   final List<Widget> _pages = [
     SendToApp(GlobalKey()),
@@ -87,8 +87,8 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
               onTap: (index) {
                 setState(() {
                   if (index == 2) {
-                    if (chooseFiles!.isNotEmpty) {
-                      chooseFiles!.clear();
+                    if (chooseFiles.isNotEmpty) {
+                      chooseFiles.clear();
                       _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
                     }
                   } else {
@@ -117,7 +117,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     icon: Icon(Icons.open_in_browser), label: "传浏览器"),
                 BottomNavigationBarItem(
                     icon: const Icon(Icons.add),
-                    label: chooseFiles!.isNotEmpty ? "点我清空" : "选择文件"),
+                    label: chooseFiles.isNotEmpty ? "点我清空" : "选择文件"),
                 const BottomNavigationBarItem(
                     icon: Icon(Icons.open_in_browser), label: "使用说明"),
                 const BottomNavigationBarItem(
@@ -153,7 +153,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
  * 获取 floatingActionButton 位置的控件
  */
   Widget getFloatingActionButton(){
-    return chooseFiles!.isNotEmpty ? 
+    return chooseFiles.isNotEmpty ? 
             Draggable(data: '',
               feedback: const Icon(Icons.file_copy, color: Colors.blue, size: 30),
               onDraggableCanceled: (Velocity velocity, Offset offset) {
@@ -195,19 +195,14 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                                   onPressed: () async {
                                     //选择文件
                                     chooseFiles = [];
-                                    List<String?>? path = await Sender.handleSharing(context);
+                                    List<Map<String,String>> path = await Sender.handleSharing(context);
                                     //print(path);
-                                    chooseFiles?.addAll(path!);
-                                    // List<String>? pathInfo = chooseFiles![0]?.split('.');
-                                    // String? suffix = pathInfo![pathInfo.length - 1];
-                                    // String? fileName = Uri.decodeComponent(pathInfo[pathInfo.length - 2]);
-                                    // fileName = fileName.substring(fileName.length - 3);
-                                    // showShortFileName = "...$fileName.$suffix";
-                                    //print(showShortFileName);
-                                    showShortFileName = getShortFileName(chooseFiles![0]!);
+                                    chooseFiles.addAll(path);
+                                    showShortFileName = getShortFileName(chooseFiles[0]["originUri"]!);
                                     setState(() {
                                       //isLoading = false;
-                                      if ((chooseFiles?.length)! > 0) {
+                                      // ignore: prefer_is_empty
+                                      if ((chooseFiles.length) > 0) {
                                         _FloatingActionButtonIcon = const Icon(Icons.file_copy, color: Colors.white);
                                       } else {
                                         _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
@@ -238,11 +233,12 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     IconButton(
                         onPressed: () async {
                           //选择文件
-                          List<String?>? path = await Sender.handleSharing(context);
-                          chooseFiles?.addAll(path!);
+                          List<Map<String,String>> path = await Sender.handleSharing(context);
+                          chooseFiles.addAll(path);
                           setState(() {
                             //isLoading = false;
-                            if ((chooseFiles?.length)! > 0) {
+                            // ignore: prefer_is_empty
+                            if ((chooseFiles.length) > 0) {
                               _FloatingActionButtonIcon = const Icon(Icons.file_copy, color: Colors.white);
                             } else {
                               _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);

@@ -125,21 +125,35 @@ String fommatFileSize(int fileSizeBytes){
 
 //获取文件名的简略形式 以免文件名过长
 //params limLengh 限制的简略文件名字符长度（包含后缀）
-String getShortFileName(String fileNameWithExtension,[int limLengh = 6]){
-  fileNameWithExtension = fileNameWithExtension.substring(fileNameWithExtension.length - limLengh);
-  return "...$fileNameWithExtension";
+String getShortFileName(String baseName,[int limLengh = 6]){
+  if(baseName.length <= limLengh){
+    return baseName;
+  }
+  baseName = baseName.substring(baseName.length - limLengh);
+  return "...$baseName";
+}
+
+//根据 storageUri 或 privateUri 获取文件基本信息
+Map<String,String>  getFileInfo(String storageOrPrivateUri){
+  Map<String,String> fileInfo = {};
+  fileInfo['baseName'] = p.basename(storageOrPrivateUri);
+  fileInfo['fileName'] = p.withoutExtension(fileInfo['baseName']!);
+  fileInfo['shortFileName'] = getShortFileName(fileInfo['baseName']!);
+  fileInfo['extension'] = p.extension(fileInfo['baseName']!);
+  File tempFile = File(storageOrPrivateUri);
+  fileInfo['fileSize'] = tempFile.lengthSync().toString();
+  return fileInfo;
 }
 
 //发送文件信息 客户端发送到服务端
-Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<String?>? fileList_, context_) async {
-  int fileCount = fileList_!.length;  //待发送文件数量
+Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_, List<Map<String,String>> fileList_, context_) async {
+  int fileCount = fileList_.length;  //待发送文件数量
   int fileSize = 0;                   //待发送文件大小 单位M
   for(int i = 0;i < fileCount;i++){
-    File _tempFile = File(fileList_[i]!);
-    fileSize += _tempFile.lengthSync();
+    fileSize += int.parse(fileList_[i]['fileSize']!);
   }
   
-  String url = "http://$serverIP_:$serverPort_/fileinfo";
+  String url      = "http://$serverIP_:$serverPort_/fileinfo";
   String formBody = "fileSize=$fileSize&fileCount=$fileCount";
 
   HttpClientRequest request = await  client.postUrl(Uri.parse(url));
@@ -183,8 +197,13 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
 
 //发送文件
 //TODO 发送多个文件
-Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, List<String?>? filelist_) async {
-  String filePath = Uri.decodeComponent(filelist_![0]!);
+Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, List<Map<String,String>> filelist_) async {
+  String filePath = "";
+  if(filelist_[0]["storageUri"]!.isEmpty){
+    filePath = Uri.decodeComponent(filelist_[0]["privateUri"]!);
+  } else {
+    filePath = Uri.decodeComponent(filelist_[0]["storageUri"]!);
+  }
   File file = File(filePath); 
   Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
   HttpClientRequest request = await client_.postUrl(uri);
@@ -192,8 +211,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
   //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
   //log(filePath,StackTrace.current);
-  String basename = p.basename(filePath);
-  request.headers.set("filename", basename);
+  request.headers.set("baseName", filelist_[0]["baseName"]!);
 
   try{
     await request.addStream(file.openRead());
@@ -201,13 +219,12 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
     //这里一定要关闭request 并重新打开一个request
     request.close();
     request = await client_.postUrl(uri);
-    request.headers.set("filename", basename);
+    request.headers.set("baseName", filelist_[0]["baseName"]!);
     const platform = MethodChannel("AndroidApi");
-    String fileNameWithoutExtension = p.withoutExtension(basename);
-    String fileExtension = p.extension(basename);
-    filePath = "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fpubspec_123.lock";
+
+    //filePath = "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fpubspec_123.lock";
  
-    String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filePath,fileNameWithoutExtension,fileExtension]);
+    String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filelist_[0]["contentUri"], filelist_[0]["fileName"], filelist_[0]["extension"]]);
     File newFile = File(newPrivatePath);
     log(newFile,StackTrace.current);
     await request.addStream(newFile.openRead());
@@ -218,6 +235,19 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   log(result, StackTrace.current);
   return result;
   //client.close();
+}
+
+//将 List<String?> 转成 List<Map<String,String>>的形式
+List<Map<String,String>> transformList(List<String?> list){
+  List<Map<String,String>> result = [];
+  //Map<String,String> map = {"contentUri":"","storageUri":"","privateUri":"","baseName":"","fileName":"","extension":""};
+  Map<String,String> map = {};
+  for(int i = 0; i < list.length; i++){
+    map["contentUri"] = list[i]!;
+    result.add(map);
+  }
+  
+  return result;
 }
 
 // getEstimatedTime(receivedBits, totalBits, currentSpeed) {

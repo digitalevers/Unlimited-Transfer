@@ -13,17 +13,25 @@ class ReceiveFilesLog extends StatefulWidget {
 
   @override
   State<ReceiveFilesLog> createState() => _ReceiveFilesLogState();
-
+  
 }
+
+
 
 // ignore: camel_case_types
 class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
   List<String> receviceFilesLog = [];
+  final ScrollController _scrollController = ScrollController();  //ListView 滑动控制器
 
   @override
   void initState() {
     super.initState();
     _initState();
+
+    //界面build完成后执行回调函数
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    // });
   }
 
   void _initState() async{
@@ -41,50 +49,78 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      reverse: false,
-      itemCount: receviceFilesLog.length,
-      itemBuilder: (BuildContext context, int index) {
-        return
-          Container(
-            color: const Color(0xffFF9E3D),
-            child: ListTile(
-              //tileColor: const Color(0xffFF9E3D),
-              //selectedTileColor:const Color(0xff1122dd),
-              iconColor:const Color(0xffFFFFFF),
-              textColor:const Color(0xffFFFFFF),
-              //selectedColor:const Color(0xff1122dd),
-              //focusColor:Color.fromARGB(255, 197, 30, 30),
-              //hoverColor:Color.fromARGB(255, 185, 28, 216),
-              //splashColor: Color.fromARGB(255, 62, 204, 44),
-              title: Text(getShortFileName(receviceFilesLog[index],15)),
-              subtitle: Text("From"),
-              trailing: SizedBox(
-                width: 100,
-                child: Row(
-                  children: [
-                      InkWell(
-                      onTap: () {
-                        //call your onpressed function here
-                        print('Button Pressed');
-                      },
-                      child: const Icon(Icons.file_open),
-                    ),
-                    const SizedBox(width: 20),
-                    InkWell(
-                      onTap: () {
-                        //call your onpressed function here
-                        print('Delete Pressed');
-                      },
-                      child: Icon(Icons.delete),
-                    ),
-                  ],
-              )
-              )
-            )
-            );
-      },
+    return receviceFilesLog.isEmpty ? receviceFilesLogIsEmpty() : receviceFilesLogNotEmpty();
+  }
+
+  Widget receviceFilesLogIsEmpty(){
+    return Container(
+      color: Colors.blue,
+      alignment: Alignment.center,
+      child: const Text(
+        '接收文件记录',
+        style: TextStyle(color: Colors.white),
+      )
     );
+  }
+
+  Widget receviceFilesLogNotEmpty(){
+    return 
+      Scrollbar(
+        child: 
+          ListView.separated(
+            controller: _scrollController,
+            padding:const EdgeInsets.all(5),
+            reverse: false,
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(height: 2);
+            },
+            itemCount: receviceFilesLog.length,
+            itemBuilder: (BuildContext context, int index) {
+              return
+                Container(
+                  color: index == receviceFilesLog.length - 1 ? const Color(0xddFF9E3D) : const Color(0xffFF9E3D),
+                  child: 
+                    ListTile(
+                      //contentPadding: const EdgeInsets.all(5),
+                      //tileColor: const Color(0xffFF9E3D),
+                      //selectedTileColor:const Color(0xff1122dd),
+                      iconColor:const Color(0xffFFFFFF),
+                      textColor:const Color(0xffFFFFFF),
+                      //selectedColor:const Color(0xff1122dd),
+                      //focusColor:Color.fromARGB(255, 197, 30, 30),
+                      //hoverColor:Color.fromARGB(255, 185, 28, 216),
+                      //splashColor: Color.fromARGB(255, 62, 204, 44),
+
+                      isThreeLine: false,
+                      title: Text(getShortFileName(p.basename(receviceFilesLog[index]),15)),
+                      subtitle: Text("From 172.16.28.133\nDate 2023-12-13 16:47",style: TextStyle(fontSize:10.0,color: Color.fromARGB(255, 250, 250, 250))),
+                      trailing: SizedBox(
+                        width: 100,
+                        child: Row(
+                          children: [
+                              InkWell(
+                              onTap: () {
+                                //call your onpressed function here
+                                print('Button Pressed');
+                              },
+                              child: const Icon(Icons.file_open),
+                            ),
+                            const SizedBox(width: 20),
+                            InkWell(
+                              onTap: () {
+                                //call your onpressed function here
+                                print('Delete Pressed');
+                              },
+                              child: Icon(Icons.delete),
+                            ),
+                          ],
+                      )
+                      )
+                    )
+                  );
+            },
+          )
+      );
   }
 
   void insertFilesLog(String filePath) async {
@@ -100,6 +136,10 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
     receviceFilesLog = _getBaseName(filesLog);
     await prefs!.setStringList("receviceFilesLog", filesLog);
     setState(() {});
+    // 延迟500毫秒，再进行滑动
+    Future.delayed(Duration(milliseconds: 500), () {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
   }
 
   void delFilesLog(String filePath) async{
