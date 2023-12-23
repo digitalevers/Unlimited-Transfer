@@ -146,7 +146,7 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
   request.add(utf8.encode(formBody));
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();
-  log(result, StackTrace.current);
+  //log(result, StackTrace.current);
   if(result == ""){
     log("服务器无返回");
   } else {
@@ -197,32 +197,26 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
 
   try{
     await request.addStream(file.openRead());
-    HttpClientResponse response = await request.close();
-    String result = await response.transform(utf8.decoder).join();
-    log(result, StackTrace.current);
-    return result;
   } on FileSystemException {
     //这里一定要关闭request 并重新打开一个request
     request.close();
-
     request = await client_.postUrl(uri);
     request.headers.set("filename", basename);
-
     const platform = MethodChannel("AndroidApi");
     String fileNameWithoutExtension = p.withoutExtension(basename);
     String fileExtension = p.extension(basename);
     filePath = "content://com.android.externalstorage.documents/document/primary%3ADownload%2Fpubspec_123.lock";
-    
+ 
     String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filePath,fileNameWithoutExtension,fileExtension]);
-
     File newFile = File(newPrivatePath);
-    //log(newFile,StackTrace.current);
+    log(newFile,StackTrace.current);
     await request.addStream(newFile.openRead());
-    HttpClientResponse response = await request.close();
-    String result = await response.transform(utf8.decoder).join();
-    log(result, StackTrace.current);
-    return result;
   }
+
+  HttpClientResponse response = await request.close();
+  String result = await response.transform(utf8.decoder).join();
+  log(result, StackTrace.current);
+  return result;
   //client.close();
 }
 

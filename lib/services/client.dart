@@ -73,6 +73,9 @@ class Sender{
       //log(fileList,StackTrace.current);
       if(Platform.isIOS){
         
+
+
+        
       } else if(Platform.isAndroid){
         for(int i = 0; i < fileList!.length; i++){
           //第一种方式 使用插件试图转换成 /data/data 开头的内部链接 但是会将文件复制一份放到 "/data/data/0/包名" 的内部空间中 如果文件很大造成空间浪费而且复制会特别耗时

@@ -95,14 +95,16 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     _currentIndex = index;
                   }
                   //选中其他tab页 停止雷达扫描
-                  if (index != 0) {
-                    _indexSweepGradient = null;
-                  } else {
-                    _indexSweepGradient = SweepGradient(colors: [
-                      Colors.white.withOpacity(0.2),
-                      Colors.white.withOpacity(0.6),
-                    ]);
-                  }
+                  // if (index != 0) {
+                  //   _indexSweepGradient = null;
+                  // } else {
+                  //   _indexSweepGradient = SweepGradient(colors: [
+                  //     Colors.white.withOpacity(0.2),
+                  //     Colors.white.withOpacity(0.6),
+                  //   ]);
+                  // }
+                  //2023-12-23关闭扫描动画
+                  _indexSweepGradient = null;
 
                   // ignore: avoid_print
                   //print(this);
