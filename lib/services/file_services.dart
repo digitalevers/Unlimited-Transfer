@@ -49,15 +49,13 @@ class FileMethods {
         {'name': fileName, 'size': size, 'file': file, 'extension': type});
   }
 
-  static Future<String> getSavePath(
-      String filePath, SenderModel senderModel) async {
+  static Future<String> getSavePath(String filePath, SenderModel senderModel) async {
     // ignore: unused_local_variable
     String? savePath;
     Directory? directory;
     //extract filename from filepath send by the sender
 
-    String fileName =
-        filePath.split(senderModel.os == "windows" ? r'\' : r'/').last;
+    String fileName = filePath.split(senderModel.os == "windows" ? r'\' : r'/').last;
     directory = await getSaveDirectory();
     savePath = p.join(directory.path, fileName);
 
@@ -79,8 +77,7 @@ class FileMethods {
 
 //for receiver to display filenames
   static Future<List<String>> getFileNames(SenderModel senderModel) async {
-    var resp = await Dio()
-        .get('http://${senderModel.ip}:${senderModel.port}/getpaths');
+    var resp = await Dio().get('http://${senderModel.ip}:${senderModel.port}/getpaths');
     Map<String, dynamic> filePathMap = jsonDecode(resp.data);
     List<String> fileNames = [];
     if (filePathMap.containsKey('isApk')) {
