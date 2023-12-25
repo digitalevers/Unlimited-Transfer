@@ -58,7 +58,7 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
       alignment: Alignment.center,
       child: const Text(
         '接收文件记录',
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Color(0xffEDF1F2)),
       )
     );
   }
@@ -72,13 +72,13 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
             padding:const EdgeInsets.all(5),
             reverse: false,
             separatorBuilder: (BuildContext context, int index) {
-              return const SizedBox(height: 2);
+              return const SizedBox(height: 5);
             },
             itemCount: receviceFilesLog.length,
             itemBuilder: (BuildContext context, int index) {
               return
                 Container(
-                  color: index == receviceFilesLog.length - 1 ? const Color(0xddFF9E3D) : const Color(0xffFF9E3D),
+                  color: index == receviceFilesLog.length - 1 ? const Color(0xffFC6621) : const Color(0xffFF9E3D),
                   child: 
                     ListTile(
                       //contentPadding: const EdgeInsets.all(5),
