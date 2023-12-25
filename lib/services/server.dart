@@ -44,7 +44,6 @@ class Server {
       (HttpRequest request) async {
         if (request.method.toLowerCase() == 'post') {
           String baseUri = p.basename(request.requestedUri.toString());
-   
           if (baseUri == "fileinfo") {
             // String os = (request.headers['os']![0]);
             // String username = request.headers['receiver-name']![0];
@@ -159,18 +158,11 @@ class Server {
             // ).show(key.currentContext as BuildContext);
             BotToast.showText(text:"接收完毕");
           } else {
-            // print("server");
-            // //uri should be in format http://ip:port/secretcode/file-index
-            // List requriToList = request.requestedUri.toString().split('/');
-            // if (int.parse(requriToList[requriToList.length - 2]) == _randomSecretCode) {
-
-            // } else {
-            //   request.response.write('Wrong secret-code.Photon-server denied access');
-            // }
+            request.response.write('Wrong Request Method denied access');
           }
         } else {
-          //非post
-           //print(request.requestedUri);
+          //非post 路由处理
+           print(request.requestedUri);
            request.response
         ..headers.contentType = ContentType.html
         ..write('''

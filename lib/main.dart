@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:woniu/services/fileManager.dart';
 import 'pages/tabs.dart';
 
 import 'common/config.dart';
@@ -28,6 +29,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();  //这一行很重要且必须放在第一行 放在 SharedPreferences 前面 否则运行会报错 暂不知原因
   prefs = await SharedPreferences.getInstance();
   Hive.init((await getApplicationDocumentsDirectory()).path);
+
+  // var dir = GSFileSystemFileStorage.scanDir("/");
+  // for(var file in dir){
+  //   print(file.path);
+  // }
+  
   // await Hive.openBox('appData');
   // Box box = Hive.box('appData');
   // box.get('avatarPath') ?? box.put('avatarPath', 'assets/avatars/1.png');

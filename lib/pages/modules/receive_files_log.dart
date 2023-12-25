@@ -6,6 +6,8 @@ import '../../common/global_variable.dart';
 import 'package:path/path.dart' as p;
 import 'package:woniu/common/func.dart';
 
+import 'package:open_file/open_file.dart';
+
 
 //组件单独放在一个文件里则无法访问到 _ReceiveFilesLogState 该类为文件私有
 class ReceiveFilesLog extends StatefulWidget {
@@ -101,7 +103,9 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                               InkWell(
                               onTap: () {
                                 //call your onpressed function here
-                                print('Button Pressed');
+                                OpenFile.open(receviceFilesLog[index]).then((value) => 
+                                  log(value.message,StackTrace.current)
+                                );
                               },
                               child: const Icon(Icons.file_open),
                             ),
@@ -111,7 +115,7 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                                 //call your onpressed function here
                                 print('Delete Pressed');
                               },
-                              child: Icon(Icons.delete),
+                              child: const Icon(Icons.delete),
                             ),
                           ],
                       )

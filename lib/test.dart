@@ -9,9 +9,9 @@ import 'package:path/path.dart' as p;
 // String _data = "0";
 
 // void main() {
-//   // _testMethod();
-//   // sleep(Duration(seconds: 2));
-//   // print("执行其他的操作");
+//   _testMethod();
+//   sleep(Duration(seconds: 2));
+//   print("执行其他的操作");
 
 // }
 
