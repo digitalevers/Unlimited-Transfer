@@ -73,12 +73,15 @@ class GSFileSystemFileStorage{
   }
 
   //创建文件
-  static void makeFile(String filePath){
+  static File makeFile(String filePath){
     if(fileExists(filePath)){
       throw Exception("file does exists");
     } else {
-      File(filePath).createSync();
+      File file = File(filePath);
+      file.createSync();
+      return file;
     }
+
   }
   
   //获取文件修改时间

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:cherry_toast/resources/arrays.dart';
 import 'package:dio/dio.dart';
@@ -11,8 +12,10 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:woniu/models/sender_model.dart';
 import 'package:woniu/pages/tabs/send_to_app.dart';
+import 'package:woniu/services/fileManager.dart';
 import 'package:woniu/services/file_services.dart';
 import 'package:woniu/controllers/controllers.dart';
 import 'package:http/http.dart' as http;
@@ -39,11 +42,12 @@ class Server {
       return {'hasErr': true, 'type': 'server', 'errMsg': '$e'};
     }
 
-    bool? allowRequest;
+
     _server!.listen(
       (HttpRequest request) async {
         if (request.method.toLowerCase() == 'post') {
           String baseUri = p.basename(request.requestedUri.toString());
+          //log(baseUri,StackTrace.current);
           if (baseUri == "fileinfo") {
             // String os = (request.headers['os']![0]);
             // String username = request.headers['receiver-name']![0];
@@ -79,8 +83,6 @@ class Server {
             } else {
               request.response.write(jsonEncode({'code': HttpResponseCode.serverBusy})); //告知客户端 "服务端繁忙"
             }
-            
-            
           } else if (baseUri == "fileupload") {
             //Server端在8G的Win10系统中超过510M左右的文件传输便会产生OOM
             //而Client端在Android上，只要文件超过255M便会产生OOM
@@ -157,29 +159,73 @@ class Server {
             //   animationDuration: const Duration(milliseconds:  500),
             // ).show(key.currentContext as BuildContext);
             BotToast.showText(text:"接收完毕");
+          } else if(baseUri == "fileManager.php"){
+            List<FileSystemEntity> ls = GSFileSystemFileStorage.scanDir("/storage/emulated/0/");
+
           } else {
-            request.response.write('Wrong Request Method denied access');
+            request.response.write('Request Path denied access');
           }
+          request.response.close();
         } else {
-          //非post 路由处理
-           print(request.requestedUri);
-           request.response
-        ..headers.contentType = ContentType.html
-        ..write('''
-          <html>
-          <head>
-            <title>Image Upload Server</title>
-          </head>
-          <body>
-            <form method="post" action="/fileupload" enctype="multipart/form-data">
-              <input type="file" name="fileupload" /><br /><br />
-              <button type="submit">Upload to server</button>
-            </form>
-          </body>
-          </html>
-        ''');
+          //非post get 路由处理
+           //print(request.requestedUri);
+          String path = request.requestedUri.path;
+          if(path == '/'){
+            path = '/index.html';
+          }
+          String extension = p.extension(path);
+          //log(extension,StackTrace.current);
+          switch(extension){
+            case ".html":
+              request.response.headers.contentType = ContentType.html;
+              break;
+            case ".js":
+              request.response.headers.contentType = ContentType.parse("application/javascript");
+              break;
+            case ".css":
+              request.response.headers.contentType = ContentType.parse("text/css; charset=utf-8");
+              break;
+            case ".gif":
+              request.response.headers.contentType = ContentType.parse("image/gif");
+              break;
+            case ".png":
+              request.response.headers.contentType = ContentType.parse("image/png");
+              break;
+            case ".ico":
+              request.response.headers.contentType = ContentType.parse("image/ico");
+              break;
+            case ".apk":
+              request.response.headers.contentType = ContentType.parse("application/vnd.android.package-archive");
+              break;
+            default:
+              request.response.headers.contentType = ContentType.json;
+              break;
+          }
+          //log(path,StackTrace.current);
+          if(extension == ".html" || extension == ".js" || extension == ".css"){
+            String data = await rootBundle.loadString("assets$path");
+            request.response.write(data);
+            request.response.close();
+          } else if(extension == ".png" || extension == ".jpg" || extension == ".gif"){
+            //HTTP SERVER不直接支持 reponse.write 写入二进制数据
+            //暂时有两个解决方案 一种是将 assets下的图片读取到/data/data私域目录 然后打开 file stream 再 reponse.addstream输出
+            //还有一种是在html和css文件内直接用base64图片编码
+            ByteData img = await rootBundle.load("assets$path");
+            String dir = (await getApplicationSupportDirectory()).path;
+            String filePath = "$dir/assets$path";
+            log(filePath,StackTrace.current);
+            //request.response.headers.contentLength = img.lengthInBytes;
+            //GSFileSystemFileStorage.makeFile(filePath).writeAsBytes(img.buffer.asUint8List(img.offsetInBytes, img.lengthInBytes));
+            File newFile = await File(filePath).writeAsBytes(img.buffer.asUint8List(img.offsetInBytes, img.lengthInBytes));
+            request.response.addStream(newFile.openRead()).then((value) => request.response.close());
+
+            // File file = File("/storage/emulated/0/Download/ZFileManager_1.0.apk");
+            // await rootBundle.load("assets/images/directory.png");
+            // //log(file.existsSync(),StackTrace.current);
+            // request.response.addStream(file.openRead()).then((value) => request.response.close());
+          }
         }
-        request.response.close();
+        //request.response.close();
       },
     );
     return {
