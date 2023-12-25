@@ -169,3 +169,11 @@ class GSFileSystemFileStorage{
     }
   }
 }
+
+// void main(){
+//   //GSFileSystemFileStorage gs = GSFileSystemFileStorage();
+//   var dir = GSFileSystemFileStorage.scanDir("/");
+//   for(var file in dir){
+//     print(file.path);
+//   }
+// }
