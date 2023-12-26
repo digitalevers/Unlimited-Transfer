@@ -1,21 +1,24 @@
 // ignore: file_names
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
+import 'package:html_character_entities/html_character_entities.dart';
+import 'package:crypto/crypto.dart';
 
 class FileSystemFileStorage{
   //io.FileSystemEntityType.FILE
-  static bool isDir(String dirPath) {
+   bool isDir(String dirPath) {
     //File(dirPath).statSync().type == io.FileSystemEntityType.DIRECTORY
 		return Directory(dirPath).existsSync();
 	}
 
-  static bool fileExists(String filePath){
-    return File(filePath).existsSync();
+   bool fileExists(String filePath){
+    return File(filePath).statSync().size != -1;
   }
 
-  static List<FileSystemEntity> scanDir(String dirPath){
+   List<FileSystemEntity> scanDir(String dirPath){
     Directory dir = Directory(dirPath);
     if(dir.existsSync()){
       return dir.listSync();
@@ -24,7 +27,7 @@ class FileSystemFileStorage{
     }
   }
 
-  static int fileSize(String filePath){
+   int fileSize(String filePath){
     File file = File(filePath);
     if(file.existsSync()){
       return file.lengthSync();
@@ -34,7 +37,7 @@ class FileSystemFileStorage{
   }
 
   //删除文件
-  static void deleteFile(String filePath){
+   void deleteFile(String filePath){
     File file = File(filePath);
     if(file.existsSync()){
       file.deleteSync();
@@ -44,7 +47,7 @@ class FileSystemFileStorage{
   }
 
   //删除文件夹
-  static void deleteDir(String dirPath,[Directory? directory]){
+   void deleteDir(String dirPath,[Directory? directory]){
     directory ??= Directory(dirPath);
     if (directory.existsSync()) {    
       List<FileSystemEntity> files = directory.listSync();    
@@ -64,7 +67,7 @@ class FileSystemFileStorage{
   }
 
   //创建文件夹
-  static void makeDir(String dirPath){
+   void makeDir(String dirPath){
     if(isDir(dirPath)){
       return;
     } else {
@@ -73,7 +76,7 @@ class FileSystemFileStorage{
   }
 
   //创建文件
-  static File makeFile({String? filePath,File? file}){
+   File makeFile({String? filePath,File? file}){
     if(filePath == null && file == null){
       throw Exception("need one parameter at least");
     }
@@ -92,18 +95,20 @@ class FileSystemFileStorage{
   }
   
   //获取文件修改时间
-  static DateTime filemtime(String filePath){
+   DateTime filemtime(String filePath){
     File file = File(filePath);
     if(file.existsSync()){
       FileStat fs = file.statSync();
       return fs.modified;
     } else {
-      throw Exception("file does not exists");
+      Directory dir = Directory(filePath);
+      FileStat ds = dir.statSync();
+      return ds.modified;
     }
   }
 
   //复制文件
-  static File copyFile(String fromFilePath,String toFilePath){
+   File copyFile(String fromFilePath,String toFilePath){
     File fromFile = File(fromFilePath);
     if(fromFile.existsSync()){
       File toFile = File(toFilePath);
@@ -118,7 +123,7 @@ class FileSystemFileStorage{
   }
 
   //复制文件夹
-  static void copyDir(String srcDirPath,String dstDirPath){
+   void copyDir(String srcDirPath,String dstDirPath){
     Directory srcDir = Directory(srcDirPath);
     if(srcDir.existsSync()){
       Directory dstDir = Directory(dstDirPath);
@@ -137,7 +142,8 @@ class FileSystemFileStorage{
     }
   }
 
-  static void renameItem(String fromFileName, String toFileName){
+  //重命名文件
+   void renameItem(String fromFileName, String toFileName){
     File fromFile = File(fromFileName);
     if(fromFile.existsSync()){
       try{
@@ -150,7 +156,8 @@ class FileSystemFileStorage{
     }
   }
 
-  static dynamic readFile(String filePath,[int type = 1]){
+  //读取文件
+   dynamic readFile(String filePath,[int type = 1]){
     File file = File(filePath);
     if(file.existsSync()){
       if(type == 1){
@@ -165,7 +172,8 @@ class FileSystemFileStorage{
     }
   }
 
-  static void writefile(String filePath,dynamic content){
+  //写文件
+   void writefile(String filePath,dynamic content){
     File file = File(filePath);
     if(!file.existsSync()){
       file.createSync();
@@ -180,10 +188,215 @@ class FileSystemFileStorage{
   }
 }
 
-// void main(){
-//   //GSFileSystemFileStorage gs = GSFileSystemFileStorage();
-//   var dir = GSFileSystemFileStorage.scanDir("/");
-//   for(var file in dir){
-//     print(file.path);
-//   }
-// }
+class FileManager{
+  FileSystemFileStorage _fileStorage;
+  Map<String,String> _options = {};
+  //bool _setUtf8Header = true;
+  final List<String> _functions = [];
+  String _itemNameRegex = '[/\?\*;:{}\\\\]+';
+
+  FileManager(this._fileStorage, this._options){
+		_functions.add("listDir");
+    _functions.add("makeFile");
+    _functions.add("makeDirectory");
+		_functions.add("deleteItem");
+		_functions.add("copyItem");
+		_functions.add("renameItem");
+		_functions.add("moveItems");
+		_functions.add("downloadItem");
+		_functions.add("readfile");
+		_functions.add("writefile");
+		_functions.add("uploadfile");
+		_functions.add("jCropImage");
+		_functions.add("imageResize");
+		_functions.add("copyAsFile");
+		_functions.add("serveImage");
+		_functions.add("zipItem");
+		_functions.add("unZipItem");
+  }
+
+  String getRequestFunction(int index){
+		String result = "";
+		if (_functions[index].isNotEmpty) {
+			result = _functions[index];
+		}
+		return result;
+	}
+
+  String listDir(Map<String,String> args){
+    String rootDir = _options["rootDir"]!;
+		String dir = args['dir']!;
+    //print(rootDir + dir);
+		if(_fileStorage.isDir(rootDir + dir) ) {
+			List<FileSystemEntity> files = _fileStorage.scanDir(rootDir + dir);
+      //print(Directory("/storage/emulated/0/Pictures/").listSync().length);
+			//natcasesort($files);
+			String html = '';
+			html += 'var gsdirs = new Array();';
+			html += 'var gsfiles = new Array();';
+      for(FileSystemEntity file in files ) {
+        //print(file.path);
+        if (p.basename(file.path) == '.' || p.basename(file.path) == '..' || p.basename(file.path) == '.htaccess') {
+          continue;
+        }
+        try{
+          if(_fileStorage.fileExists(file.path)){
+            
+            if(_fileStorage.isDir(file.path) ) {
+              //print("dir"+file.path);
+              String dirPath = file.path.replaceAll(rootDir, "");
+              html += 'gsdirs.push(new gsItem("2", "${p.basename(file.path)}", "$dirPath", "0", "${md5.convert(const Utf8Encoder().convert(file.path))}", "dir", "${_fileStorage.filemtime(file.path)}"));';
+            } else {
+              
+              String extension = p.extension(file.path);
+              html += 'gsfiles.push(new gsItem("1", "${p.basename(file.path)}", "${p.basename(file.path)}", "${_fileStorage.fileSize(file.path)}", "${md5.convert(const Utf8Encoder().convert(file.path))}", "${Uri.encodeComponent(extension).toLowerCase()}", "${_fileStorage.filemtime(file.path)}"));';
+            }
+          }
+        } catch(e){
+          print(e);
+        }
+			}
+      //print(html);
+			return html;
+		} else {
+			throw Exception("ILlegalArgumentException: dir to list does NOT exists $dir");
+		}
+  }
+
+  void makeFile(Map<String,String> args){
+    
+  }
+
+  void makeDirectory(Map<String,String> args){
+    
+  }
+
+  void deleteItem(Map<String,String> args){
+
+  }
+
+  void copyItem(Map<String,String> args){
+
+  }
+
+  void renameItem(Map<String,String> args){
+
+  }
+
+  void moveItems(Map<String,String> args){
+
+  }
+
+  void downloadItem(Map<String,String> args){
+
+  }
+
+  void readfile(Map<String,String> args){
+
+  }
+
+  void writefile(Map<String,String> args){
+
+  }
+
+  void uploadfile(Map<String,String> args){
+
+  }
+
+  void jCropImage(Map<String,String> args){
+
+  }
+
+  void imageResize(Map<String,String> args){
+
+  }
+
+  void copyAsFile(Map<String,String> args){
+
+  }
+
+  void serveImage(Map<String,String> args){
+
+  }
+
+  void zipItem(Map<String,String> args){
+
+  }
+
+  void unZipItem(Map<String,String> args){
+
+  }
+
+  //dynamic invoke the method
+  //dart:mirros lib is not avaiable on all platforms
+  Function getMethod(String name) {
+    if (name == "listDir") return listDir;
+    if (name == "makeFile") return makeFile;
+    if (name == "makeDirectory") return makeDirectory;
+    if (name == "deleteItem") return deleteItem;
+    if (name == "copyItem") return copyItem;
+    if (name == "renameItem") return renameItem;
+    if (name == "moveItems") return moveItems;
+    if (name == "downloadItem") return downloadItem;
+    if (name == "readfile") return readfile;
+    if (name == "writefile") return writefile;
+    if (name == "uploadfile") return uploadfile;
+    if (name == "jCropImage") return jCropImage;
+    if (name == "imageResize") return imageResize;
+    if (name == "copyAsFile") return copyAsFile;
+    if (name == "serveImage") return serveImage;
+    if (name == "zipItem") return zipItem;
+    if (name == "unZipItem") return unZipItem;
+    throw ArgumentError.value(name, "name");
+  }
+
+  String process(Map<String,String> args){
+    if (args['opt'] == null || args['opt']!.isEmpty) {
+			args['opt']  = "0"; //listDir
+		}
+    
+    String? rootDir = _options["rootDir"];
+    if(rootDir == null){
+      throw Exception("ConfigurationException: root can NOT be null");
+    }
+
+    if(args["dir"] == null || args["dir"]!.isEmpty){
+      throw Exception("ILlegalArgumentException: dir can NOT be null");
+    } else {
+      args["dir"] = Uri.decodeFull(args["dir"]!);
+      args["dir"] = HtmlCharacterEntities.decode(args["dir"]!);
+    }
+    
+    String response = '';
+		String functionName = getRequestFunction(int.parse(args["opt"]!));
+    if (functionName.isNotEmpty) {
+      response = getMethod(functionName)(args);
+    } else {
+      throw Exception("ILlegalArgumentException: Unknown action${args['opt']}");
+    }
+		// if (_setUtf8Header) {
+		// 	header("Content-Type: text/html; charset=utf-8");
+		// }
+
+    return response;
+  }
+}
+
+
+void main(){
+  Map<String,String> options = {};
+  options["rootDir"] = 'E:';
+  FileManager manager = FileManager(FileSystemFileStorage(), options);
+  
+  Map<String,String> requestArgs = {"dir":"/"};
+  String result = "";
+  try {
+    result = manager.process(requestArgs);
+    //File file = File("E:/System Volume Information");
+    //print(file.existsSync());
+  } catch (e) {
+    //result = '{result: \'0\', gserror: \''.addslashes($e->getMessage()).'\', code: \''.$e->getCode().'\'}';
+    print(e);
+  }
+  print(result);
+}

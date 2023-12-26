@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.woniu">
+    package="com.digitalevers.transfer">
    <application
         android:label="无界闪传"
         android:name="${applicationName}"

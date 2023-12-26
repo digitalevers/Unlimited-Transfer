@@ -47,7 +47,7 @@ class Server {
       (HttpRequest request) async {
         if (request.method.toLowerCase() == 'post') {
           String baseUri = p.basename(request.requestedUri.toString());
-          //log(baseUri,StackTrace.current);
+          log(baseUri,StackTrace.current);
           if (baseUri == "fileinfo") {
             // String os = (request.headers['os']![0]);
             // String username = request.headers['receiver-name']![0];
@@ -160,8 +160,25 @@ class Server {
             // ).show(key.currentContext as BuildContext);
             BotToast.showText(text:"接收完毕");
           } else if(baseUri == "fileManager.php"){
-            List<FileSystemEntity> ls = FileSystemFileStorage.scanDir("/storage/emulated/0/");
+            //log(await getExternalCacheDirectories(),StackTrace.current); // /storage/emulated/0/Android/data/包名/cache
+            //log(await getExternalStorageDirectories(),StackTrace.current);  // /storage/emulated/0/Android/data/包名/files
+            //log(await getExternalStorageDirectory(),StackTrace.current);      // /storage/emulated/0/Android/data/包名/files
+            //log(await getApplicationSupportDirectory(),StackTrace.current);   // /data/user/0/包名/files
+            Map<String,String> options = {"rootDir":"/storage/emulated/0"};
+            FileManager manager = FileManager(FileSystemFileStorage(), options);
+            String postParams = await request.bytesToString(utf8);
+            List<String> params = postParams.split('=');
+            //log(postParams,StackTrace.current);
 
+            Map<String,String> requestArgs = {"dir":Uri.decodeFull(params[1])};
+            String result = "";
+            try {
+              result = manager.process(requestArgs);
+            } catch (e) {
+              //result = '{result: \'0\', gserror: \''.addslashes($e->getMessage()).'\', code: \''.$e->getCode().'\'}';
+              e.printError();
+            }
+            request.response.write(result);
           } else {
             request.response.write('Request Path denied access');
           }

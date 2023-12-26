@@ -521,7 +521,7 @@ if (jQuery) (function(jQuery){
 					for (var num in gsfiless) {
 						var curItem = gsfiless[num];
 						gs_cur_items[curItem.id] = curItem;
-						fileshtml += "<tr><td><a href='#' class='item_menu_link_holder' rel='" + curItem.id + "'><img src='images/menu_icon.png'></a></td><td><div class='file gsItem directory_info ext_" + curItem.getExt() + "' id='gs_div_holder_" + curItem.id + "' rel='" + curItem.id + "'>" + curItem.name + "</div></td><td><span class=\'file_ext_name\'>" + curItem.getExt() + "</span> file</td><td>" + curItem.getSize() + "</td><td>"+curItem.getLastMod()+"</td></tr>";
+						fileshtml += "<tr><td><a href='#' class='item_menu_link_holder' rel='" + curItem.id + "'><img src='/images/menu_icon.png'></a></td><td><div class='file gsItem directory_info ext_" + curItem.getExt() + "' id='gs_div_holder_" + curItem.id + "' rel='" + curItem.id + "'>" + curItem.name + "</div></td><td><span class=\'file_ext_name\'>" + curItem.getExt() + "</span> file</td><td>" + curItem.getSize() + "</td><td>"+curItem.getLastMod()+"</td></tr>";
 					}
 				}
 				return fileshtml;
@@ -549,7 +549,7 @@ if (jQuery) (function(jQuery){
 					for (var numf in gsfiless) {
 						var curItem = gsfiless[numf];
 						gs_cur_items[curItem.id] = curItem;
-						fileshtml += "<tr><td><a href='#' class='item_menu_link_holder' rel='" + curItem.id + "'><img src='images/menu_icon.png'></a></td><td><div class='directory directory_info gsItem' id='gs_div_holder_" + curItem.id + "' rel=\'" + curItem.id + "\'><a href='javascript:void(0)' ondblclick=\"jQuery('#"+curItem.id+"').trigger('click'); return false\">" + curItem.name + "</a></div></td><td>Dir</td><td>0</td><td>"+curItem.getLastMod()+"</td></tr>";
+						fileshtml += "<tr><td><a href='#' class='item_menu_link_holder' rel='" + curItem.id + "'><img src='/images/menu_icon.png'></a></td><td><div class='directory directory_info gsItem' id='gs_div_holder_" + curItem.id + "' rel=\'" + curItem.id + "\'><a href='javascript:void(0)' ondblclick=\"jQuery('#"+curItem.id+"').trigger('click'); return false\">" + curItem.name + "</a></div></td><td>Dir</td><td>0</td><td>"+curItem.getLastMod()+"</td></tr>";
 					}
 				}
                 return fileshtml;

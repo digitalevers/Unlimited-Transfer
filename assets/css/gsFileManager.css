@@ -111,10 +111,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e2e2e2', end
 }
 
 .toggleplus {
-	background: url('images/toggle_plus.png') left top no-repeat;
+	background: url('/images/toggle_plus.png') left top no-repeat;
 }
 .toggleminus {
-	background: url('images/toggle_minus.png') left top no-repeat;
+	background: url('/images/toggle_minus.png') left top no-repeat;
 }
 
 .dirs_files_table {

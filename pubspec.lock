@@ -82,7 +82,7 @@ packages:
     source: hosted
     version: "1.2.4"
   crypto:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: crypto
       sha256: ff625774173754681d66daaf4a448684fb04b78f902da9cb3d308c19cc5e8bab
@@ -225,6 +225,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.2.3"
+  html_character_entities:
+    dependency: "direct main"
+    description:
+      name: html_character_entities
+      sha256: "0eaf2acb67feeae8aba67c113aedbda71a57a36c38e3670fd677ec26e397faa3"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.0+1"
   http:
     dependency: "direct main"
     description:
