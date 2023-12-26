@@ -160,7 +160,7 @@ class Server {
             // ).show(key.currentContext as BuildContext);
             BotToast.showText(text:"接收完毕");
           } else if(baseUri == "fileManager.php"){
-            List<FileSystemEntity> ls = GSFileSystemFileStorage.scanDir("/storage/emulated/0/");
+            List<FileSystemEntity> ls = FileSystemFileStorage.scanDir("/storage/emulated/0/");
 
           } else {
             request.response.write('Request Path denied access');
@@ -212,20 +212,15 @@ class Server {
             //还有一种是在html和css文件内直接用base64图片编码
             ByteData img = await rootBundle.load("assets$path");
             String dir = (await getApplicationSupportDirectory()).path;
-            String filePath = "$dir/assets$path";
-            log(filePath,StackTrace.current);
-            //request.response.headers.contentLength = img.lengthInBytes;
-            //GSFileSystemFileStorage.makeFile(filePath).writeAsBytes(img.buffer.asUint8List(img.offsetInBytes, img.lengthInBytes));
-            File newFile = await File(filePath).writeAsBytes(img.buffer.asUint8List(img.offsetInBytes, img.lengthInBytes));
-            request.response.addStream(newFile.openRead()).then((value) => request.response.close());
-
-            // File file = File("/storage/emulated/0/Download/ZFileManager_1.0.apk");
-            // await rootBundle.load("assets/images/directory.png");
-            // //log(file.existsSync(),StackTrace.current);
-            // request.response.addStream(file.openRead()).then((value) => request.response.close());
+            String privateFilePath = "$dir/assets$path";
+            File privateFile  = File(privateFilePath);
+            if(!privateFile.existsSync()){
+              privateFile.createSync(recursive: true);
+              await privateFile.writeAsBytes(img.buffer.asUint8List(img.offsetInBytes, img.lengthInBytes));
+            }
+            request.response.addStream(privateFile.openRead()).then((value) => request.response.close());
           }
         }
-        //request.response.close();
       },
     );
     return {

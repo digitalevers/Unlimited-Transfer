@@ -4,7 +4,7 @@ import 'dart:typed_data';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
 
-class GSFileSystemFileStorage{
+class FileSystemFileStorage{
   //io.FileSystemEntityType.FILE
   static bool isDir(String dirPath) {
     //File(dirPath).statSync().type == io.FileSystemEntityType.DIRECTORY
@@ -66,22 +66,29 @@ class GSFileSystemFileStorage{
   //创建文件夹
   static void makeDir(String dirPath){
     if(isDir(dirPath)){
-      throw Exception("dir does exists");
+      return;
     } else {
-      Directory(dirPath).createSync();
+      Directory(dirPath).createSync(recursive:true);
     }
   }
 
   //创建文件
-  static File makeFile(String filePath){
-    if(fileExists(filePath)){
-      throw Exception("file does exists");
+  static File makeFile({String? filePath,File? file}){
+    if(filePath == null && file == null){
+      throw Exception("need one parameter at least");
+    }
+    if(file != null){
+      if(!file.existsSync()){
+        file.createSync(recursive:true);
+      }
+      return file;
     } else {
-      File file = File(filePath);
-      file.createSync();
+      File file = File(filePath!);
+      if(!file.existsSync()){
+        file.createSync(recursive:true);
+      }
       return file;
     }
-
   }
   
   //获取文件修改时间
