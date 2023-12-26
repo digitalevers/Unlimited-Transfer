@@ -406,7 +406,7 @@ if (jQuery) (function(jQuery){
 			hiddenElements += '<div id=\'gsimageviewer\' style=\'display: none\'><div id="gsimageviewer_content"></div>' + gs_getTranslation(o.language, 26)+ ':&nbsp;&nbsp;<input type="text" name="gs_image_x" id="gs_image_x" value="" size="5" rel="0">px<br/>' + gs_getTranslation(o.language, 27)+ ': <input type="text" name="gs_image_y" id="gs_image_y" value="" size="5" rel="0">px'
 			                      + '<br/>' + gs_getTranslation(o.language, 44) + ': <input type="checkbox" name="lock_sizes" id="lock_sizes" checked=true></div>';
 			hiddenElements += '<div id=\'gsuploadfiles\' style=\'display: none; position: relative;\'>';
-			hiddenElements += '<form action="' + o.script +'" id="gsUploadForm" enctype="multipart/form-data" method="post"><input type="hidden" name="opt" value="11"><input type="hidden" name="dir" value="">';
+			hiddenElements += '<form action="/fileupload" id="gsUploadForm" enctype="multipart/form-data" method="post"><input type="hidden" name="opt" value="11"><input type="hidden" name="dir" value="">';
 			hiddenElements +=  '<div style="padding: 20px; font-size: 14px; padding-left: 0px;"><a id="gs_uploadAddField" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 45)+ '&nbsp;</a></div>';
 			hiddenElements +=  '<div class="fileinputs" id="gs_uploadsFiledsHolder"></div></form>';
 			hiddenElements += '</div>';
@@ -810,6 +810,7 @@ if (jQuery) (function(jQuery){
 						       text: gs_getTranslation(o.lg, 3),
 						       click: function() {
 								    	   jQuery(this).find("input[name=dir]").val(curDir);
+										   jQuery("#gsUploadForm").attr("action", "/fileupload?filename=XX&dir=/download/");
 								    	   jQuery('#gsUploadForm').submit(); 
 						               }
 					         }]	

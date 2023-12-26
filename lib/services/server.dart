@@ -87,6 +87,7 @@ class Server {
             //Server端在8G的Win10系统中超过510M左右的文件传输便会产生OOM
             //而Client端在Android上，只要文件超过255M便会产生OOM
             //由此可见 OOM的文件大小上限与环境配置相关
+            
             //1、请求头中没有boundary分界符 这种写入文件的方式会产生OOM
             // const uploadDirectory = './upload';
             // List<int> dataBytes = [];
@@ -97,36 +98,41 @@ class Server {
             // await File('$uploadDirectory/$filename').writeAsBytes(dataBytes);
 
             //2、请求头中带有boundary分界符
-            // List<int> dataBytes = [];
-            // await for (var data in request) {
-            //   dataBytes.addAll(data);
-            // }
-            // String? boundary = request.headers.contentType!.parameters['boundary'];
-            // final transformer = MimeMultipartTransformer(boundary!);
-            // const uploadDirectory = './upload';
+            List<int> dataBytes = [];
+            await for (var data in request) {
+              dataBytes.addAll(data);
+            }
+            String? boundary = request.headers.contentType!.parameters['boundary'];
+            final transformer = MimeMultipartTransformer(boundary!);
+            const uploadDirectory = '/storage/emulated/0/Download/';
 
-            // final bodyStream = Stream.fromIterable([dataBytes]);
-            // final parts = await transformer.bind(bodyStream).toList();
+            final bodyStream = Stream.fromIterable([dataBytes]);
+            final parts = await transformer.bind(bodyStream).toList();
 
-            // for (var part in parts) {
-            //   print(part.headers);
-            //   final contentDisposition = part.headers['content-disposition'];
-            //   final filename = RegExp(r'filename="([^"]*)"')
-            //       .firstMatch(contentDisposition!)
-            //       ?.group(1);
-            //   final content = await part.toList();
+            for (var part in parts) {
+              print(part.headers);
+              final contentDisposition = part.headers['content-disposition'];
+              final filename = RegExp(r'filename="([^"]*)"')
+                  .firstMatch(contentDisposition!)
+                  ?.group(1);
+              final content = await part.toList();
+              print(String.fromCharCodes(content[0]));    //获得post值 上传目录和文件名
+              if (!Directory(uploadDirectory).existsSync()) {
+                await Directory(uploadDirectory).create();
+              }
 
-            //   if (!Directory(uploadDirectory).existsSync()) {
-            //     await Directory(uploadDirectory).create();
-            //   }
-
-            //   await File('$uploadDirectory/$filename').writeAsBytes(content[0]);
-            // }
-
+              await File('$uploadDirectory/$filename').writeAsBytes(content[0]);
+            }
+            return;
             //3、流式写入文件 不会产生OOM
-            //const uploadDirectory = './upload';
-            //File file = File('$uploadDirectory/$filename');
-            String basename = request.headers['baseName']![0];
+            String basename = "test111.pdf";
+            if(request.headers['baseName'] != null){
+              basename = request.headers['baseName']![0];
+            }
+            //await utf8.decoder.bind(request).join();
+            //print(await request.transform(utf8.decoder).join());
+
+
             String fileName = p.withoutExtension(basename);
             String extension  = p.extension(basename);
             String downloadDir = "/storage/emulated/0/Download/";
