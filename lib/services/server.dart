@@ -197,7 +197,7 @@ class Server {
               request.response.headers.contentType = ContentType.html;
               break;
             case ".js":
-              request.response.headers.contentType = ContentType.parse("application/javascript");
+              request.response.headers.contentType = ContentType.parse("application/javascript; charset=utf-8");
               break;
             case ".css":
               request.response.headers.contentType = ContentType.parse("text/css; charset=utf-8");
@@ -221,6 +221,7 @@ class Server {
           //log(path,StackTrace.current);
           if(extension == ".html" || extension == ".js" || extension == ".css"){
             String data = await rootBundle.loadString("assets$path");
+            
             request.response.write(data);
             request.response.close();
           } else if(extension == ".png" || extension == ".jpg" || extension == ".gif"){

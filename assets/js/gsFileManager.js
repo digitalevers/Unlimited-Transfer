@@ -219,6 +219,58 @@ gs_filemanager_languages['en'][48] = 'CkEditor select';
 gs_filemanager_languages['en'][49] = 'Refresh';
 gs_filemanager_languages['en'][50] = 'Menu';
 
+gs_filemanager_languages['zh'] = new Array();
+gs_filemanager_languages['zh'][1] = '当前目录';
+gs_filemanager_languages['zh'][2] = '剪切板';
+gs_filemanager_languages['zh'][3] = '上传';
+gs_filemanager_languages['zh'][4] = '新建文件';
+gs_filemanager_languages['zh'][5] = '新建目录';
+gs_filemanager_languages['zh'][6] = '粘贴';
+gs_filemanager_languages['zh'][7] = '文件名';
+gs_filemanager_languages['zh'][8] = '文件类型';
+gs_filemanager_languages['zh'][9] = '文件大小';
+gs_filemanager_languages['zh'][10] = '最近修改';
+gs_filemanager_languages['zh'][11] = '打开方式';
+gs_filemanager_languages['zh'][12] = '记事本';
+gs_filemanager_languages['zh'][13] = '图片查看';
+gs_filemanager_languages['zh'][14] = '复制';
+gs_filemanager_languages['zh'][15] = '剪切';
+gs_filemanager_languages['zh'][16] = '重命名';
+gs_filemanager_languages['zh'][17] = '复制到';
+gs_filemanager_languages['zh'][18] = '下载';
+gs_filemanager_languages['zh'][19] = '删除';
+gs_filemanager_languages['zh'][20] = '打开';
+gs_filemanager_languages['zh'][21] = 'CKeditor';
+gs_filemanager_languages['zh'][22] = 'JCrop';
+gs_filemanager_languages['zh'][23] = '全选';
+gs_filemanager_languages['zh'][24] = '全不选';
+gs_filemanager_languages['zh'][25] = '反选';
+gs_filemanager_languages['zh'][26] = '宽度';
+gs_filemanager_languages['zh'][27] = '高度';
+gs_filemanager_languages['zh'][28] = '取消';
+gs_filemanager_languages['zh'][29] = '上传文件';
+gs_filemanager_languages['zh'][30] = '条目';
+gs_filemanager_languages['zh'][31] = '保存';
+gs_filemanager_languages['zh'][32] = '缩放';
+gs_filemanager_languages['zh'][33] = '裁剪';
+gs_filemanager_languages['zh'][34] = '另存为';
+gs_filemanager_languages['zh'][35] = '新文件名';
+gs_filemanager_languages['zh'][36] = '文件名';
+gs_filemanager_languages['zh'][37] = '目录名';
+gs_filemanager_languages['zh'][38] = '确定要删除所选文件?';
+gs_filemanager_languages['zh'][39] = '压缩目录';
+gs_filemanager_languages['zh'][40] = '压缩文件';
+gs_filemanager_languages['zh'][41] = '压缩文件名';
+gs_filemanager_languages['zh'][42] = '解压';
+gs_filemanager_languages['zh'][43] = '解压名';
+gs_filemanager_languages['zh'][44] = '锁大小';
+gs_filemanager_languages['zh'][45] = '添加上传文件';
+gs_filemanager_languages['zh'][46] = '移除';
+gs_filemanager_languages['zh'][47] = '文件名不能包含 \ / . * ? " < > |';
+gs_filemanager_languages['zh'][48] = 'CkEditor';
+gs_filemanager_languages['zh'][49] = '刷新';
+gs_filemanager_languages['zh'][50] = '菜单';
+
 function gs_getTranslation(lg, code){
 	result = null;
 	if (typeof(gs_filemanager_languages[lg]) != 'undefined') {
@@ -274,7 +326,7 @@ if (jQuery) (function(jQuery){
 		gsFileManager: function(o) {
 			if( !o ) var o = {};
 			if( o.root == undefined ) o.root = '/';
-			if( o.language == undefined ) o.language = 'en';
+			if( o.language == undefined ) o.language = 'zh';
 			if( o.script == undefined ) o.script = 'jqueryFileTree.php';
 			if( o.expandSpeed == undefined ) o.expandSpeed= 500;
 			if( o.collapseSpeed == undefined ) o.collapseSpeed= 500;
