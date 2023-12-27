@@ -98,32 +98,32 @@ class Server {
             // await File('$uploadDirectory/$filename').writeAsBytes(dataBytes);
 
             //2、请求头中带有boundary分界符
-            List<int> dataBytes = [];
-            await for (var data in request) {
-              dataBytes.addAll(data);
-            }
-            String? boundary = request.headers.contentType!.parameters['boundary'];
-            final transformer = MimeMultipartTransformer(boundary!);
-            const uploadDirectory = '/storage/emulated/0/Download/';
+            // List<int> dataBytes = [];
+            // await for (var data in request) {
+            //   dataBytes.addAll(data);
+            // }
+            // String? boundary = request.headers.contentType!.parameters['boundary'];
+            // final transformer = MimeMultipartTransformer(boundary!);
+            // const uploadDirectory = '/storage/emulated/0/Download/';
 
-            final bodyStream = Stream.fromIterable([dataBytes]);
-            final parts = await transformer.bind(bodyStream).toList();
+            // final bodyStream = Stream.fromIterable([dataBytes]);
+            // final parts = await transformer.bind(bodyStream).toList();
 
-            for (var part in parts) {
-              print(part.headers);
-              final contentDisposition = part.headers['content-disposition'];
-              final filename = RegExp(r'filename="([^"]*)"')
-                  .firstMatch(contentDisposition!)
-                  ?.group(1);
-              final content = await part.toList();
-              print(String.fromCharCodes(content[0]));    //获得post值 上传目录和文件名
-              if (!Directory(uploadDirectory).existsSync()) {
-                await Directory(uploadDirectory).create();
-              }
+            // for (var part in parts) {
+            //   print(part.headers);
+            //   final contentDisposition = part.headers['content-disposition'];
+            //   final filename = RegExp(r'filename="([^"]*)"')
+            //       .firstMatch(contentDisposition!)
+            //       ?.group(1);
+            //   final content = await part.toList();
+            //   print(String.fromCharCodes(content[0]));    //获得post值 上传目录和文件名
+            //   if (!Directory(uploadDirectory).existsSync()) {
+            //     await Directory(uploadDirectory).create();
+            //   }
 
-              await File('$uploadDirectory/$filename').writeAsBytes(content[0]);
-            }
-            return;
+            //   await File('$uploadDirectory/$filename').writeAsBytes(content[0]);
+            // }
+
             //3、流式写入文件 不会产生OOM
             String basename = "test111.pdf";
             if(request.headers['baseName'] != null){
@@ -131,8 +131,7 @@ class Server {
             }
             //await utf8.decoder.bind(request).join();
             //print(await request.transform(utf8.decoder).join());
-
-
+ 
             String fileName = p.withoutExtension(basename);
             String extension  = p.extension(basename);
             String downloadDir = "/storage/emulated/0/Download/";

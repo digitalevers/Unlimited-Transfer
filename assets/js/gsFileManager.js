@@ -810,7 +810,7 @@ if (jQuery) (function(jQuery){
 						       text: gs_getTranslation(o.lg, 3),
 						       click: function() {
 								    	   jQuery(this).find("input[name=dir]").val(curDir);
-										   jQuery("#gsUploadForm").attr("action", "/fileupload?filename=XX&dir=/download/");
+										   //jQuery("#gsUploadForm").attr("action", "/fileupload?filename=XX&dir=" + curDir);
 								    	   jQuery('#gsUploadForm').submit(); 
 						               }
 					         }]	
