@@ -47,7 +47,7 @@ class Server {
       (HttpRequest request) async {
         if (request.method.toLowerCase() == 'post') {
           String baseUri = p.basename(request.requestedUri.toString());
-          log(baseUri,StackTrace.current);
+          //log(baseUri,StackTrace.current);
           if (baseUri == "fileinfo") {
             // String os = (request.headers['os']![0]);
             // String username = request.headers['receiver-name']![0];
@@ -82,6 +82,53 @@ class Server {
               }
             } else {
               request.response.write(jsonEncode({'code': HttpResponseCode.serverBusy})); //告知客户端 "服务端繁忙"
+            }
+          } else if(baseUri == "webfileupload"){
+            //处理web端的文件POST上传请求
+            const rootDir = '/storage/emulated/0';
+            List<int> dataBytes = [];
+            await for (var data in request) {
+              dataBytes.addAll(data);
+            }
+            String? boundary = request.headers.contentType!.parameters['boundary'];
+            final transformer = MimeMultipartTransformer(boundary!);
+            final bodyStream = Stream.fromIterable([dataBytes]);
+            final parts = await transformer.bind(bodyStream).toList();
+
+            //默认上传目录
+            String dir = "/Download";
+            try{
+              for (MimeMultipart part in parts) {
+                //log(part.headers,StackTrace.current);
+                final contentDisposition = part.headers['content-disposition'];
+                final filename = RegExp(r'filename="([^"]*)"').firstMatch(contentDisposition!)?.group(1);
+                final content = await part.toList();
+                //log(filename,StackTrace.current);
+                String? postKey = RegExp(r'name="([^"]*)"').firstMatch(contentDisposition)?.group(1);
+                //默认POST 的dir键会排在filename前面 所以会先循环访问到
+                if(filename == null){
+                  //log("$postKey-$postValue",StackTrace.current);
+                  if(postKey == "dir"){
+                    String postValue = String.fromCharCodes(content[0]);
+                    dir = postValue;
+                  }
+                } else {
+                  //log("$postKey-$filename",StackTrace.current);
+                  String filePath = "$rootDir$dir/$filename";
+                  File file = File(filePath);
+                  //log(filePath,StackTrace.current);
+                  IOSink sink = file.openWrite(mode: FileMode.write);
+                  await sink.addStream(Stream.fromIterable(content));
+                  await sink.flush();
+                  await sink.close();
+                }
+                // if (!Directory(uploadDirectory).existsSync()) {
+                //   await Directory(uploadDirectory).create();
+                // }
+                // await File('$uploadDirectory/$filename').writeAsBytes(content[0]);
+              }
+            } catch(e){
+              print(e);
             }
           } else if (baseUri == "fileupload") {
             //Server端在8G的Win10系统中超过510M左右的文件传输便会产生OOM
@@ -125,13 +172,8 @@ class Server {
             // }
 
             //3、流式写入文件 不会产生OOM
-            String basename = "test111.pdf";
-            if(request.headers['baseName'] != null){
-              basename = request.headers['baseName']![0];
-            }
-            //await utf8.decoder.bind(request).join();
-            //print(await request.transform(utf8.decoder).join());
- 
+            String basename = request.headers['baseName']![0];
+            //log(await utf8.decoder.bind(request).join(),StackTrace.current);
             String fileName = p.withoutExtension(basename);
             String extension  = p.extension(basename);
             String downloadDir = "/storage/emulated/0/Download/";
@@ -189,59 +231,74 @@ class Server {
           }
           request.response.close();
         } else {
-          //非post get 路由处理
-           //print(request.requestedUri);
+          //下载get请求
           String path = request.requestedUri.path;
-          if(path == '/'){
-            path = '/index.html';
-          }
-          String extension = p.extension(path);
-          //log(extension,StackTrace.current);
-          switch(extension){
-            case ".html":
-              request.response.headers.contentType = ContentType.html;
-              break;
-            case ".js":
-              request.response.headers.contentType = ContentType.parse("application/javascript; charset=utf-8");
-              break;
-            case ".css":
-              request.response.headers.contentType = ContentType.parse("text/css; charset=utf-8");
-              break;
-            case ".gif":
-              request.response.headers.contentType = ContentType.parse("image/gif");
-              break;
-            case ".png":
-              request.response.headers.contentType = ContentType.parse("image/png");
-              break;
-            case ".ico":
-              request.response.headers.contentType = ContentType.parse("image/ico");
-              break;
-            case ".apk":
-              request.response.headers.contentType = ContentType.parse("application/vnd.android.package-archive");
-              break;
-            default:
-              request.response.headers.contentType = ContentType.json;
-              break;
-          }
-          //log(path,StackTrace.current);
-          if(extension == ".html" || extension == ".js" || extension == ".css"){
-            String data = await rootBundle.loadString("assets$path");
-            
-            request.response.write(data);
-            request.response.close();
-          } else if(extension == ".png" || extension == ".jpg" || extension == ".gif"){
-            //HTTP SERVER不直接支持 reponse.write 写入二进制数据
-            //暂时有两个解决方案 一种是将 assets下的图片读取到/data/data私域目录 然后打开 file stream 再 reponse.addstream输出
-            //还有一种是在html和css文件内直接用base64图片编码
-            ByteData img = await rootBundle.load("assets$path");
-            String dir = (await getApplicationSupportDirectory()).path;
-            String privateFilePath = "$dir/assets$path";
-            File privateFile  = File(privateFilePath);
-            if(!privateFile.existsSync()){
-              privateFile.createSync(recursive: true);
-              await privateFile.writeAsBytes(img.buffer.asUint8List(img.offsetInBytes, img.lengthInBytes));
+          if(p.basename(path) == "fileManager.php"){
+            Map<String, List<String>> params = request.requestedUri.queryParametersAll;
+            //log(params,StackTrace.current);
+            //调用fileManager引擎处理opt
+            Map<String,String> options = {"rootDir":"/storage/emulated/0"};
+            FileManager manager = FileManager(FileSystemFileStorage(), options);
+            Map<String,dynamic> requestArgs = {"dir":params["dir"]![0],"request":request,"opt":params["opt"]![0], "filename":params["filename"]![0]};
+            //log(requestArgs,StackTrace.current);
+            try{
+              manager.process(requestArgs);
+            } catch(e){
+              print(e);
             }
-            request.response.addStream(privateFile.openRead()).then((value) => request.response.close());
+          } else {
+            //其他静态资源get请求
+            if(path == '/'){
+              path = '/index.html';
+            }
+            String extension = p.extension(path);
+            //log(extension,StackTrace.current);
+            switch(extension){
+              case ".html":
+                request.response.headers.contentType = ContentType.html;
+                break;
+              case ".js":
+                request.response.headers.contentType = ContentType.parse("application/javascript; charset=utf-8");
+                break;
+              case ".css":
+                request.response.headers.contentType = ContentType.parse("text/css; charset=utf-8");
+                break;
+              case ".gif":
+                request.response.headers.contentType = ContentType.parse("image/gif");
+                break;
+              case ".png":
+                request.response.headers.contentType = ContentType.parse("image/png");
+                break;
+              case ".ico":
+                request.response.headers.contentType = ContentType.parse("image/ico");
+                break;
+              case ".apk":
+                request.response.headers.contentType = ContentType.parse("application/vnd.android.package-archive");
+                break;
+              default:
+                request.response.headers.contentType = ContentType.json;
+                break;
+            }
+            //log(path,StackTrace.current);
+            if(extension == ".html" || extension == ".js" || extension == ".css"){
+              String data = await rootBundle.loadString("assets$path");
+              
+              request.response.write(data);
+              request.response.close();
+            } else if(extension == ".png" || extension == ".jpg" || extension == ".gif"){
+              //HTTP SERVER不直接支持 reponse.write 写入二进制数据
+              //暂时有两个解决方案 一种是将 assets下的图片读取到/data/data私域目录 然后打开 file stream 再 reponse.addstream输出
+              //还有一种是在html和css文件内直接用base64图片编码
+              ByteData img = await rootBundle.load("assets$path");
+              String dir = (await getApplicationSupportDirectory()).path;
+              String privateFilePath = "$dir/assets$path";
+              File privateFile  = File(privateFilePath);
+              if(!privateFile.existsSync()){
+                privateFile.createSync(recursive: true);
+                await privateFile.writeAsBytes(img.buffer.asUint8List(img.offsetInBytes, img.lengthInBytes));
+              }
+              request.response.addStream(privateFile.openRead()).then((value) => request.response.close());
+            }
           }
         }
       },

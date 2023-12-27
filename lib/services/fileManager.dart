@@ -196,6 +196,7 @@ class FileManager{
   String _itemNameRegex = '[/\?\*;:{}\\\\]+';
 
   FileManager(this._fileStorage, this._options){
+    _functions.add("");
 		_functions.add("listDir");
     _functions.add("makeFile");
     _functions.add("makeDirectory");
@@ -263,67 +264,75 @@ class FileManager{
 		}
   }
 
-  void makeFile(Map<String,String> args){
+  void makeFile(Map<String,dynamic> args){
     
   }
 
-  void makeDirectory(Map<String,String> args){
+  void makeDirectory(Map<String,dynamic> args){
     
   }
 
-  void deleteItem(Map<String,String> args){
+  void deleteItem(Map<String,dynamic> args){
 
   }
 
-  void copyItem(Map<String,String> args){
+  void copyItem(Map<String,dynamic> args){
 
   }
 
-  void renameItem(Map<String,String> args){
+  void renameItem(Map<String,dynamic> args){
 
   }
 
-  void moveItems(Map<String,String> args){
+  void moveItems(Map<String,dynamic> args){
 
   }
 
-  void downloadItem(Map<String,String> args){
+  void downloadItem(Map<String,dynamic> args){
+    //print(args);
+    String rootDir = _options["rootDir"]!;
+		String dir = args['dir'];
+    String filename = args['filename'];
+    File downloadFile  = File(rootDir + dir + filename);
+    //TODO根据后缀获取MIME
+    args["request"].response.headers.contentType = ContentType.parse("application/vnd.android.package-archive");
+    args["request"].response.headers.set("content-disposition","attachment; filename=$filename");
+    args["request"].response.addStream(downloadFile.openRead()).then((_) => args["request"].response.close());
+  }
+
+  void readfile(Map<String,dynamic> args){
 
   }
 
-  void readfile(Map<String,String> args){
+  void writefile(Map<String,dynamic> args){
 
   }
 
-  void writefile(Map<String,String> args){
+  void uploadfile(Map<String,dynamic> args){
 
   }
 
-  void uploadfile(Map<String,String> args){
+  void jCropImage(Map<String,dynamic> args){
 
   }
 
-  void jCropImage(Map<String,String> args){
+  void imageResize(Map<String,dynamic> args){
 
   }
 
-  void imageResize(Map<String,String> args){
+  void copyAsFile(Map<String,dynamic> args){
 
   }
 
-  void copyAsFile(Map<String,String> args){
+  void serveImage(Map<String,dynamic> args){
 
   }
 
-  void serveImage(Map<String,String> args){
+  void zipItem(Map<String,dynamic> args){
 
   }
 
-  void zipItem(Map<String,String> args){
-
-  }
-
-  void unZipItem(Map<String,String> args){
+  void unZipItem(Map<String,dynamic> args){
 
   }
 
@@ -350,9 +359,9 @@ class FileManager{
     throw ArgumentError.value(name, "name");
   }
 
-  String process(Map<String,String> args){
+  String process(Map<String,dynamic> args){
     if (args['opt'] == null || args['opt']!.isEmpty) {
-			args['opt']  = "0"; //listDir
+			args['opt']  = "1"; //listDir
 		}
     
     String? rootDir = _options["rootDir"];
@@ -367,10 +376,10 @@ class FileManager{
       args["dir"] = HtmlCharacterEntities.decode(args["dir"]!);
     }
     
-    String response = '';
+    String response = "";
 		String functionName = getRequestFunction(int.parse(args["opt"]!));
     if (functionName.isNotEmpty) {
-      response = getMethod(functionName)(args);
+      response = getMethod(functionName)(args) ?? "";
     } else {
       throw Exception("ILlegalArgumentException: Unknown action${args['opt']}");
     }
