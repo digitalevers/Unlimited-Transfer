@@ -196,7 +196,6 @@ class Server {
             _serverStatus = ServerStatus.idle;
             // 更新接收文件记录显示区的UI界面
             receiveFilesLogKey.currentState!.insertFilesLog(filePath);
-            
             //print("接收完毕");
             // CherryToast.info(
             //   title:  const Text("接收完毕"),
@@ -214,13 +213,19 @@ class Server {
             Map<String,String> options = {"rootDir":"/storage/emulated/0"};
             FileManager manager = FileManager(FileSystemFileStorage(), options);
             String postParams = await request.bytesToString(utf8);
-            List<String> params = postParams.split('=');
-            //log(postParams,StackTrace.current);
-
-            Map<String,String> requestArgs = {"dir":Uri.decodeFull(params[1])};
+            List<String> params = postParams.split('&');
+            Map<String,String> postKeyValue = {};
+            for(String val in params){
+              if(val.split('=')[0] == 'dir'){
+                postKeyValue[val.split('=')[0]] = Uri.decodeFull(val.split('=')[1]);
+              } else {
+                postKeyValue[val.split('=')[0]] = val.split('=')[1];
+              }
+            }
             String result = "";
             try {
-              result = manager.process(requestArgs);
+              //log(postKeyValue,StackTrace.current);
+              result = manager.process(postKeyValue);
             } catch (e) {
               //result = '{result: \'0\', gserror: \''.addslashes($e->getMessage()).'\', code: \''.$e->getCode().'\'}';
               e.printError();
@@ -231,7 +236,8 @@ class Server {
           }
           request.response.close();
         } else {
-          //下载get请求
+          //GET 请求
+          //下载文件的GET请求
           String path = request.requestedUri.path;
           if(p.basename(path) == "fileManager.php"){
             Map<String, List<String>> params = request.requestedUri.queryParametersAll;
@@ -247,7 +253,7 @@ class Server {
               print(e);
             }
           } else {
-            //其他静态资源get请求
+            //其他静态资源的GET请求
             if(path == '/'){
               path = '/index.html';
             }

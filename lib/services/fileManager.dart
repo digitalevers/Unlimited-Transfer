@@ -273,7 +273,11 @@ class FileManager{
   }
 
   void deleteItem(Map<String,dynamic> args){
-
+    //print(args);
+    String rootDir = _options["rootDir"]!;
+		String dir = args['dir'];
+    String filename = args['files'];
+    _fileStorage.deleteFile(rootDir + dir + filename);
   }
 
   void copyItem(Map<String,dynamic> args){
