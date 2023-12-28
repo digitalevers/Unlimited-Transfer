@@ -215,8 +215,8 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
     request.close();
     request = await client_.postUrl(uri);
     request.headers.set("baseName", filelist_[0]["baseName"]!);
-    const platform = MethodChannel("AndroidApi");
     
+    const platform = MethodChannel("AndroidApi");
     String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filelist_[0]["contentUri"], filelist_[0]["fileName"], filelist_[0]["extension"]]);
     File newFile = File(newPrivatePath);
     log(newFile,StackTrace.current);

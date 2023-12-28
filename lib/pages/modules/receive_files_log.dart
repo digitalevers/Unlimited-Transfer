@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../common/global_variable.dart';
 import 'package:path/path.dart' as p;
 import 'package:woniu/common/func.dart';
@@ -100,14 +101,25 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                         width: 100,
                         child: Row(
                           children: [
-                              InkWell(
-                              onTap: () {
-                                //call your onpressed function here
-                                OpenFile.open(receviceFilesLog[index]).then((value) => 
-                                  log(value.message,StackTrace.current)
-                                );
-                              },
-                              child: const Icon(Icons.file_open),
+                            InkWell(
+                            onTap: () async {
+                              //call your onpressed function here
+                              if(Platform.isAndroid){
+                                const platform = MethodChannel("AndroidApi");
+                                bool openResult = await platform.invokeMethod("openDir",["/Download"]);
+                              }
+                            },
+                            child: const Icon(Icons.drive_file_move_rounded),
+                            ),
+                            const SizedBox(width: 20),
+                            InkWell(
+                            onTap: () {
+                              //call your onpressed function here
+                              OpenFile.open(receviceFilesLog[index]).then((value) => 
+                                log(value.message,StackTrace.current)
+                              );
+                            },
+                            child: const Icon(Icons.file_open),
                             ),
                             const SizedBox(width: 20),
                             InkWell(

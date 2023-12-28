@@ -66,6 +66,9 @@ public class MainActivity extends FlutterActivity {
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
+                        } else if(call.method.equals("openDir")){
+                            String dir = (String) (((ArrayList) call.arguments).get(0));
+                            result.success(openDir(dir));
                         } else {
                             result.notImplemented();
                         }
@@ -286,5 +289,16 @@ public class MainActivity extends FlutterActivity {
 
     private static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+
+    public boolean openDir(String dirPath){
+        Uri uri = Uri.parse("content://com.android.externalstorage.documents/document/primary:"+Uri.encode(dirPath));
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
+        startActivityForResult(intent, 1);
+        return true;
     }
 }
