@@ -334,16 +334,18 @@ if (jQuery) (function(jQuery){
 			if( o.collapseEasing == undefined ) o.collapseEasing = null;
 			if( o.loadMessage == undefined ) o.loadMessage = 'Loading...';
 			
-			var menuHtml = '<table class=\'gsHeadTable\' cellpadding=0 cellspacing=0><tr><td><span class=\'gsHeadText\'> ' + gs_getTranslation(o.language, 1)+ ': </span><span id=\'curDir\'></span></td><td><div style="text-align: right; padding-right: 20px;"><a href=\'javascript: void(0);\' onClick=\'return gs_showClipboardContent();\' class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 2)+ '&nbsp;</a><span id=\'gsClipBoard\'>0 items</span></div></td></tr></table><br/>';
-			menuHtml += '<a id="gs_itemmenubutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 50)+ '&nbsp;</a>';
+			var menuHtml = '<table class=\'gsHeadTable\' cellpadding=0 cellspacing=0><tr><td><span class=\'gsHeadText\'> ' + gs_getTranslation(o.language, 1)+ ': </span><span id=\'curDir\'></span></td>'+
+			//'<td><div style="text-align: right; padding-right: 20px;"><a href=\'javascript: void(0);\' onClick=\'return gs_showClipboardContent();\' class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 2)+ '&nbsp;</a><span id=\'gsClipBoard\'>0 items</span></div></td>'+
+			'</tr></table><br/>';
+			//menuHtml += '<a id="gs_itemmenubutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 50)+ '&nbsp;</a>';
 			
 			menuHtml += '<a id="gs_uploadbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 3)+ '&nbsp;</a>';
-			menuHtml += '<a id="gs_newfilebutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 4)+ '&nbsp;</a>';
-			menuHtml += '<a id="gs_newdirbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 5)+ '&nbsp;</a>';
-			menuHtml += '<a id="gs_pastebutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 6)+ '&nbsp;</a>';
-			menuHtml += '<a id="gs_selectallbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 23)+ '&nbsp;</a>';
-			menuHtml += '<a id="gs_deselectbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 24)+ '&nbsp;</a>';
-			menuHtml += '<a id="gs_invertselectbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 25)+ '&nbsp;</a>';
+			//menuHtml += '<a id="gs_newfilebutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 4)+ '&nbsp;</a>';
+			//menuHtml += '<a id="gs_newdirbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 5)+ '&nbsp;</a>';
+			//menuHtml += '<a id="gs_pastebutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 6)+ '&nbsp;</a>';
+			//menuHtml += '<a id="gs_selectallbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 23)+ '&nbsp;</a>';
+			//menuHtml += '<a id="gs_deselectbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 24)+ '&nbsp;</a>';
+			//menuHtml += '<a id="gs_invertselectbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 25)+ '&nbsp;</a>';
 			menuHtml += '<a id="gs_refreshbutton" class=\'gs_dir_content_button\'>&nbsp;' + gs_getTranslation(o.language, 49)+ '&nbsp;</a>';
 			
 			var wrapperHtml = '<div id=\'gs_dir_list\' class=\'gs_dir_list\' onClick="jQuery(this).doGSAction({action: 21})"></div>';
@@ -356,46 +358,46 @@ if (jQuery) (function(jQuery){
 			wrapperHtml    += '</div></div>';
 			
 			var contexMenus = '<ul id="gsFileMenu" class="contextMenu">';
-			contexMenus += '<li class="edit"><a href="#edit">' + gs_getTranslation(o.language, 11)+ '</a>';
-			contexMenus += '   <ul class="contextMenu subContextMenu">';
-			contexMenus += '     <li class="notepad"><a href="#notepad" rel="12">' + gs_getTranslation(o.language, 12)+ '</a></li>';
-			if (typeof(CKEDITOR) != 'undefined') {
-			    contexMenus += '     <li class="notepad"><a href="#ckeditor" rel="18">' + gs_getTranslation(o.language, 21)+ '</a></li>';
-			}
-			contexMenus += '     <li class="picture separator"><a href="#imageviewer" rel="15">' + gs_getTranslation(o.language, 13)+ '</a></li>';
-			if(jQuery().Jcrop){
-			    contexMenus += '     <li class="picture"><a href="#jcrop" rel="16">' + gs_getTranslation(o.language, 22)+ '</a></li>';
-			}
-			contexMenus += '   </ul>';
-			contexMenus += '</li>';
-			contexMenus += '<li class="copy separator"><a href="#Copy" rel="7">' + gs_getTranslation(o.language, 14)+ '</a></li>';
-			contexMenus += '<li class="cut"><a href="#Cut" rel="8">' + gs_getTranslation(o.language, 15)+ '</a></li>';
-			contexMenus += '<li class="rename"><a href="#Rename" rel="10">' + gs_getTranslation(o.language, 16)+ '</a></li>';
-			contexMenus += '<li class="rename"><a href="#Copy As" rel="13">' + gs_getTranslation(o.language, 17)+ '</a></li>';
-			contexMenus += '<li class="zip"><a href="#zip" rel="19">' + gs_getTranslation(o.language, 40)+ '</a></li>';
-			contexMenus += '<li class="zip"><a href="#zip" rel="23">' + gs_getTranslation(o.language, 42)+ '</a></li>';
+			// contexMenus += '<li class="edit"><a href="#edit">' + gs_getTranslation(o.language, 11)+ '</a>';
+			// contexMenus += '   <ul class="contextMenu subContextMenu">';
+			// contexMenus += '     <li class="notepad"><a href="#notepad" rel="12">' + gs_getTranslation(o.language, 12)+ '</a></li>';
+			// if (typeof(CKEDITOR) != 'undefined') {
+			//     contexMenus += '     <li class="notepad"><a href="#ckeditor" rel="18">' + gs_getTranslation(o.language, 21)+ '</a></li>';
+			// }
+			// contexMenus += '     <li class="picture separator"><a href="#imageviewer" rel="15">' + gs_getTranslation(o.language, 13)+ '</a></li>';
+			// if(jQuery().Jcrop){
+			//    contexMenus += '     <li class="picture"><a href="#jcrop" rel="16">' + gs_getTranslation(o.language, 22)+ '</a></li>';
+			// }
+			// contexMenus += '   </ul>';
+			// contexMenus += '</li>';
+			//contexMenus += '<li class="copy separator"><a href="#Copy" rel="7">' + gs_getTranslation(o.language, 14)+ '</a></li>';
+			//contexMenus += '<li class="cut"><a href="#Cut" rel="8">' + gs_getTranslation(o.language, 15)+ '</a></li>';
+			//contexMenus += '<li class="rename"><a href="#Rename" rel="10">' + gs_getTranslation(o.language, 16)+ '</a></li>';
+			//contexMenus += '<li class="rename"><a href="#Copy As" rel="13">' + gs_getTranslation(o.language, 17)+ '</a></li>';
+			//contexMenus += '<li class="zip"><a href="#zip" rel="19">' + gs_getTranslation(o.language, 40)+ '</a></li>';
+			//contexMenus += '<li class="zip"><a href="#zip" rel="23">' + gs_getTranslation(o.language, 42)+ '</a></li>';
 			contexMenus += '<li class="download separator"><a href="#Download" rel="11">' + gs_getTranslation(o.language, 18)+ '</a></li>';
 			contexMenus += '<li class="delete"><a href="#Delete" rel="6">' + gs_getTranslation(o.language, 19)+ '</a></li>';
 			contexMenus += '</ul>';
             
 			contexMenus += '<ul id="gsDirMenu" class="contextMenu">';
 			contexMenus += '<li class="directorymenu"><a href="#Open" rel="5">' + gs_getTranslation(o.language, 20)+ '</a></li>';
-			contexMenus += '<li class="copy separator"><a href="#Copy" rel="7">' + gs_getTranslation(o.language, 14)+ '</a></li>';
-			contexMenus += '<li class="cut"><a href="#Cut" rel="8">' + gs_getTranslation(o.language, 15)+ '</a></li>';
-			contexMenus += '<li class="rename"><a href="#Rename" rel="10">' + gs_getTranslation(o.language, 16)+ '</a></li>';
-			contexMenus += '<li class="zip"><a href="#zip" rel="19">' + gs_getTranslation(o.language, 39)+ '</a></li>';
-			contexMenus += '<li class="zip"><a href="#zip" rel="23">' + gs_getTranslation(o.language, 42)+ '</a></li>';
+			//contexMenus += '<li class="copy separator"><a href="#Copy" rel="7">' + gs_getTranslation(o.language, 14)+ '</a></li>';
+			//contexMenus += '<li class="cut"><a href="#Cut" rel="8">' + gs_getTranslation(o.language, 15)+ '</a></li>';
+			//contexMenus += '<li class="rename"><a href="#Rename" rel="10">' + gs_getTranslation(o.language, 16)+ '</a></li>';
+			//contexMenus += '<li class="zip"><a href="#zip" rel="19">' + gs_getTranslation(o.language, 39)+ '</a></li>';
+			//contexMenus += '<li class="zip"><a href="#zip" rel="23">' + gs_getTranslation(o.language, 42)+ '</a></li>';
 			contexMenus += '<li class="delete"><a href="#Delete" rel="4">' + gs_getTranslation(o.language, 19)+ '</a></li>';
 			contexMenus += '</ul>';
 			
 			contexMenus += '<ul id="gsContentMenu" class="contextMenu">';
-			contexMenus += '<li class="paste separator"><a href="#Paste" rel="9">' + gs_getTranslation(o.language, 6)+ '</a></li>';
-			contexMenus += '<li class="newfile separator"><a href="#New File" rel="2">' + gs_getTranslation(o.language, 4)+ '</a></li>';
-			contexMenus += '<li class="newdir"><a href="#New Directory" rel="3">' + gs_getTranslation(o.language, 5)+ '</a></li>';
+			//contexMenus += '<li class="paste separator"><a href="#Paste" rel="9">' + gs_getTranslation(o.language, 6)+ '</a></li>';
+			//contexMenus += '<li class="newfile separator"><a href="#New File" rel="2">' + gs_getTranslation(o.language, 4)+ '</a></li>';
+			//contexMenus += '<li class="newdir"><a href="#New Directory" rel="3">' + gs_getTranslation(o.language, 5)+ '</a></li>';
 			contexMenus += '<li class="uploadfolder separator"><a href="#Upload" rel="14">' + gs_getTranslation(o.language, 3)+ '</a></li>';
-			contexMenus += '<li class="selection separator"><a href="#Select All" rel="20">' + gs_getTranslation(o.language, 23)+ '</a></li>';
-			contexMenus += '<li class="selection"><a href="#>Deselect all" rel="21">' + gs_getTranslation(o.language, 24)+ '</a></li>';
-			contexMenus += '<li class="selection"><a href="#Invert selection" rel="22">' + gs_getTranslation(o.language, 25)+ '</a></li>';
+			//contexMenus += '<li class="selection separator"><a href="#Select All" rel="20">' + gs_getTranslation(o.language, 23)+ '</a></li>';
+			//contexMenus += '<li class="selection"><a href="#>Deselect all" rel="21">' + gs_getTranslation(o.language, 24)+ '</a></li>';
+			//contexMenus += '<li class="selection"><a href="#Invert selection" rel="22">' + gs_getTranslation(o.language, 25)+ '</a></li>';
 			contexMenus += '</ul>';
 			
 			wrapperHtml    += contexMenus;
@@ -573,7 +575,11 @@ if (jQuery) (function(jQuery){
 					for (var num in gsfiless) {
 						var curItem = gsfiless[num];
 						gs_cur_items[curItem.id] = curItem;
-						fileshtml += "<tr><td><a href='#' class='item_menu_link_holder' rel='" + curItem.id + "'><img src='/images/menu_icon.png'></a></td><td><div class='file gsItem directory_info ext_" + curItem.getExt() + "' id='gs_div_holder_" + curItem.id + "' rel='" + curItem.id + "'>" + curItem.name + "</div></td><td><span class=\'file_ext_name\'>" + curItem.getExt() + "</span> file</td><td>" + curItem.getSize() + "</td><td>"+curItem.getLastMod()+"</td></tr>";
+						fileshtml += "<tr>"+
+						
+						//"<td><a href='#' class='item_menu_link_holder' rel='" + curItem.id + "'><img src='/images/menu_icon.png'></a></td>"+
+						
+						"<td><div class='file gsItem directory_info ext_" + curItem.getExt() + "' id='gs_div_holder_" + curItem.id + "' rel='" + curItem.id + "'>" + curItem.name + "</div></td><td><span class=\'file_ext_name\'>" + curItem.getExt() + "</span> file</td><td>" + curItem.getSize() + "</td><td>"+curItem.getLastMod()+"</td></tr>";
 					}
 				}
 				return fileshtml;
@@ -595,13 +601,17 @@ if (jQuery) (function(jQuery){
 				var fileshtml = '';
 				var gs_lastparent = jQuery('#' + jQuery("#curDir").attr('rel')).parent().parent().parent().children('a');
 				if (gs_lastparent.length > 0) {
-				    fileshtml += "<tr><td></td><td><div class='directory directory_info gsItem' rel=\'up\'><a href='javascript:void(0)' ondblclick=\"jQuery('#" + jQuery("#curDir").attr('rel')+ "').parent().parent().parent().children('a').trigger('click'); return false\"> ..up</a></div></td><td>Dir</td></tr>";
+				    fileshtml += "<tr>"+
+					//"<td></td>"+
+					"<td><div class='directory directory_info gsItem' rel=\'up\'><a href='javascript:void(0)' ondblclick=\"jQuery('#" + jQuery("#curDir").attr('rel')+ "').parent().parent().parent().children('a').trigger('click'); return false\"> ..</a></div></td><td>Dir</td></tr>";
 				}
 				if (gsfiless.length > 0) {
 					for (var numf in gsfiless) {
 						var curItem = gsfiless[numf];
 						gs_cur_items[curItem.id] = curItem;
-						fileshtml += "<tr><td><a href='#' class='item_menu_link_holder' rel='" + curItem.id + "'><img src='/images/menu_icon.png'></a></td><td><div class='directory directory_info gsItem' id='gs_div_holder_" + curItem.id + "' rel=\'" + curItem.id + "\'><a href='javascript:void(0)' ondblclick=\"jQuery('#"+curItem.id+"').trigger('click'); return false\">" + curItem.name + "</a></div></td><td>Dir</td><td>0</td><td>"+curItem.getLastMod()+"</td></tr>";
+						fileshtml += "<tr>"+
+						//"<td><a href='#' class='item_menu_link_holder' rel='" + curItem.id + "'><img src='/images/menu_icon.png'></a></td>"+
+						"<td><div class='directory directory_info gsItem' id='gs_div_holder_" + curItem.id + "' rel=\'" + curItem.id + "\'><a href='javascript:void(0)' ondblclick=\"jQuery('#"+curItem.id+"').trigger('click'); return false\">" + curItem.name + "</a></div></td><td>Dir</td><td>0</td><td>"+curItem.getLastMod()+"</td></tr>";
 					}
 				}
                 return fileshtml;
@@ -610,7 +620,9 @@ if (jQuery) (function(jQuery){
 			function showContent (gsdirss, gsfiless) {
 				var dirshtml = showDirs (gsdirss);
 				var fileshtml = showFiles (gsfiless);
-				var tableheader = '<table class=\'dirs_files_table\' cellpadding=0 cellspacing=2 id="gs_content_table"><tr><th style="width: 60px">' + gs_getTranslation(o.language, 50)+ '</th><th>' + gs_getTranslation(o.language, 7)+ '</th><th width=\'10%\'>' + gs_getTranslation(o.language, 8)+ '</th><th width=\'10%\'>' + gs_getTranslation(o.language, 9)+ '</th><th width=\'20%\'>' + gs_getTranslation(o.language, 10)+ '</th></tr>';
+				var tableheader = '<table class=\'dirs_files_table\' cellpadding=0 cellspacing=2 id="gs_content_table"><tr>'
+				'<th style="width: 60px">' + gs_getTranslation(o.language, 50)+ '</th>'
+				'<th>' + gs_getTranslation(o.language, 7)+ '</th><th width=\'10%\'>' + gs_getTranslation(o.language, 8)+ '</th><th width=\'10%\'>' + gs_getTranslation(o.language, 9)+ '</th><th width=\'20%\'>' + gs_getTranslation(o.language, 10)+ '</th></tr>';
 				jQuery('#gs_dir_content').html(tableheader + dirshtml + fileshtml + "</table>");
 				
 				jQuery('div.file').contextMenu({
@@ -631,6 +643,11 @@ if (jQuery) (function(jQuery){
 						} else {
 							cur_element.addClass('rowSelected');
 							gs_cur_selected_item = cur_element;
+							//移除所有siblings <tr>标签的selected status
+							cur_element.parent().parent().siblings().find('div.rowSelected').each((index,ele)=>{
+									$(ele).removeClass('rowSelected');
+							})
+							console.log(gs_cur_selected_item);
 						}
 				    }
 					jQuery(".contextMenu").hide();

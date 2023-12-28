@@ -300,7 +300,7 @@ class FileManager{
     File downloadFile  = File(rootDir + dir + filename);
     //TODO根据后缀获取MIME
     args["request"].response.headers.contentType = ContentType.parse("application/vnd.android.package-archive");
-    args["request"].response.headers.set("content-disposition","attachment; filename=$filename");
+    args["request"].response.headers.set("content-disposition","attachment; filename=${Uri.encodeComponent(filename)}");
     args["request"].response.addStream(downloadFile.openRead()).then((_) => args["request"].response.close());
   }
 
