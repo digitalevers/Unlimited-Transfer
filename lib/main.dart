@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:woniu/pages/modules/show_general_dialog.dart';
 import 'package:woniu/services/fileManager.dart';
 import 'pages/tabs.dart';
 
@@ -78,7 +79,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    log("启动Home页面");
+    log("启动Main页面");
     return const Tabs();
   }
 }
