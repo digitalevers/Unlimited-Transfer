@@ -27,6 +27,11 @@ class HttpResponseCode{
   static const acceptFile = 1;
   static const serverBusy = 2;
 }
+//项目官网
+String website = "https://transfer.digitalevers.com";
+//本地设备和网络信息
+Map deviceInfo = {'model': '', 'lanIP': '', 'networkText': '', 'deviceType': ''};
+
 //日志开关
 bool LogFlag = true;
 //服务器返回标识

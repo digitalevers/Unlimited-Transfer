@@ -62,8 +62,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   //如果显示widget重叠了 尝试重新生成widget的次数
   int createWidgetCount = 2;
   //本地设备和网络信息
-  Map deviceInfo = {'model': '', 'lanIP': '', 'networkText': '', 'deviceType': ''};
-  //Map deviceInfo = {};
+  //deviceInfo = {'model': '', 'lanIP': '', 'networkText': '', 'deviceType': ''};
 
   //动画控制器
   late AnimationController _animationController;
