@@ -67,5 +67,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     log("启动Main页面");
     return const Tabs();
+    //return const PrivacyPage();
   }
 }
