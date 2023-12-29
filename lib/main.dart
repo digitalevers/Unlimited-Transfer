@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:woniu/pages/modules/show_general_dialog.dart';
+import 'package:woniu/pages/modules/privacy_page.dart';
 import 'package:woniu/services/fileManager.dart';
 import 'pages/tabs.dart';
 
@@ -11,6 +11,7 @@ import 'common/func.dart';
 import 'common/global_variable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bot_toast/bot_toast.dart';
+
 
 
 // 重写HttpOverrides
@@ -30,18 +31,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();  //这一行很重要且必须放在第一行 放在 SharedPreferences 前面 否则运行会报错 暂不知原因
   prefs = await SharedPreferences.getInstance();
   Hive.init((await getApplicationDocumentsDirectory()).path);
-
-  // var dir = GSFileSystemFileStorage.scanDir("/");
-  // for(var file in dir){
-  //   print(file.path);
-  // }
-  
-  // await Hive.openBox('appData');
-  // Box box = Hive.box('appData');
-  // box.get('avatarPath') ?? box.put('avatarPath', 'assets/avatars/1.png');
-  // box.get('username') ?? box.put('username', '${Platform.localHostname} user');
-  // box.get('queryPackages') ?? box.put('queryPackages', false);
-  // GetIt getIt = GetIt.instance;
   if(useProxy){
     HttpOverrides.global = MyHttpOverrides(); // 使用自己的HttpOverrides
   }
@@ -50,7 +39,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -69,9 +57,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
   final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
