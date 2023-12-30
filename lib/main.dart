@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:woniu/pages/modules/privacy_page.dart';
@@ -34,6 +35,9 @@ void main() async {
   if(useProxy){
     HttpOverrides.global = MyHttpOverrides(); // 使用自己的HttpOverrides
   }
+  // 设置为透明
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.blue));
+
   runApp(const MyApp());
 }
 
