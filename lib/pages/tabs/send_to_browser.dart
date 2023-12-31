@@ -2,7 +2,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get_navigation/src/routes/default_transitions.dart';
 import 'package:woniu/common/func.dart';
 import 'package:woniu/common/global_variable.dart';
 

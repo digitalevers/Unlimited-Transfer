@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:woniu/pages/modules/privacy_page.dart';
-import 'package:woniu/services/fileManager.dart';
 import 'pages/tabs.dart';
 
 import 'common/config.dart';
@@ -35,14 +34,14 @@ void main() async {
   if(useProxy){
     HttpOverrides.global = MyHttpOverrides(); // 使用自己的HttpOverrides
   }
-  // 设置为透明
+  // 屏幕顶部状态栏设置为透明（沉浸式）
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.blue));
-
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -53,7 +52,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'A Crossplatform File Transfer Tool'),
+      home: MyHomePage(title: 'A Crossplatform File Transfer Tool',key: MyHomePageKey),
       builder: BotToastInit(),  //bot_toast
     );
   }
@@ -62,15 +61,24 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
   final String title;
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   @override
   Widget build(BuildContext context) {
     log("启动Main页面");
-    return const Tabs();
-    //return const PrivacyPage();
+    bool allowPrivacy = prefs?.getBool("allowPrivacy") ?? false;
+    if(allowPrivacy){
+      //刷新页面也不关闭 showGeneralDialog 弹窗?
+      
+      return const Tabs();
+    } else {
+      return const PrivacyPage();
+    }
+    
   }
 }

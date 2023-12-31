@@ -46,6 +46,7 @@ List<Map<String,String>> fileList = []; //_fileList 前面加_会让变量私有
 final GlobalKey<NavigatorState> nav = GlobalKey<NavigatorState>();
 //全局key - stack 远程设备item容器
 final GlobalKey remoteDevicesKey = GlobalKey();
+final GlobalKey MyHomePageKey = GlobalKey();
 
 Offset remoteDevicesOffset = Offset(0, 0);
 //缓存实例

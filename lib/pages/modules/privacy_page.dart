@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:woniu/common/global_variable.dart';
 // Import for Android features.
 //import 'package:webview_flutter_android/webview_flutter_android.dart';
 // Import for iOS features.
@@ -109,7 +110,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
                                 alignment: Alignment.center,
                                 color: Theme.of(context).primaryColor,
                                 child: const Text('同意',style:TextStyle(color: Colors.white))),
-                            onTap: () {},
+                            onTap: () async {
+                              await prefs?.setBool("allowPrivacy",true);
+                              //关闭弹窗
+                              Navigator.pop(context);
+                              MyHomePageKey.currentState!.setState(() {});
+                            },
                           )),
                         ],
                       ),
@@ -125,6 +131,8 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+      color: Colors.blue,
+    );
   }
 }

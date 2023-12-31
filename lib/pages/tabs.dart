@@ -1,5 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:woniu/pages/modules/privacy_page.dart';
 import 'tabs/send_to_app.dart';
 import 'tabs/send_to_browser.dart';
 import 'tabs/choose_file.dart';
@@ -14,6 +16,7 @@ import 'package:showcaseview/showcaseview.dart';
 
 
 class Tabs extends StatefulWidget {
+  //final GlobalKey tabsKey;
   const Tabs({super.key});
 
   @override
@@ -56,7 +59,17 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
     _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
     //添加到事件队列中
     Future.delayed(Duration.zero, () {_animationController?.repeat();});
-    WidgetsBinding.instance.addPostFrameCallback((_) =>ShowCaseWidget.of(myContext).startShowCase([_one]));
+    
+    //TODO 报 myContext not initial
+    // if(myContext != null){
+    //   log(1111,StackTrace.current);
+    //   WidgetsBinding.instance.addPostFrameCallback((_) =>
+    //     ShowCaseWidget.of(myContext).startShowCase([_one])
+    //   );
+    // }
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        ShowCaseWidget.of(myContext).startShowCase([_one])
+    );
   }
 
   @override
@@ -128,8 +141,10 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
             floatingActionButton: newerShowOneTime(),
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
           );
-        }));
+        })
+    );
   }
+
 
   /// 新手引导蒙层只显示一次
   Widget newerShowOneTime(){
@@ -170,7 +185,6 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     //print(key);
                     BotToast.showText(text:"等待对方接收");
                     sendFileInfo(client, key, httpServerPort, fileList, myContext);
-                    ///cancel();
                     break;
                   }
                 }
