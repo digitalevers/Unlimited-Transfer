@@ -52,7 +52,7 @@ class _nameState extends State<About> {
             ),
             SizedBox(height: 5),
             SizedBox(
-              child: Text("微信 digitalevers\n邮箱 opensource@digitalevers.com\n官网 https://transfer.digitalevers.com",style: TextStyle(fontSize: 16)),
+              child: Text("微信 digitalevers\n邮箱 transfer@digitalevers.com\n官网 https://transfer.digitalevers.com",style: TextStyle(fontSize: 16)),
             ),
           ],
         )
