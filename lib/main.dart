@@ -74,7 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
     bool allowPrivacy = prefs?.getBool("allowPrivacy") ?? false;
     if(allowPrivacy){
       //刷新页面也不关闭 showGeneralDialog 弹窗?
-      
       return const Tabs();
     } else {
       return const PrivacyPage();

@@ -243,6 +243,38 @@ List<Map<String,String>> transformList(List<String?> list){
   return result;
 }
 
+
+ContentType getHeaderContentType(String extension){
+  ContentType ct = ContentType.text;
+  switch(extension){
+    case ".html":
+      ct = ContentType.html;
+      break;
+    case ".js":
+      ct = ContentType.parse("application/javascript; charset=utf-8");
+      break;
+    case ".css":
+      ct = ContentType.parse("text/css; charset=utf-8");
+      break;
+    case ".gif":
+      ct = ContentType.parse("image/gif");
+      break;
+    case ".png":
+      ct = ContentType.parse("image/png");
+      break;
+    case ".ico":
+      ct = ContentType.parse("image/ico");
+      break;
+    case ".apk":
+      ct = ContentType.parse("application/vnd.android.package-archive");
+      break;
+    case ".json":
+      ct = ContentType.json;
+      break;
+  }
+  return ct;
+}
+
 // getEstimatedTime(receivedBits, totalBits, currentSpeed) {
 //   ///speed in [mega bits  x * 10^6 bits ]
 //   double estBits = (totalBits - receivedBits) / 1000000;

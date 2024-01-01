@@ -259,32 +259,8 @@ class Server {
             }
             String extension = p.extension(path);
             //log(extension,StackTrace.current);
-            switch(extension){
-              case ".html":
-                request.response.headers.contentType = ContentType.html;
-                break;
-              case ".js":
-                request.response.headers.contentType = ContentType.parse("application/javascript; charset=utf-8");
-                break;
-              case ".css":
-                request.response.headers.contentType = ContentType.parse("text/css; charset=utf-8");
-                break;
-              case ".gif":
-                request.response.headers.contentType = ContentType.parse("image/gif");
-                break;
-              case ".png":
-                request.response.headers.contentType = ContentType.parse("image/png");
-                break;
-              case ".ico":
-                request.response.headers.contentType = ContentType.parse("image/ico");
-                break;
-              case ".apk":
-                request.response.headers.contentType = ContentType.parse("application/vnd.android.package-archive");
-                break;
-              default:
-                request.response.headers.contentType = ContentType.json;
-                break;
-            }
+            request.response.headers.contentType = getHeaderContentType(extension);
+            
             //log(path,StackTrace.current);
             if(extension == ".html" || extension == ".js" || extension == ".css"){
               String data = await rootBundle.loadString("assets$path");
