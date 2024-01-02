@@ -189,7 +189,24 @@ class Server {
               }
             }
             IOSink sink = file.openWrite(mode: FileMode.append);
-            await sink.addStream(request);
+
+            //添加 request拦截器实时统计已发送文件大小
+            int byteCount = 0;
+            Stream<List<int>> stream2 = request.transform(
+              StreamTransformer.fromHandlers(
+                handleData: (data, sink) {
+                  byteCount += data.length;
+                  print(byteCount);
+                  sink.add(data);
+                },
+                handleError: (error, stack, sink) {},
+                handleDone: (sink) {
+                  //sink.close();
+                },
+              ),
+            );
+
+            await sink.addStream(stream2);
             await sink.flush();
             await sink.close();
             //文件传输完毕 服务器置为空闲状态 并弹窗接收完成提示

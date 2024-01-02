@@ -205,6 +205,8 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     //print(left_);
     map['top'] = top_;
     map['left'] = left_;
+    map['transferProgess'] = 0;
+    //交由全局变量把控
     remoteDevicesData[map['lanIP']] = map;
     //print(remoteDevicesData);
     //使用Dragtarget包裹 Positioned 报错. 但将 Positioned 改为 Container.则不再报错 but why?
@@ -223,18 +225,18 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
               borderRadius: BorderRadius.circular(16),
             ),
             child: Stack(children: [
-              const Positioned(
+              Positioned(
                 left: 0,
                 top: 0,
                 child: StepProgressIndicator(
                     fallbackLength: 120,
                     totalSteps: 100,
-                    currentStep: 0,
+                    currentStep: map['transferProgess'],
                     size: 32,        //进度指示条的高度
                     padding: 0,
                     selectedColor: Colors.transparent,
                     unselectedColor: Colors.grey,
-                    roundedEdges: Radius.circular(16),
+                    roundedEdges: const Radius.circular(16),
                   )),
               Positioned(
                 left: 0,
@@ -286,7 +288,6 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     // }, builder: (context,candidateData,rejectData){
     //   return remoteDeviceWidget;
     // });
-
     remoteDevicesWidget.add(remoteDeviceWidget);
   }
 

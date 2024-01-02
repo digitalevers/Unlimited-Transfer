@@ -60,7 +60,7 @@ class Sender{
     /**
      * 分享文件 包括外部意图和内部主动选择文件进行分享
      * /storage/emulated/0/
-     * /data/data/0/com.example.woniu/files/uri_to_files
+     * /data/data/0/com.digitalevers.transfer/files/uri_to_files
      */
   static Future<List<Map<String,String>>> share(context, { bool externalIntent = false, List<String> appList = const <String>[]}) async {
     if (externalIntent) {
