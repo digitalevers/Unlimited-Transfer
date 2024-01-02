@@ -173,6 +173,7 @@ class Server {
 
             //3、流式写入文件 不会产生OOM
             String basename = request.headers['baseName']![0];
+            String fileSize = request.headers['fileSize']![0];
             //log(await utf8.decoder.bind(request).join(),StackTrace.current);
             String fileName = p.withoutExtension(basename);
             String extension  = p.extension(basename);
@@ -189,8 +190,11 @@ class Server {
               }
             }
             IOSink sink = file.openWrite(mode: FileMode.append);
+            //获取远程客户端ip
+            String clientIP = request.connectionInfo!.remoteAddress.address;
+            int clientCurrentProgress = remoteDevicesData[clientIP]!["transferProgess"] ?? 0;
 
-            //添加 request拦截器实时统计已发送文件大小
+            //添加 request拦截器实时统计已发送文件大小 每+1%的文件大小setState更新进度条
             int byteCount = 0;
             Stream<List<int>> stream2 = request.transform(
               StreamTransformer.fromHandlers(
