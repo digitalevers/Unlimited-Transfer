@@ -215,6 +215,9 @@ class Server {
 
                   },
                   handleDone: (sink) {
+                    //文件传输完毕 重新初始化step indicator组件
+                    remoteDevicesData[clientIP]!["transferProgess"] = 0;
+                    remoteDevicesData[clientIP]!["remoteDeviceWidgetKey"].currentState.setState((){});
                     sink.close();
                   },
                 ),

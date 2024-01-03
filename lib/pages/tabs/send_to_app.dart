@@ -182,7 +182,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   //将远程设备的item添加到显示区内
   void addRemoteDeviceToWidget(Map<String, dynamic> map) {
     remoteDeviceShowFlexibleSize ??= remoteDeviceShowFlexible.currentContext?.size;
-    map['remoteDeviceWidgetKey'] = GlobalKey<State<StepProgress>>();
+    map['remoteDeviceWidgetKey'] = GlobalKey();
     //约束在 district范围内随机生成top和left值 并尽可能不与之前的矩阵重叠
     double top_ = 0.0;
     double left_ = 0.0;
@@ -228,17 +228,8 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
                Positioned(
                 left: 0,
                 top: 0,
-                child: 
-                  // StepProgressIndicator(
-                  //   fallbackLength: 120,
-                  //   totalSteps: 100,
-                  //   currentStep: 20,
-                  //   size: 32,        //进度指示条的高度
-                  //   padding: 0,
-                  //   selectedColor: Colors.transparent,
-                  //   unselectedColor: Colors.grey,
-                  //   roundedEdges: const Radius.circular(16),
-                  // ),
+                child:
+                  // 因为StepProgressIndicator本身是 stateless 所以无法更新状态 需要自定义一个stateful来封装StepProgressIndicator
                   StepProgress(map['lanIP'],key:map['remoteDeviceWidgetKey'])
                 ),
               Positioned(
