@@ -172,60 +172,73 @@ class Server {
             // }
 
             //3、流式写入文件 不会产生OOM
-            String basename = request.headers['baseName']![0];
-            String fileSize = request.headers['fileSize']![0];
-            //log(await utf8.decoder.bind(request).join(),StackTrace.current);
-            String fileName = p.withoutExtension(basename);
-            String extension  = p.extension(basename);
-            String downloadDir = "/storage/emulated/0/Download/";
-            String filePath = downloadDir + basename;
-            File file = File(filePath);
-            //有同名文件 则在源文件后追加一个随机文件名生成一个新的文件名
-            if(file.existsSync()){
-              String randomFileSuffix = (100 + Random().nextInt(999 - 100)).toString();
-              filePath = "$downloadDir${fileName}_$randomFileSuffix$extension";
-              file = File(filePath);
+            try{
+              String basename = request.headers['baseName']![0];
+              int fileSize = int.parse(request.headers['content-length']![0]);
+
+              //log(await utf8.decoder.bind(request).join(),StackTrace.current);
+              String fileName = p.withoutExtension(basename);
+              String extension  = p.extension(basename);
+              String downloadDir = "/storage/emulated/0/Download/";
+              String filePath = downloadDir + basename;
+              File file = File(filePath);
+              //有同名文件 则在源文件后追加一个随机文件名生成一个新的文件名
               if(file.existsSync()){
-                throw const FileSystemException("The file have exist already");
+                String randomFileSuffix = (100 + Random().nextInt(999 - 100)).toString();
+                filePath = "$downloadDir${fileName}_$randomFileSuffix$extension";
+                file = File(filePath);
+                if(file.existsSync()){
+                  throw const FileSystemException("The file have exist already");
+                }
               }
+              IOSink sink = file.openWrite(mode: FileMode.append);
+              //获取客户端ip
+              String clientIP = request.connectionInfo!.remoteAddress.address;
+              int currentTransferProgress = remoteDevicesData[clientIP]!["transferProgess"] ?? 0;
+              //log(remoteDevicesData[clientIP],StackTrace.current);
+              //添加 request拦截器实时统计已发送文件大小 每+1%的文件大小setState更新进度条
+              int byteCount = 0;
+              Stream<List<int>> requestStream = request.transform(
+                StreamTransformer.fromHandlers(
+                  handleData: (data, sink) {
+                    byteCount += data.length;
+                    int latestTransferProgress = (byteCount * 100 / fileSize).ceil();
+                    if(latestTransferProgress != currentTransferProgress){
+                        currentTransferProgress = latestTransferProgress;
+                        remoteDevicesData[clientIP]!["transferProgess"] = latestTransferProgress;
+                        remoteDevicesData[clientIP]!["remoteDeviceWidgetKey"].currentState.setState((){});
+                    }
+                    
+                    sink.add(data);
+                  },
+                  handleError: (error, stack, sink) {
+
+                  },
+                  handleDone: (sink) {
+                    sink.close();
+                  },
+                ),
+              );
+
+              await sink.addStream(requestStream);
+              await sink.flush();
+              //await sink.close();
+              //文件传输完毕 服务器置为空闲状态 并弹窗接收完成提示
+              _serverStatus = ServerStatus.idle;
+              // 更新接收文件记录显示区的UI界面
+              receiveFilesLogKey.currentState!.insertFilesLog(filePath);
+              //print("接收完毕");
+              // CherryToast.info(
+              //   title:  const Text("接收完毕"),
+              //   toastPosition: Position.bottom,
+              //   displayCloseButton:false,
+              //   actionHandler:(){},
+              //   animationDuration: const Duration(milliseconds:  500),
+              // ).show(key.currentContext as BuildContext);
+              BotToast.showText(text:"接收完毕");
+            } catch(e){
+              print(e);
             }
-            IOSink sink = file.openWrite(mode: FileMode.append);
-            //获取远程客户端ip
-            String clientIP = request.connectionInfo!.remoteAddress.address;
-            int clientCurrentProgress = remoteDevicesData[clientIP]!["transferProgess"] ?? 0;
-
-            //添加 request拦截器实时统计已发送文件大小 每+1%的文件大小setState更新进度条
-            int byteCount = 0;
-            Stream<List<int>> stream2 = request.transform(
-              StreamTransformer.fromHandlers(
-                handleData: (data, sink) {
-                  byteCount += data.length;
-                  print(byteCount);
-                  sink.add(data);
-                },
-                handleError: (error, stack, sink) {},
-                handleDone: (sink) {
-                  //sink.close();
-                },
-              ),
-            );
-
-            await sink.addStream(stream2);
-            await sink.flush();
-            await sink.close();
-            //文件传输完毕 服务器置为空闲状态 并弹窗接收完成提示
-            _serverStatus = ServerStatus.idle;
-            // 更新接收文件记录显示区的UI界面
-            receiveFilesLogKey.currentState!.insertFilesLog(filePath);
-            //print("接收完毕");
-            // CherryToast.info(
-            //   title:  const Text("接收完毕"),
-            //   toastPosition: Position.bottom,
-            //   displayCloseButton:false,
-            //   actionHandler:(){},
-            //   animationDuration: const Duration(milliseconds:  500),
-            // ).show(key.currentContext as BuildContext);
-            BotToast.showText(text:"接收完毕");
           } else if(baseUri == "fileManager.php"){
             //log(await getExternalCacheDirectories(),StackTrace.current); // /storage/emulated/0/Android/data/包名/cache
             //log(await getExternalStorageDirectories(),StackTrace.current);  // /storage/emulated/0/Android/data/包名/files

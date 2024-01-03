@@ -5,7 +5,7 @@ import 'dart:math';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:step_progress_indicator/step_progress_indicator.dart';
+//import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:woniu/api/device_info_api.dart';
 import 'package:woniu/common/func.dart';
 import 'package:woniu/pages/modules/water_ripple.dart';
@@ -14,7 +14,8 @@ import 'package:woniu/services/server.dart';
 import 'package:woniu/common/config.dart';
 import 'package:woniu/common/global_variable.dart';
 
-import '../modules/receive_files_log.dart';
+import 'package:woniu/pages/modules/receive_files_log.dart';
+import 'package:woniu/pages/modules/step_progress.dart';
 
 class SendToApp extends StatefulWidget {
   final GlobalKey _key;
@@ -181,8 +182,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   //将远程设备的item添加到显示区内
   void addRemoteDeviceToWidget(Map<String, dynamic> map) {
     remoteDeviceShowFlexibleSize ??= remoteDeviceShowFlexible.currentContext?.size;
-    final GlobalKey remoteDeviceWidgetKey = GlobalKey();
-    map['remoteDeviceWidgetKey'] = remoteDeviceWidgetKey;
+    map['remoteDeviceWidgetKey'] = GlobalKey<State<StepProgress>>();
     //约束在 district范围内随机生成top和left值 并尽可能不与之前的矩阵重叠
     double top_ = 0.0;
     double left_ = 0.0;
@@ -208,7 +208,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     map['transferProgess'] = 0;
     //交由全局变量把控
     remoteDevicesData[map['lanIP']] = map;
-    //print(remoteDevicesData);
+    //log(remoteDevicesData,StackTrace.current);
     //使用Dragtarget包裹 Positioned 报错. 但将 Positioned 改为 Container.则不再报错 but why?
     // Widget remoteDeviceWidget = Container(
     //   child: const Text("avbc",style: TextStyle(fontSize: 80),),
@@ -216,7 +216,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     Widget remoteDeviceWidget = Positioned(
         top: top_,
         left: left_,
-        key: remoteDeviceWidgetKey,
+        //key: map['remoteDeviceWidgetKey'],
         child: Container(
             constraints: BoxConstraints( maxWidth: remoteDevicesWidgetMaxSize.width, maxHeight: remoteDevicesWidgetMaxSize.height),
             //padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
@@ -225,19 +225,22 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
               borderRadius: BorderRadius.circular(16),
             ),
             child: Stack(children: [
-              Positioned(
+               Positioned(
                 left: 0,
                 top: 0,
-                child: StepProgressIndicator(
-                    fallbackLength: 120,
-                    totalSteps: 100,
-                    currentStep: map['transferProgess'],
-                    size: 32,        //进度指示条的高度
-                    padding: 0,
-                    selectedColor: Colors.transparent,
-                    unselectedColor: Colors.grey,
-                    roundedEdges: const Radius.circular(16),
-                  )),
+                child: 
+                  // StepProgressIndicator(
+                  //   fallbackLength: 120,
+                  //   totalSteps: 100,
+                  //   currentStep: 20,
+                  //   size: 32,        //进度指示条的高度
+                  //   padding: 0,
+                  //   selectedColor: Colors.transparent,
+                  //   unselectedColor: Colors.grey,
+                  //   roundedEdges: const Radius.circular(16),
+                  // ),
+                  StepProgress(map['lanIP'],key:map['remoteDeviceWidgetKey'])
+                ),
               Positioned(
                 left: 0,
                 top: 0, 
@@ -351,6 +354,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
               //判断设备是否已经添加进显示区
               if (!remoteDevicesData.containsKey(_json['lanIP'])) {
                 //print(_json['lanIP']);
+
                 setState(() {
                   addRemoteDeviceToWidget(_json);
                   remoteDevicesWidgetPlus = remoteDevicesWidget;

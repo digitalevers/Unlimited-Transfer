@@ -207,6 +207,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
   //log(filePath,StackTrace.current);
   request.headers.set("baseName", filelist_[0]["baseName"]!);
+  request.headers.set("content-length", filelist_[0]["fileSize"]!);
 
   try{
     await request.addStream(file.openRead());
@@ -215,6 +216,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
     request.close();
     request = await client_.postUrl(uri);
     request.headers.set("baseName", filelist_[0]["baseName"]!);
+    request.headers.set("content-length", filelist_[0]["fileSize"]!);
     
     const platform = MethodChannel("AndroidApi");
     String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filelist_[0]["contentUri"], filelist_[0]["fileName"], filelist_[0]["extension"]]);

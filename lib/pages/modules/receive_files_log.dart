@@ -98,7 +98,7 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                       title: Text(getShortFileName(p.basename(receviceFilesLog[index]),15)),
                       subtitle: Text("From 172.16.28.133\nDate 2023-12-13 16:47",style: TextStyle(fontSize:10.0,color: Color.fromARGB(255, 250, 250, 250))),
                       trailing: SizedBox(
-                        width: 100,
+                        width: 120,
                         child: Row(
                           children: [
                             InkWell(
