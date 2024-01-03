@@ -208,7 +208,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
   //log(filePath,StackTrace.current);
   request.headers.set("baseName", filelist_[0]["baseName"]!);
   request.headers.set("content-length", filelist_[0]["fileSize"]!);
-
+  request.headers.set("client-hostname", deviceInfo["model"]);
   try{
     await request.addStream(file.openRead());
   } on FileSystemException {

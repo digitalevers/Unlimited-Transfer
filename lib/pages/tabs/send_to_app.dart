@@ -229,7 +229,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
                 left: 0,
                 top: 0,
                 child:
-                  // 因为StepProgressIndicator本身是 stateless 所以无法更新状态 需要自定义一个stateful来封装StepProgressIndicator
+                  // 因为StepProgressIndicator本身是 stateless 所以无法更新状态 需要自定义一个stateful封装StepProgressIndicator再进行更新
                   StepProgress(map['lanIP'],key:map['remoteDeviceWidgetKey'])
                 ),
               Positioned(

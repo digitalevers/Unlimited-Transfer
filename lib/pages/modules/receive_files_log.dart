@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -23,7 +24,7 @@ class ReceiveFilesLog extends StatefulWidget {
 
 // ignore: camel_case_types
 class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
-  List<String> receviceFilesLog = [];
+  List<Map<String,dynamic>> receviceFilesLog = [];
   final ScrollController _scrollController = ScrollController();  //ListView 滑动控制器
 
   @override
@@ -41,12 +42,14 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
     List<String> filesLog = prefs!.getStringList("receviceFilesLog") ?? [];
     //遍历文件是否存在
     for(int i = 0; i < filesLog.length; i++){
-      bool fileExist = await File(filesLog[i]).exists();
+      String fileFullPath = jsonDecode(filesLog[i])["fileFullPath"];
+      bool fileExist = await File(fileFullPath).exists();
       if(fileExist == false){
         filesLog.removeAt(i);
       }
     }
-    receviceFilesLog = _getBaseName(filesLog);
+    // ignore: unnecessary_this
+    this.receviceFilesLog = _getBaseName(filesLog);
     await prefs!.setStringList("receviceFilesLog", filesLog);
   }
 
@@ -95,8 +98,8 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                       //splashColor: Color.fromARGB(255, 62, 204, 44),
 
                       isThreeLine: false,
-                      title: Text(getShortFileName(p.basename(receviceFilesLog[index]),15)),
-                      subtitle: Text("From 172.16.28.133\nDate 2023-12-13 16:47",style: TextStyle(fontSize:10.0,color: Color.fromARGB(255, 250, 250, 250))),
+                      title: Text(getShortFileName(p.basename(receviceFilesLog[index]["fileFullPath"]!),15)),
+                      subtitle: Text("From ${receviceFilesLog[index]["from"]!}\nDate ${receviceFilesLog[index]["date"]!}",style: const TextStyle(fontSize:10.0,color: Color.fromARGB(255, 250, 250, 250))),
                       trailing: SizedBox(
                         width: 120,
                         child: Row(
@@ -107,6 +110,8 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                               if(Platform.isAndroid){
                                 const platform = MethodChannel("AndroidApi");
                                 bool openResult = await platform.invokeMethod("openDir",["/Download"]);
+                              } else {
+                                //TODO 预留iOS打开指定文件夹
                               }
                             },
                             child: const Icon(Icons.drive_file_move_rounded),
@@ -115,7 +120,7 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                             InkWell(
                             onTap: () {
                               //call your onpressed function here
-                              OpenFile.open(receviceFilesLog[index]).then((value) => 
+                              OpenFile.open(receviceFilesLog[index]["fileFullPath"]!).then((value) => 
                                 log(value.message,StackTrace.current)
                               );
                             },
@@ -139,18 +144,20 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
       );
   }
 
-  void insertFilesLog(String filePath) async {
+  void insertFilesLog(String fileInfoJson) async {
     List<String>? filesLog = prefs!.getStringList("receviceFilesLog") ?? [];
-    filesLog.add(filePath);
+    filesLog.add(fileInfoJson);
     //遍历文件是否存在
     for(int i = 0; i < filesLog.length; i++){
-      bool fileExist = await File(filesLog[i]).exists();
+      String fileFullPath = jsonDecode(filesLog[i])["fileFullPath"];
+      bool fileExist = await File(fileFullPath).exists();
       if(fileExist == false){
         filesLog.removeAt(i);
       }
     }
-    receviceFilesLog = _getBaseName(filesLog);
     await prefs!.setStringList("receviceFilesLog", filesLog);
+    // ignore: unnecessary_this
+    this.receviceFilesLog = _getBaseName(filesLog);
     setState(() {});
     // 延迟500毫秒，再进行滑动
     Future.delayed(Duration(milliseconds: 500), () {
@@ -163,13 +170,15 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
     filesLog.remove(filePath);
     //遍历文件是否存在
     for(int i = 0; i < filesLog.length; i++){
-      bool fileExist = await File(filesLog[i]).exists();
-      if(fileExist == false){
+      String fileFullPath = jsonDecode(filesLog[i])["fileFullPath"];
+      bool fileExist = File(filesLog[i]).existsSync();
+      if(fileExist == false || fileFullPath == filePath){
         filesLog.removeAt(i);
       }
     }
-    receviceFilesLog = _getBaseName(filesLog);
     await prefs!.setStringList("receviceFilesLog", filesLog);
+    // ignore: unnecessary_this
+    this.receviceFilesLog = _getBaseName(filesLog);
     setState(() {});
   }
 
@@ -177,21 +186,26 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
     List<String>? filesLog = prefs!.getStringList("receviceFilesLog") ?? [];
     //遍历文件是否存在
     for(int i = 0; i < filesLog.length; i++){
-      bool fileExist = await File(filesLog[i]).exists();
+      String fileFullPath = jsonDecode(filesLog[i])["fileFullPath"];
+      bool fileExist = await File(fileFullPath).exists();
       if(fileExist == false){
         filesLog.removeAt(i);
       }
     }
-    receviceFilesLog = _getBaseName(filesLog);
+    
     await prefs!.setStringList("receviceFilesLog", filesLog);
+    // ignore: unnecessary_this
+    this.receviceFilesLog = _getBaseName(filesLog);
     setState(() {});
   }
 
-  List<String> _getBaseName(List<String> filesLog){
-    List<String> baseNameFilesLog = [];
+  List<Map<String,dynamic>> _getBaseName(List<String> filesLog){
+    List<Map<String,dynamic>> baseNameFilesLog = [];
     for(int i = 0; i < filesLog.length; i++){
-        //baseNameFilesLog.add(p.basename(filesLog[i]));
-        baseNameFilesLog.add(filesLog[i]);
+      Map<String,dynamic> fileInfoMap = jsonDecode(filesLog[i]);
+      fileInfoMap["fileFullPath"] = fileInfoMap["fileFullPath"];
+      baseNameFilesLog.add(fileInfoMap);
+      //baseNameFilesLog.add(filesLog[i]);
     }
     return baseNameFilesLog;
   }

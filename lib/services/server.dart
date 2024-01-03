@@ -175,7 +175,10 @@ class Server {
             try{
               String basename = request.headers['baseName']![0];
               int fileSize = int.parse(request.headers['content-length']![0]);
-
+              String clientHostName = request.headers['client-hostname']![0];
+              String clientIP = request.connectionInfo!.remoteAddress.address;
+              log(clientHostName,StackTrace.current);
+    
               //log(await utf8.decoder.bind(request).join(),StackTrace.current);
               String fileName = p.withoutExtension(basename);
               String extension  = p.extension(basename);
@@ -192,8 +195,6 @@ class Server {
                 }
               }
               IOSink sink = file.openWrite(mode: FileMode.append);
-              //获取客户端ip
-              String clientIP = request.connectionInfo!.remoteAddress.address;
               int currentTransferProgress = remoteDevicesData[clientIP]!["transferProgess"] ?? 0;
               //log(remoteDevicesData[clientIP],StackTrace.current);
               //添加 request拦截器实时统计已发送文件大小 每+1%的文件大小setState更新进度条
@@ -229,7 +230,12 @@ class Server {
               //文件传输完毕 服务器置为空闲状态 并弹窗接收完成提示
               _serverStatus = ServerStatus.idle;
               // 更新接收文件记录显示区的UI界面
-              receiveFilesLogKey.currentState!.insertFilesLog(filePath);
+              String fileInfoJson = jsonEncode({
+                "fileFullPath":filePath,
+                "from":"$clientIP  ( $clientHostName )",
+                "date":DateTime.now().toString().substring(0,19)
+              });
+              receiveFilesLogKey.currentState!.insertFilesLog(fileInfoJson);
               //print("接收完毕");
               // CherryToast.info(
               //   title:  const Text("接收完毕"),

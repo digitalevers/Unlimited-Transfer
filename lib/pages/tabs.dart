@@ -118,16 +118,13 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                   // }
                   //2023-12-23关闭扫描动画
                   _indexSweepGradient = null;
-
-                  // ignore: avoid_print
-                  //print(this);
                 });
               },
               items: <BottomNavigationBarItem>[
                 const BottomNavigationBarItem(
-                    icon: Icon(Icons.phone_iphone), label: "传手机"),
+                    icon: Icon(Icons.phone_iphone), label: "传APP"),
                 const BottomNavigationBarItem(
-                    icon: Icon(Icons.open_in_browser), label: "传电脑"),
+                    icon: Icon(Icons.open_in_browser), label: "传浏览器"),
                 BottomNavigationBarItem(
                     icon: const Icon(Icons.add),
                     label: chooseFiles.isNotEmpty ? "点我清空" : "选择文件"),
