@@ -120,7 +120,8 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                             InkWell(
                             onTap: () {
                               //call your onpressed function here
-                              OpenFile.open(receviceFilesLog[index]["fileFullPath"]!).then((value) => 
+                              OpenFile.open(receviceFilesLog[index]["fileFullPath"]!).then(
+                                (value) => 
                                 log(value.message,StackTrace.current)
                               );
                             },
@@ -129,8 +130,8 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                             const SizedBox(width: 20),
                             InkWell(
                               onTap: () {
-                                //call your onpressed function here
-                                print('Delete Pressed');
+                                // ignore: unnecessary_this
+                                this.delFilesLog(receviceFilesLog[index]["fileFullPath"]);
                               },
                               child: const Icon(Icons.delete),
                             ),
@@ -166,9 +167,14 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
   }
 
   void delFilesLog(String filePath) async{
-    List<String>? filesLog = prefs!.getStringList("receviceFilesLog") ?? [];
-    filesLog.remove(filePath);
+    File file = File(filePath);
+    if (file.existsSync()) {
+      file.deleteSync();
+    } else {
+      log("文件不存在",StackTrace.current);
+    }
     //遍历文件是否存在
+    List<String>? filesLog = prefs!.getStringList("receviceFilesLog") ?? [];
     for(int i = 0; i < filesLog.length; i++){
       String fileFullPath = jsonDecode(filesLog[i])["fileFullPath"];
       bool fileExist = File(filesLog[i]).existsSync();
