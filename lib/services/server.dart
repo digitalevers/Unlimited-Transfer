@@ -116,6 +116,8 @@ class Server {
             // }
 
             //3、流式写入文件 不会产生OOM
+            //Flutter: How to get upload / download progress for http requests
+            //https://stackoverflow.com/questions/50455131/flutter-how-to-get-upload-download-progress-for-http-requests
             const uploadDirectory = './upload';
             String filename = request.headers['filename']![0];
             //File file = File('$uploadDirectory/$filename');
