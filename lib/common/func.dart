@@ -198,24 +198,23 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
 //发送文件
 //TODO 发送多个文件
 Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, List<Map<String,String>> filelist_) async {
-  String filePath = Uri.decodeComponent(filelist_[0]["originUri"]!);
-  File file = File(filePath); 
   Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
   HttpClientRequest request = await client_.postUrl(uri);
-  //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
-  //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
-  //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
-  //log(filePath,StackTrace.current);
-  request.headers.set("baseName", filelist_[0]["baseName"]!);
-  request.headers.set("content-length", filelist_[0]["fileSize"]!);
-  request.headers.set("client-hostname", deviceInfo["model"]);
   try{
+    String filePath = filelist_[0]["originUri"]!;
+    File file = File(filePath); 
+    //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
+    //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
+    //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
+    request.headers.set("baseName", Uri.encodeComponent(filelist_[0]["baseName"]!));
+    request.headers.set("content-length", filelist_[0]["fileSize"]!);
+    request.headers.set("client-hostname", deviceInfo["model"]);
     await request.addStream(file.openRead());
   } on FileSystemException {
     //这里一定要关闭request 并重新打开一个request
     request.close();
     request = await client_.postUrl(uri);
-    request.headers.set("baseName", filelist_[0]["baseName"]!);
+    request.headers.set("baseName", Uri.encodeComponent(filelist_[0]["baseName"]!));
     request.headers.set("content-length", filelist_[0]["fileSize"]!);
     
     const platform = MethodChannel("AndroidApi");
@@ -223,11 +222,15 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
     File newFile = File(newPrivatePath);
     log(newFile,StackTrace.current);
     await request.addStream(newFile.openRead());
+  } catch(e,stack) {
+    print(e);
+    print(stack);
+    request.close();
   }
 
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();
-  log(result, StackTrace.current);
+  //log(result, StackTrace.current);
   return result;
   //client.close();
 }

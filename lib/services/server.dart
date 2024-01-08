@@ -173,11 +173,11 @@ class Server {
 
             //3、流式写入文件 不会产生OOM
             try{
-              String basename = request.headers['baseName']![0];
+              String basename = Uri.decodeComponent(request.headers['baseName']![0]);
               int fileSize = int.parse(request.headers['content-length']![0]);
               String clientHostName = request.headers['client-hostname']![0];
               String clientIP = request.connectionInfo!.remoteAddress.address;
-              log(clientHostName,StackTrace.current);
+              //log(clientHostName,StackTrace.current);
     
               //log(await utf8.decoder.bind(request).join(),StackTrace.current);
               String fileName = p.withoutExtension(basename);

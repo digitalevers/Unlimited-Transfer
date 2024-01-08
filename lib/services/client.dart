@@ -64,6 +64,7 @@ class Sender{
      */
   static Future<List<Map<String,String>>> share(context, { bool externalIntent = false, List<String> appList = const <String>[]}) async {
     if (externalIntent) {
+      //分享意图
       if(Platform.isIOS){
 
       } else if(Platform.isAndroid){
@@ -71,12 +72,12 @@ class Sender{
         fileList = transformList(sharedMediaFiles.map((e) => e.path).toList());
       }
     } else {
+      //主动选择
       if(Platform.isIOS){
         
-
       } else if(Platform.isAndroid){
         fileList  = transformList(await FileMethods.pickFiles());
-        log(fileList,StackTrace.current);
+        //log(fileList,StackTrace.current);
         for(int i = 0; i < fileList.length; i++){
           //第一种方式 使用插件试图转换成 /data/data 开头的内部链接 但是会将文件复制一份放到 "/data/data/0/包名" 的内部空间中 如果文件很大造成空间浪费而且复制会特别耗时
           //fileList![i] = (await toFile(fileList![i]!)).path;
