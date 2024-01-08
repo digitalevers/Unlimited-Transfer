@@ -205,7 +205,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     //print(left_);
     map['top'] = top_;
     map['left'] = left_;
-    map['transferProgess'] = 0;
+    map['receiveProgess'] = 0;
     //交由全局变量把控
     remoteDevicesData[map['lanIP']] = map;
     //log(remoteDevicesData,StackTrace.current);

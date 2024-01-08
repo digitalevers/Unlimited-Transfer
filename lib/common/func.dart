@@ -206,9 +206,12 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
     //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
     //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
     //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
+    //上述现象其实是没有授权所有文件访问权限引起
     request.headers.set("baseName", Uri.encodeComponent(filelist_[0]["baseName"]!));
     request.headers.set("content-length", filelist_[0]["fileSize"]!);
     request.headers.set("client-hostname", deviceInfo["model"]);
+
+    
     await request.addStream(file.openRead());
   } on FileSystemException {
     //这里一定要关闭request 并重新打开一个request
@@ -220,7 +223,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
     const platform = MethodChannel("AndroidApi");
     String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filelist_[0]["contentUri"], filelist_[0]["fileName"], filelist_[0]["extension"]]);
     File newFile = File(newPrivatePath);
-    log(newFile,StackTrace.current);
+    //log(newFile,StackTrace.current);
     await request.addStream(newFile.openRead());
   } catch(e,stack) {
     print(e);
