@@ -195,7 +195,7 @@ class Server {
                 }
               }
               IOSink sink = file.openWrite(mode: FileMode.append);
-              int currentReceiveProgress = remoteDevicesData[clientIP]!["receiveProgess"] ?? 0;
+              int currentReceiveProgress = remoteDevicesData[clientIP]!["progress"] ?? 0;
               //log(remoteDevicesData[clientIP],StackTrace.current);
               //添加 request拦截器实时统计已发送文件大小 每+1%的文件大小setState更新进度条
               int byteCount = 0;
@@ -206,10 +206,9 @@ class Server {
                     int latestTransferProgress = (byteCount * 100 / fileSize).ceil();
                     if(latestTransferProgress != currentReceiveProgress){
                         currentReceiveProgress = latestTransferProgress;
-                        remoteDevicesData[clientIP]!["receiveProgess"] = latestTransferProgress;
+                        remoteDevicesData[clientIP]!["progress"] = latestTransferProgress;
                         remoteDevicesData[clientIP]!["remoteDeviceWidgetKey"].currentState.setState((){});
-                    }
-                    
+                    }   
                     sink.add(data);
                   },
                   handleError: (error, stack, sink) {
@@ -217,7 +216,7 @@ class Server {
                   },
                   handleDone: (sink) {
                     //文件传输完毕 重新初始化step indicator组件
-                    remoteDevicesData[clientIP]!["receiveProgess"] = 0;
+                    remoteDevicesData[clientIP]!["progress"] = 0;
                     remoteDevicesData[clientIP]!["remoteDeviceWidgetKey"].currentState.setState((){});
                     sink.close();
                   },

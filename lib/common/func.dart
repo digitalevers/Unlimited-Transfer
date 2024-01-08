@@ -211,15 +211,46 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
     request.headers.set("content-length", filelist_[0]["fileSize"]!);
     request.headers.set("client-hostname", deviceInfo["model"]);
 
-    
-    await request.addStream(file.openRead());
+    Stream<List<int>> fileStream = file.openRead();
+    //已发送文件长度
+    int byteCount = 0;
+    //待发送文件总长度
+    int fileSize = int.parse(filelist_[0]["fileSize"]!);
+    //发送进度
+    int currentSentProgress = remoteDevicesData[serverIP_]!["progress"] ?? 0;
+    //fileStream添加interceptor
+    Stream<List<int>> sendStream = fileStream.transform(
+      StreamTransformer.fromHandlers(
+        handleData: (data, sink) {
+          byteCount += data.length;
+          int latestSentProgress = (byteCount * 100 / fileSize).ceil();
+          //log(latestSentProgress,StackTrace.current);
+          if(latestSentProgress != currentSentProgress){
+              currentSentProgress = latestSentProgress;
+              remoteDevicesData[serverIP_]!["progress"] = latestSentProgress;
+              remoteDevicesData[serverIP_]!["remoteDeviceWidgetKey"].currentState.setState((){});
+          } 
+          sink.add(data);
+        },
+        handleError: (error, stack, sink) {
+
+        },
+        handleDone: (sink) {
+          //文件发送完毕 重新初始化step indicator组件
+          remoteDevicesData[serverIP_]!["progress"] = 0;
+          remoteDevicesData[serverIP_]!["remoteDeviceWidgetKey"].currentState.setState((){});
+          sink.close();
+        },
+      ),
+    );
+    await request.addStream(sendStream);
+
   } on FileSystemException {
     //这里一定要关闭request 并重新打开一个request
     request.close();
     request = await client_.postUrl(uri);
     request.headers.set("baseName", Uri.encodeComponent(filelist_[0]["baseName"]!));
     request.headers.set("content-length", filelist_[0]["fileSize"]!);
-    
     const platform = MethodChannel("AndroidApi");
     String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filelist_[0]["contentUri"], filelist_[0]["fileName"], filelist_[0]["extension"]]);
     File newFile = File(newPrivatePath);
@@ -233,9 +264,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, L
 
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();
-  //log(result, StackTrace.current);
   return result;
-  //client.close();
 }
 
 //将 List<String?> 转成 List<Map<String,String>>的形式

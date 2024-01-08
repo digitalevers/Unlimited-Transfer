@@ -27,7 +27,7 @@ class _StepProgressState extends State<StepProgress> {
     return StepProgressIndicator(
       fallbackLength: 120,
       totalSteps: 100,
-      currentStep: remoteDevicesData[_ip]!["receiveProgess"],
+      currentStep: remoteDevicesData[_ip]!["progress"],
       size: 32,        //进度指示条的高度
       padding: 0,
       selectedColor: Colors.transparent,
