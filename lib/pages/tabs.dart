@@ -178,8 +178,9 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                   //print(remoteDevicesOffset);
                   double top_ = remoteDevicesData[key]!['top'] + remoteDevicesOffset.dy;
                   double left_ = remoteDevicesData[key]!['left'] + remoteDevicesOffset.dx;
+                  //log(remoteDevicesData[key]!['top'],StackTrace.current);
+                  //log(remoteDevicesOffset.dy,StackTrace.current);
                   if(pointInsideRect(offset, top_, left_, remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight)){
-                    //print(key);
                     BotToast.showText(text:"等待对方接收");
                     sendFileInfo(client, key, httpServerPort, fileList, myContext);
                     break;
