@@ -7,7 +7,7 @@
         {
             "name": "ulimited-transfer",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
         },
         {
             "name": "ulimited-transfer (profile mode)",
@@ -19,7 +19,8 @@
             "name": "ulimited-transfer (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+                  
         }
     ]
 }

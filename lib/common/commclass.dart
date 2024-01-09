@@ -21,8 +21,11 @@ class CustomPrint{
     var fileInfo = traceString.substring(index0fFileName);
     var listOfInfos = fileInfo.split(":");
     fileName = listOfInfos[0];
-    lineNumber = int.parse(listOfInfos[1]);
-    var columnStr = listOfInfos[2];
-    columnStr = columnStr.replaceFirst(")","");
+    lineNumber = int.parse(listOfInfos[1].replaceAll(RegExp(r'[^0-9]'),''));  //release模式下若是非纯数字（字符串中包含字母）会报错
+    var columnStr = "";
+    if(listOfInfos.length > 2){
+      columnStr = listOfInfos[2];
+      columnStr = columnStr.replaceFirst(")","");
+    }
   }
 }
