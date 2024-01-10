@@ -14,7 +14,7 @@ class About extends StatefulWidget {
 class _nameState extends State<About> {
   @override
   Widget build(BuildContext context) {
-    log("about页渲染完成");
+    //log("about页渲染完成");
     return SizedBox(
       height: double.infinity,
       width: double.infinity,
