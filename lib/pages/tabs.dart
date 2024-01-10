@@ -226,9 +226,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     ),
                     Container(margin: const EdgeInsets.only(bottom: 5), 
                               child: 
-                                Text(showShortFileName,textAlign:TextAlign.center,
-                                  style:const TextStyle(fontSize:10,color:Colors.white),
-                                )
+                                Text(showShortFileName,textAlign:TextAlign.center,style:const TextStyle(fontSize:10,color:Colors.white))
                     )
                   ],
                 )) 
@@ -244,18 +242,24 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     buildRotationTransition(),
                     IconButton(
                         onPressed: () async {
-                          //选择文件
-                          List<Map<String,String>> path = await Sender.handleSharing(context);
-                          chooseFiles.addAll(path);
-                          setState(() {
-                            //isLoading = false;
-                            // ignore: prefer_is_empty
-                            if ((chooseFiles.length) > 0) {
-                              _FloatingActionButtonIcon = const Icon(Icons.file_copy, color: Colors.white);
-                            } else {
-                              _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
+                          try{
+                            //选择文件
+                            List<Map<String,String>> path = await Sender.handleSharing(context);
+                            chooseFiles.addAll(path);
+                            setState(() {
+                              //isLoading = false;
+                              // ignore: prefer_is_empty
+                              if ((chooseFiles.length) > 0) {
+                                _FloatingActionButtonIcon = const Icon(Icons.file_copy, color: Colors.white);
+                              } else {
+                                _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
+                              }
+                            });
+                          } catch(e){
+                            if(e.runtimeType.toString() == "PlatformException"){
+                              BotToast.showText(text:"请到设置的授权管理手动授权，否则无法使用哦~");
                             }
-                          });
+                          }
                         },
                         icon: _FloatingActionButtonIcon
                     ),

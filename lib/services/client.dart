@@ -42,18 +42,6 @@ class Sender{
 
     }
     return await Sender.share(nav.currentContext, externalIntent: externalIntent);
-
-    // Log(shareRespMap, StackTrace.current);
-    // ShareError shareErr = ShareError.fromMap(shareRespMap);
-
-    // switch (shareErr.hasError) {
-    //   case true:
-    //     showSnackBar(nav.currentContext, '${shareErr.errorMessage}');
-    //     break;
-    //   case false:
-    //     Navigator.pushNamed(nav.currentContext!, '/sharepage');
-    //     break;
-    // }
   }
 
     // ignore: slash_for_doc_comments
@@ -66,7 +54,7 @@ class Sender{
     if (externalIntent) {
       //分享意图
       if(Platform.isIOS){
-
+        //TODO iOS分享意图
       } else if(Platform.isAndroid){
         List<SharedMediaFile> sharedMediaFiles = await ReceiveSharingIntent.getInitialMedia();
         fileList = transformList(sharedMediaFiles.map((e) => e.path).toList());
@@ -74,7 +62,8 @@ class Sender{
     } else {
       //主动选择
       if(Platform.isIOS){
-        
+        //TODO iOS文件选择
+
       } else if(Platform.isAndroid){
         fileList  = transformList(await FileMethods.pickFiles());
         //log(fileList,StackTrace.current);
@@ -105,7 +94,7 @@ class Sender{
       }
     }
   
-    //log(fileList,StackTrace.current);
+    log(fileList,StackTrace.current);
     return fileList;
   }
 

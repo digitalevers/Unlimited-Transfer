@@ -83,16 +83,16 @@ public class MainActivity extends FlutterActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             System.out.println("-----------------------"+Environment.isExternalStorageManager());
         }
-        final int REQUEST_MANAGE_FILES_ACCESS = 2;
-        //2023-12-23 22:00 add
+        //2023-12-23 22:00
         //请求所有文件权限 才能调用intent打开文件
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if(!Environment.isExternalStorageManager()){
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                intent.setData(Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, REQUEST_MANAGE_FILES_ACCESS);
-            }
-        }
+        // final int REQUEST_MANAGE_FILES_ACCESS = 2;
+        // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        //     if(!Environment.isExternalStorageManager()){
+        //         Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+        //         intent.setData(Uri.parse("package:" + getPackageName()));
+        //         startActivityForResult(intent, REQUEST_MANAGE_FILES_ACCESS);
+        //     }
+        // }
 
         String path = "";
         // 以 file:// 开头的
