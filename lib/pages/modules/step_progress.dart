@@ -32,7 +32,9 @@ class _StepProgressState extends State<StepProgress> {
       padding: 0,
       selectedColor: Colors.transparent,
       unselectedColor: Colors.grey,
-      roundedEdges: const Radius.circular(16),
+      //2024-01-10
+      //TODO  Radius.circular doesn't work very well when the Rect width is very small,so don't use Radius.circular property temporarily
+      //roundedEdges: const Radius.circular(16),
     );
   }
 }

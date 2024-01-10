@@ -220,9 +220,11 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
         child: Container(
             constraints: BoxConstraints( maxWidth: remoteDevicesWidgetMaxSize.width, maxHeight: remoteDevicesWidgetMaxSize.height),
             //padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 255, 126, 90),
-              borderRadius: BorderRadius.circular(16),
+            decoration: const BoxDecoration(
+              color: Color.fromARGB(255, 255, 126, 90),
+              //2024-01-10
+              //TODO  Radius.circular doesn't work very well when the Rect width is very small,so don't use Radius.circular property temporarily
+              //borderRadius: BorderRadius.circular(16),
             ),
             child: Stack(children: [
                Positioned(
@@ -237,18 +239,9 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
                 top: 0, 
                 child: Row(
                   children: [
-                    Container(
+                    SizedBox(
                       height: 32,
                       width: 32,
-                      //margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
-                      decoration: const BoxDecoration(
-                          //color: Colors.blue,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(16),
-                              topLeft: Radius.circular(16))
-                          // borderRadius:
-                          //     BorderRadius.all(Radius.circular(16))
-                          ),
                       child: Icon(
                         getRemoteDeviceTypeIcon(map['deviceType']),
                         color: Colors.white,
