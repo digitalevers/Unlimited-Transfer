@@ -80,7 +80,12 @@ void main() {//注意：需要添加async，因为await必须在async方法内�
   //  String basename = p.basename(path);
   //  print(p.withoutExtension(basename));
   //  print(p.extension(basename));
-
+  List a = [];
+  List b=[20];
+  //a = [...b];
+  a = b;
+  a.add(10);
+  print(b);
 }
 
 String formatFileSize(int fileSizeBytes){

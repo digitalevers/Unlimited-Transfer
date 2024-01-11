@@ -322,14 +322,14 @@ public class FilePickerDelegate implements PluginRegistry.ActivityResultListener
                 this.permissionManager.askForPermission(Manifest.permission.READ_MEDIA_IMAGES, REQUEST_CODE);
                 return;
             }
-            if (!this.permissionManager.isPermissionGranted(Manifest.permission.READ_MEDIA_VIDEO)) {
+            /*if (!this.permissionManager.isPermissionGranted(Manifest.permission.READ_MEDIA_VIDEO)) {
                 this.permissionManager.askForPermission(Manifest.permission.READ_MEDIA_VIDEO, REQUEST_CODE);
                 return;
             }
             if (!this.permissionManager.isPermissionGranted(Manifest.permission.READ_MEDIA_AUDIO)) {
                 this.permissionManager.askForPermission(Manifest.permission.READ_MEDIA_AUDIO, REQUEST_CODE);
                 return;
-            }
+            }*/
         }
         this.startFileExplorer();
     }

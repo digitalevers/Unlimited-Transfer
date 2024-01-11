@@ -27,10 +27,15 @@ class SendToApp extends StatefulWidget {
 
 class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMixin {
   final GlobalKey _key;
-  _SendToAppState(this._key);
+  _SendToAppState(this._key){
+    //log("_SendToAppState",StackTrace.current);
+  }
   //UDP socket
   RawDatagramSocket? socket;
+  //UDP广播定时器
   Timer? timer;
+  //探测下线设备定时器
+  Timer? cleanTimer;
   //UDP 启动锁确保只启动一次
   bool startUDPLock = false;
   //当前页面的 globalKey
@@ -57,7 +62,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   List<Widget> remoteDevicesWidget = <Widget>[];
   //远程设备的显示widget + 水波纹动画(初始化的时候仅有水波纹动画)
   List<Widget> remoteDevicesWidgetPlus = <Widget>[_waterRipple];
-  //List<Widget> remoteDevicesWidgetPlus = <Widget>[dt];
+
   //远程设备的显示widget 的最大尺寸
   Size remoteDevicesWidgetMaxSize = Size(remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight);
   //如果显示widget重叠了 尝试重新生成widget的次数
@@ -73,20 +78,16 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     super.initState();
     ////////////////创建动画
     _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
-    //添加到事件队列中
     Future.delayed(Duration.zero, () {
-      //动画重复执行
       _animationController.repeat();
     });
 
     initEnv();
     
-    //界面build完成后执行回调函数
     WidgetsBinding.instance.addPostFrameCallback((_) {
       RenderBox renderBox = remoteDevicesKey.currentContext?.findRenderObject() as RenderBox;
       remoteDevicesOffset = renderBox.localToGlobal(Offset.zero);
       //print(positionRed);
-      
     });
   }
 
@@ -102,13 +103,10 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     }
     if (deviceInfo['network']['type'] == 'wifi' && deviceInfo['lanIP'].isNotEmpty) {
       startUDP();
+      startCleanTimer();
     }
     //启动HTTP SERVER并传入key 便于在server类中获取context
     await Server.startServer(sendToAppBodyKey,receiveFilesLogKey);
-
-    // setState(() {
-    //     deviceInfo = deviceInfo_;
-    // });
   }
 
   @override
@@ -116,13 +114,19 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   void dispose() {
     _animationController.dispose();
     super.dispose();
-    log('sendtoapp==dispose');
+    //log('sendtoapp==dispose');
+    stopUDP();
+    stopCleanTimer();
+    remoteDevicesData.clear();
   }
 
   @override
   void deactivate() {
     super.deactivate();
-    log('sendtoapp==deactivate');
+    //log('sendtoapp==deactivate');
+    stopUDP();
+    stopCleanTimer();
+    remoteDevicesData.clear();
   }
 
   // ignore: slash_for_doc_comments
@@ -182,6 +186,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   //将远程设备的item添加到显示区内
   void addRemoteDeviceToWidget(Map<String, dynamic> map) {
     remoteDeviceShowFlexibleSize ??= remoteDeviceShowFlexible.currentContext?.size;
+    map['remoteDeviceKey'] = GlobalKey();
     map['remoteDeviceWidgetKey'] = GlobalKey();
     //约束在 district范围内随机生成top和left值 并尽可能不与之前的矩阵重叠
     double top_ = 0.0;
@@ -206,6 +211,8 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     map['top'] = top_;
     map['left'] = left_;
     map['progress'] = 0;
+    //添加设备的毫秒时间戳
+    map['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
     //交由全局变量把控
     remoteDevicesData[map['lanIP']] = map;
     //log(remoteDevicesData,StackTrace.current);
@@ -216,7 +223,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     Widget remoteDeviceWidget = Positioned(
         top: top_,
         left: left_,
-        //key: map['remoteDeviceWidgetKey'],
+        key: map['remoteDeviceKey'],
         child: Container(
             constraints: BoxConstraints( maxWidth: remoteDevicesWidgetMaxSize.width, maxHeight: remoteDevicesWidgetMaxSize.height),
             //padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
@@ -278,6 +285,22 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     remoteDevicesWidget.add(remoteDeviceWidget);
   }
 
+  //在设备显示区内移除远程设备的item
+  void removeRemoteDeviceFromWidget(GlobalKey remoteDeviceKey) {
+    for(int i = 0; i < remoteDevicesWidget.length; i++){
+      if(remoteDevicesWidget[i].key == remoteDeviceKey){
+        remoteDevicesWidget.removeAt(i);
+        break;
+      }
+    }
+    for(int i = 0; i < remoteDevicesWidgetPlus.length; i++){
+      if(remoteDevicesWidgetPlus[i].key == remoteDeviceKey){
+        remoteDevicesWidgetPlus.removeAt(i);
+        break;
+      }
+    }
+  }
+
   //初始化获取设备和wifi信息
   Future<Map> initGetInfo(Function func) async {
     Map deviceInfo_ = await DeviceInfoApi.getDeviceInfo();
@@ -288,14 +311,12 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     return deviceInfo_;
   }
 
-  /// 启动UDP广播
-  /// 需要加一个启动锁 多次重复启动 会出现bug
+  /// 启动UDP广播 ———— 需要加一个启动锁 多次重复启动 会出现bug
   void startUDP() async {
     if (startUDPLock == true) {
       return;
     }
     startUDPLock = true;
-
     socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, udpPort);
     socket?.broadcastEnabled = true;
     log('UDP Echo ready to receive', StackTrace.current);
@@ -307,11 +328,11 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
       'deviceType': deviceInfo['deviceType']
     };
     String broadJson = json.encode(broadMap);
-
     timer = Timer.periodic(timeout, (timer) {
       //[0x44, 0x48, 0x01, 0x01]
       socket?.send(broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
     });
+
     //print('${socket.address.address}:${socket.port}');
     socket?.listen((RawSocketEvent e) {
       switch (e) {
@@ -329,21 +350,24 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
             //解析UDP json数据
             // ignore: no_leading_underscores_for_local_identifiers
             Map<String, dynamic> _json = json.decode(msg);
-
             //print(deviceInfo['lanIP']);
             if (_json['lanIP'] != deviceInfo['lanIP']) {
               //print(_json['deviceName']);
               //remoteDevices.add(_json);
               //print('${remoteDeviceShowFlexible.currentContext?.size?.height}');
               //判断设备是否已经添加进显示区
+              //log(remoteDevicesData,StackTrace.current);
               if (!remoteDevicesData.containsKey(_json['lanIP'])) {
-                //print(_json['lanIP']);
-
                 setState(() {
                   addRemoteDeviceToWidget(_json);
-                  remoteDevicesWidgetPlus = remoteDevicesWidget;
+                  //不能直接赋值 必须深拷贝
+                  //remoteDevicesWidgetPlus = remoteDevicesWidget;
+                  remoteDevicesWidgetPlus = [...remoteDevicesWidget];
                   remoteDevicesWidgetPlus.add(_waterRipple);
                 });
+              } else {
+                //旧设备则更新毫秒时间戳
+                remoteDevicesData[_json['lanIP']]!['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
               }
             }
           }
@@ -374,10 +398,42 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
 
   /// 停止UDP广播
   void stopUDP() {
-    //Log("stopUDP", StackTrace.current);
     socket?.close();
-    //关闭定时器
+    //关闭UDP广播定时器
     timer?.cancel();
+  }
+
+  //启动"清理下线设备"定时器 每隔5秒清理一次下线设备
+  void startCleanTimer(){
+    const timeout = Duration(seconds: 5);
+    cleanTimer = Timer.periodic(timeout, (cleanTimer) {
+      if(remoteDevicesData.isNotEmpty){
+        int now = DateTime.now().millisecondsSinceEpoch;
+        // 这样删除会引起 Concurrent modification during iteration
+        // remoteDevicesData.forEach((key, value) {
+        //   if(now - value['millTimeStamp'] >= 5000){
+        //     //超过5000毫秒没有更新时间戳的默认为下线设备并将其清理
+        //     remoteDevicesData.removeWhere(key);
+        //   }
+        // });
+        remoteDevicesData.removeWhere((ip,remoteDeviceInfo){
+          if(now - remoteDeviceInfo['millTimeStamp'] >= 4000){
+            setState(() {
+              removeRemoteDeviceFromWidget(remoteDeviceInfo['remoteDeviceKey']);
+            }); 
+            return true;
+          } else {
+            return false;
+          }
+            
+        });
+      }
+    });
+  }
+
+  //关闭"清理下线设备"定时器
+  void stopCleanTimer(){
+    cleanTimer?.cancel();
   }
 
   //初始化"接收文件记录"数据

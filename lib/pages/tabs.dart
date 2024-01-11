@@ -50,6 +50,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   //新手引导蒙层
   final GlobalKey _one = GlobalKey();
+
   late BuildContext myContext;
 
   @override
@@ -59,7 +60,6 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
     _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
     //添加到事件队列中
     Future.delayed(Duration.zero, () {_animationController?.repeat();});
-    
     //TODO 报 myContext not initial
     // if(myContext != null){
     //   log(1111,StackTrace.current);
@@ -67,9 +67,6 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
     //     ShowCaseWidget.of(myContext).startShowCase([_one])
     //   );
     // }
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-        ShowCaseWidget.of(myContext).startShowCase([_one])
-    );
   }
 
   @override
@@ -88,58 +85,72 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context){
-    return ShowCaseWidget(
-      builder: Builder(
-        builder: (context) {
-          myContext = context;
-          return Scaffold(
-            body: _pages[_currentIndex],
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              type: BottomNavigationBarType.fixed,
-              onTap: (index) {
-                setState(() {
-                  if (index == 2) {
-                    if (chooseFiles.isNotEmpty) {
-                      chooseFiles.clear();
-                      _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
+    bool allowPrivacy = prefs?.getBool("allowPrivacy") ?? false;
+    if(allowPrivacy){
+      //置于initState中只会执行一次
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) {
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            ShowCaseWidget.of(myContext).startShowCase([_one]);
+          });
+        }
+      );
+
+      return ShowCaseWidget(
+        builder: Builder(
+          builder: (context) {
+            myContext = context;
+            return Scaffold(
+              body: _pages[_currentIndex],
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: _currentIndex,
+                type: BottomNavigationBarType.fixed,
+                onTap: (index) {
+                  setState(() {
+                    if (index == 2) {
+                      if (chooseFiles.isNotEmpty) {
+                        chooseFiles.clear();
+                        _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
+                      }
+                    } else {
+                      _currentIndex = index;
                     }
-                  } else {
-                    _currentIndex = index;
-                  }
-                  //选中其他tab页 停止雷达扫描
-                  // if (index != 0) {
-                  //   _indexSweepGradient = null;
-                  // } else {
-                  //   _indexSweepGradient = SweepGradient(colors: [
-                  //     Colors.white.withOpacity(0.2),
-                  //     Colors.white.withOpacity(0.6),
-                  //   ]);
-                  // }
-                  //2023-12-23关闭扫描动画
-                  _indexSweepGradient = null;
-                });
-              },
-              items: <BottomNavigationBarItem>[
-                const BottomNavigationBarItem(
-                    icon: Icon(Icons.phone_iphone), label: "传APP"),
-                const BottomNavigationBarItem(
-                    icon: Icon(Icons.open_in_browser), label: "传电脑"),
-                BottomNavigationBarItem(
-                    icon: const Icon(Icons.add),
-                    label: chooseFiles.isNotEmpty ? "点我清空" : "选择文件"),
-                const BottomNavigationBarItem(
-                    icon: Icon(Icons.open_in_browser), label: "使用说明"),
-                const BottomNavigationBarItem(
-                    icon: Icon(Icons.info_outline), label: "关于")
-              ],
-            ),
-            //新手引导蒙层只在app安装时提示一次
-            floatingActionButton: newerShowOneTime(),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          );
-        })
-    );
+                    //选中其他tab页 停止雷达扫描
+                    // if (index != 0) {
+                    //   _indexSweepGradient = null;
+                    // } else {
+                    //   _indexSweepGradient = SweepGradient(colors: [
+                    //     Colors.white.withOpacity(0.2),
+                    //     Colors.white.withOpacity(0.6),
+                    //   ]);
+                    // }
+                    //2023-12-23关闭扫描动画
+                    _indexSweepGradient = null;
+                  });
+                },
+                items: <BottomNavigationBarItem>[
+                  const BottomNavigationBarItem(
+                      icon: Icon(Icons.phone_iphone), label: "传APP"),
+                  const BottomNavigationBarItem(
+                      icon: Icon(Icons.open_in_browser), label: "传电脑"),
+                  BottomNavigationBarItem(
+                      icon: const Icon(Icons.add),
+                      label: chooseFiles.isNotEmpty ? "点我清空" : "选择文件"),
+                  const BottomNavigationBarItem(
+                      icon: Icon(Icons.open_in_browser), label: "使用说明"),
+                  const BottomNavigationBarItem(
+                      icon: Icon(Icons.info_outline), label: "关于")
+                ],
+              ),
+              //新手引导蒙层只在app安装时提示一次
+              floatingActionButton: newerShowOneTime(),
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            );
+          })
+      );
+    } else {
+      return const PrivacyPage();
+    } 
   }
 
 

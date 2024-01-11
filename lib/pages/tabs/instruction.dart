@@ -44,7 +44,7 @@ class _nameState extends State<Instruction> {
                   ),
                   const SizedBox(width: 8),
                   const Expanded(child: Text(
-                    "最上方是状态栏，从左到右分别显示当前手机名，ip 地址和是否接入WiFi的标识",
+                    "最上方为状态栏，从左到右分别显示当前手机名，ip 地址和是否接入WiFi的标识",
                     style: TextStyle(color: Colors.black, fontSize: 14),
                   )),
                 ],

@@ -71,13 +71,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     log("启动Main页面");
-    bool allowPrivacy = prefs?.getBool("allowPrivacy") ?? false;
-    if(allowPrivacy){
-      //刷新页面也不关闭 showGeneralDialog 弹窗?
-      return const Tabs();
-    } else {
-      return const PrivacyPage();
-    }
-    
+    // if(allowPrivacy){
+    //   //刷新页面也不关闭 showGeneralDialog 弹窗?
+    //   return const Tabs();
+    // } else {
+    //   return const PrivacyPage();
+    // }
+    return Tabs(key:TabsKey);
   }
 }

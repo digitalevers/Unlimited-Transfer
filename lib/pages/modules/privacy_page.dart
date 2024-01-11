@@ -9,6 +9,7 @@ import 'package:woniu/common/global_variable.dart';
 import 'package:woniu/pages/modules/privacy_view.dart';
 
 class PrivacyPage extends StatefulWidget {
+
   const PrivacyPage({super.key});
 
   @override
@@ -16,6 +17,7 @@ class PrivacyPage extends StatefulWidget {
 }
 
 class _PrivacyPageState extends State<PrivacyPage> {
+
   
   final String _data = "亲爱的用户，感谢您信任并使用无界闪传APP\n" +
       " \n" +
@@ -29,10 +31,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   @override
   void initState() {
+    
     // TODO: implement initState
     super.initState();
     //界面build完成后弹出隐私政策弹窗
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      
       showGeneralDialog(
         context: context,
         barrierDismissible: true,
@@ -125,7 +129,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                               //关闭弹窗
                               // ignore: use_build_context_synchronously
                               Navigator.pop(context);
-                              MyHomePageKey.currentState!.setState(() {});
+                              TabsKey.currentState!.setState(() {});
                             },
                           )),
                         ],
