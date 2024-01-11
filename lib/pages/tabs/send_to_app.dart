@@ -25,7 +25,7 @@ class SendToApp extends StatefulWidget {
   State<SendToApp> createState() => _SendToAppState(_key);
 }
 
-class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMixin {
+class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final GlobalKey _key;
   _SendToAppState(this._key){
     //log("_SendToAppState",StackTrace.current);
@@ -74,6 +74,28 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   late AnimationController _animationController;
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+    switch (state) {
+      case AppLifecycleState.resumed:
+        //debugPrint('应用程序可见并响应用户输入。');
+        startUDP();
+        break;
+      case AppLifecycleState.inactive:
+        //debugPrint('应用程序处于非活动状态，并且未接收用户输入');
+        stopUDP();
+        break;
+      case AppLifecycleState.paused:
+        //debugPrint('用户当前看不到应用程序，没有响应');
+        stopUDP();
+        break;
+      case AppLifecycleState.detached:
+        //debugPrint('该应用程序仍托管在引擎上，但与主机视图分离');
+        break;
+      default:
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     ////////////////创建动画
@@ -81,9 +103,9 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     Future.delayed(Duration.zero, () {
       _animationController.repeat();
     });
-
     initEnv();
-    
+    //添加监听
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       RenderBox renderBox = remoteDevicesKey.currentContext?.findRenderObject() as RenderBox;
       remoteDevicesOffset = renderBox.localToGlobal(Offset.zero);
@@ -103,7 +125,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     }
     if (deviceInfo['network']['type'] == 'wifi' && deviceInfo['lanIP'].isNotEmpty) {
       startUDP();
-      startCleanTimer();
+      //startCleanTimer();
     }
     //启动HTTP SERVER并传入key 便于在server类中获取context
     await Server.startServer(sendToAppBodyKey,receiveFilesLogKey);
@@ -116,7 +138,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     super.dispose();
     //log('sendtoapp==dispose');
     stopUDP();
-    stopCleanTimer();
+    //stopCleanTimer();
     remoteDevicesData.clear();
   }
 
@@ -125,7 +147,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     super.deactivate();
     //log('sendtoapp==deactivate');
     stopUDP();
-    stopCleanTimer();
+    //stopCleanTimer();
     remoteDevicesData.clear();
   }
 
@@ -350,24 +372,38 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
             //解析UDP json数据
             // ignore: no_leading_underscores_for_local_identifiers
             Map<String, dynamic> _json = json.decode(msg);
-            //print(deviceInfo['lanIP']);
-            if (_json['lanIP'] != deviceInfo['lanIP']) {
-              //print(_json['deviceName']);
-              //remoteDevices.add(_json);
-              //print('${remoteDeviceShowFlexible.currentContext?.size?.height}');
-              //判断设备是否已经添加进显示区
-              //log(remoteDevicesData,StackTrace.current);
-              if (!remoteDevicesData.containsKey(_json['lanIP'])) {
-                setState(() {
-                  addRemoteDeviceToWidget(_json);
-                  //不能直接赋值 必须深拷贝
-                  //remoteDevicesWidgetPlus = remoteDevicesWidget;
-                  remoteDevicesWidgetPlus = [...remoteDevicesWidget];
-                  remoteDevicesWidgetPlus.add(_waterRipple);
-                });
-              } else {
-                //旧设备则更新毫秒时间戳
-                remoteDevicesData[_json['lanIP']]!['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
+            if(_json['notifyType'] == 2){
+              //设备下线广播
+              //log(_json,StackTrace.current);
+              remoteDevicesData.removeWhere((ip,remoteDeviceInfo){
+                if(ip == _json['lanIP']){
+                  setState(() {
+                    removeRemoteDeviceFromWidget(remoteDeviceInfo['remoteDeviceKey']);
+                  }); 
+                  return true;
+                } else {
+                  return false;
+                } 
+              });
+            } else {
+              if (_json['lanIP'] != deviceInfo['lanIP']) {
+                //print(_json['deviceName']);
+                //remoteDevices.add(_json);
+                //print('${remoteDeviceShowFlexible.currentContext?.size?.height}');
+                //判断设备是否已经添加进显示区
+                //log(remoteDevicesData,StackTrace.current);
+                if (!remoteDevicesData.containsKey(_json['lanIP'])) {
+                  setState(() {
+                    addRemoteDeviceToWidget(_json);
+                    //不能直接赋值 必须深拷贝
+                    //remoteDevicesWidgetPlus = remoteDevicesWidget;
+                    remoteDevicesWidgetPlus = [...remoteDevicesWidget];
+                    remoteDevicesWidgetPlus.add(_waterRipple);
+                  });
+                } else {
+                  //旧设备则更新毫秒时间戳
+                  //remoteDevicesData[_json['lanIP']]!['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
+                }
               }
             }
           }
@@ -396,8 +432,22 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     });
   }
 
-  /// 停止UDP广播
+  //发送一个设备下线通知广播
+  void sendOfflineNotify(){
+    Map offlineNotifyMap = {
+      'notifyType': 2,
+      'lanIP': deviceInfo['lanIP'],
+      'deviceName': deviceInfo['model'],
+      'deviceType': deviceInfo['deviceType']
+    };
+    String offlineNotifyJson = json.encode(offlineNotifyMap);
+    socket?.send(offlineNotifyJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
+  }
+
+  //停止UDP广播
   void stopUDP() {
+    sendOfflineNotify();
+    startUDPLock = false;
     socket?.close();
     //关闭UDP广播定时器
     timer?.cancel();
@@ -424,8 +474,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
             return true;
           } else {
             return false;
-          }
-            
+          }  
         });
       }
     });
