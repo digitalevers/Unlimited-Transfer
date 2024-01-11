@@ -81,7 +81,7 @@ public class MainActivity extends FlutterActivity {
 
     public String getOriginFilePathByUri(Uri uri, Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            System.out.println("-----------------------"+Environment.isExternalStorageManager());
+            //System.out.println("-----------------------"+Environment.isExternalStorageManager());
         }
         //2023-12-23 22:00
         //请求所有文件权限 才能调用intent打开文件

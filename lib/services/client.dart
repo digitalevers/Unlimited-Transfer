@@ -94,7 +94,7 @@ class Sender{
       }
     }
   
-    log(fileList,StackTrace.current);
+    //log(fileList,StackTrace.current);
     return fileList;
   }
 

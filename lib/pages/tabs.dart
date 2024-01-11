@@ -137,7 +137,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                       icon: const Icon(Icons.add),
                       label: chooseFiles.isNotEmpty ? "点我清空" : "选择文件"),
                   const BottomNavigationBarItem(
-                      icon: Icon(Icons.open_in_browser), label: "使用说明"),
+                      icon: Icon(Icons.library_books), label: "使用说明"),
                   const BottomNavigationBarItem(
                       icon: Icon(Icons.info_outline), label: "关于")
                 ],
