@@ -53,6 +53,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   late BuildContext myContext;
 
+
   @override
   void initState() {
     super.initState();
@@ -218,7 +219,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                                   onPressed: () async {
                                     //选择文件
                                     chooseFiles = [];
-                                    List<Map<String,String>> path = await Sender.handleSharing(context);
+                                    List<Map<String,String>> path = await Sender.share(context);
                                     //print(path);
                                     chooseFiles.addAll(path);
                                     showShortFileName = getShortFileName(chooseFiles[0]["originUri"]!);
@@ -255,7 +256,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                         onPressed: () async {
                           try{
                             //选择文件
-                            List<Map<String,String>> path = await Sender.handleSharing(context);
+                            List<Map<String,String>> path = await Sender.share(context);
                             chooseFiles.addAll(path);
                             setState(() {
                               //isLoading = false;

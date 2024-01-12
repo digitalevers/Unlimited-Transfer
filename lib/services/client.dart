@@ -33,17 +33,6 @@ class Sender{
   static Uint8List? avatar;
   
 
-  //用户点击选择文件
-  static handleSharing(context,{bool externalIntent = false, List<String> appList = const <String>[]}) async {
-    if (Platform.isAndroid) {
-      // cause in case of android bottom sheet opens up when share is tapped
-      //Android 需要注释 否则选择文件后会黑屏
-      //Navigator.pop(nav.currentContext!);
-
-    }
-    return await Sender.share(nav.currentContext, externalIntent: externalIntent);
-  }
-
     // ignore: slash_for_doc_comments
     /**
      * 分享文件 包括外部意图和内部主动选择文件进行分享

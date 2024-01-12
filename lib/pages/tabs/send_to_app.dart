@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 //import 'package:step_progress_indicator/step_progress_indicator.dart';
@@ -25,7 +26,7 @@ class SendToApp extends StatefulWidget {
   State<SendToApp> createState() => _SendToAppState(_key);
 }
 
-class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMixin,WidgetsBindingObserver  {
   final GlobalKey _key;
   _SendToAppState(this._key){
     //log("_SendToAppState",StackTrace.current);
@@ -67,8 +68,10 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   Size remoteDevicesWidgetMaxSize = Size(remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight);
   //如果显示widget重叠了 尝试重新生成widget的次数
   int createWidgetCount = 2;
-  //本地设备和网络信息
-  //deviceInfo = {'model': '', 'lanIP': '', 'networkText': '', 'deviceType': ''};
+  //UDP广播频次间隔时间 sencond
+  static int udpBroadInternalTime = 3;
+  //清理下线设备定时器间隔时间
+  int cleanInternalTime = 3 * udpBroadInternalTime;
 
   //动画控制器
   late AnimationController _animationController;
@@ -82,11 +85,11 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
         break;
       case AppLifecycleState.inactive:
         //debugPrint('应用程序处于非活动状态，并且未接收用户输入');
-        stopUDP();
+        //stopUDP();
         break;
       case AppLifecycleState.paused:
         //debugPrint('用户当前看不到应用程序，没有响应');
-        stopUDP();
+        //stopUDP();
         break;
       case AppLifecycleState.detached:
         //debugPrint('该应用程序仍托管在引擎上，但与主机视图分离');
@@ -125,7 +128,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     }
     if (deviceInfo['network']['type'] == 'wifi' && deviceInfo['lanIP'].isNotEmpty) {
       startUDP();
-      //startCleanTimer();
+      startCleanTimer();
     }
     //启动HTTP SERVER并传入key 便于在server类中获取context
     await Server.startServer(sendToAppBodyKey,receiveFilesLogKey);
@@ -138,7 +141,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     super.dispose();
     //log('sendtoapp==dispose');
     stopUDP();
-    //stopCleanTimer();
+    stopCleanTimer();
     remoteDevicesData.clear();
   }
 
@@ -147,7 +150,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     super.deactivate();
     //log('sendtoapp==deactivate');
     stopUDP();
-    //stopCleanTimer();
+    stopCleanTimer();
     remoteDevicesData.clear();
   }
 
@@ -342,7 +345,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, udpPort);
     socket?.broadcastEnabled = true;
     log('UDP Echo ready to receive', StackTrace.current);
-    const timeout = Duration(seconds: 3);
+    Duration timeout = Duration(seconds: udpBroadInternalTime);
     //构造广播json数据
     Map broadMap = {
       'lanIP': deviceInfo['lanIP'],
@@ -402,7 +405,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
                   });
                 } else {
                   //旧设备则更新毫秒时间戳
-                  //remoteDevicesData[_json['lanIP']]!['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
+                  remoteDevicesData[_json['lanIP']]!['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
                 }
               }
             }
@@ -410,25 +413,27 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
           break;
         case RawSocketEvent.write:
           {
-            log('RawSocketEvent.write');
+            log('RawSocketEvent.write',StackTrace.current);
           }
           break;
         case RawSocketEvent.readClosed:
           {
-            log('RawSocketEvent.readClosed');
+            log('RawSocketEvent.readClosed',StackTrace.current);
           }
           break;
         case RawSocketEvent.closed:
           {
-            log('RawSocketEvent.closed');
+            log('RawSocketEvent.closed',StackTrace.current);
+            //进程在background太久 socket会被系统关闭 所以这里要手动关闭UDP广播 以便界面resume的时候重启UDP广播
+            stopUDP();
           }
           break;
       }
     }, onError: (error) {
-      log(error);
+      log(error,StackTrace.current);
+      stopUDP();
     }, onDone: () {
       socket?.close();
-      //socket = Null as RawDatagramSocket;
     });
   }
 
@@ -453,9 +458,9 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     timer?.cancel();
   }
 
-  //启动"清理下线设备"定时器 每隔5秒清理一次下线设备
+  //启动"清理下线设备"定时器 每隔 cleanInternalTime 秒清理一次下线设备(注意毫秒单位)
   void startCleanTimer(){
-    const timeout = Duration(seconds: 5);
+    Duration timeout = Duration(seconds: cleanInternalTime);
     cleanTimer = Timer.periodic(timeout, (cleanTimer) {
       if(remoteDevicesData.isNotEmpty){
         int now = DateTime.now().millisecondsSinceEpoch;
@@ -467,7 +472,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
         //   }
         // });
         remoteDevicesData.removeWhere((ip,remoteDeviceInfo){
-          if(now - remoteDeviceInfo['millTimeStamp'] >= 4000){
+          if(now - remoteDeviceInfo['millTimeStamp'] >= cleanInternalTime * 1000){
             setState(() {
               removeRemoteDeviceFromWidget(remoteDeviceInfo['remoteDeviceKey']);
             }); 

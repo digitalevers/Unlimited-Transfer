@@ -109,7 +109,6 @@ bool pointInsideRect(Offset point,double top,double left,double itemWidth,double
 
 //发送文件的一些修饰工作
 void preSendFile(){
-  
 }
 
 //转换文件大小的规格
@@ -167,104 +166,90 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
     //分析服务端响应 如果同意接收则开始发送文件
     Map resMap = jsonDecode(result);
     if(resMap['code'] == HttpResponseCode.acceptFile){
-      preSendFile();
-      sendFile(client_, serverIP_, serverPort_, fileList_).then((value) {
-        //TODO 删除复制到 /data/data 目录的文件
-        //print("发送完毕");
-        //print(context_);
-        // CherryToast.info(
-        //   title:  const Text("发送完毕"),
-        //   toastPosition: Position.bottom,
-        //   displayCloseButton:false,
-        //   actionHandler:(){},
-        //   animationDuration: const Duration(milliseconds:  500),
-        // ).show(context_);
-        BotToast.showText(text:"发送完毕");
-      });
+      //preSendFile();
+      if(fileList_.isNotEmpty){
+        for(int i = 0; i < fileList_.length; i++){
+          sendFile(client_, serverIP_, serverPort_, fileList_[i]).then((value) {
+            BotToast.showText(text:"第$i个文件发送完毕");
+          });
+        }
+      } else {
+        BotToast.showText(text:"无文件内容可发送");
+      }
     } else {
-      // CherryToast.warning(
-      //   title:  Text(HttpResponseCodeMsg[resMap['code']]!),
-      //   toastPosition: Position.bottom,
-      //   displayCloseButton:false,
-      //   actionHandler:(){},
-      //   //animationDuration: const Duration(milliseconds:  200),
-      // ).show(context_);
       BotToast.showText(text:"对方${HttpResponseCodeMsg[resMap['code']]!}");
     }
   }
   //client.close();// 这里若关闭了 就不能再次发送请求了
 }
 
-//发送文件
-//TODO 发送多个文件
-Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, List<Map<String,String>> filelist_) async {
+//发送单个文件
+Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, Map<String,String> filelistItem) async {
   Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
   HttpClientRequest request = await client_.postUrl(uri);
   //log(filelist_,StackTrace.current);
-  for(int i = 0; i < filelist_.length; i++){
-    try{
-      String filePath = filelist_[i]["originUri"]!;
-      File file = File(filePath); 
-      //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
-      //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
-      //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
-      //上述现象其实是没有授权所有文件访问权限引起
-      request.headers.set("baseName", Uri.encodeComponent(filelist_[i]["baseName"]!));
-      request.headers.set("content-length", filelist_[i]["fileSize"]!);
-      request.headers.set("client-hostname", deviceInfo["model"]);
 
-      Stream<List<int>> fileStream = file.openRead();
-      //已发送文件长度
-      int byteCount = 0;
-      //待发送文件总长度
-      int fileSize = int.parse(filelist_[i]["fileSize"]!);
-      //发送进度
-      int currentSentProgress = remoteDevicesData[serverIP_]!["progress"] ?? 0;
-      //fileStream添加interceptor
-      Stream<List<int>> sendStream = fileStream.transform(
-        StreamTransformer.fromHandlers(
-          handleData: (data, sink) {
-            byteCount += data.length;
-            int latestSentProgress = (byteCount * 100 / fileSize).ceil();
-            //log(latestSentProgress,StackTrace.current);
-            if(latestSentProgress != currentSentProgress){
-                currentSentProgress = latestSentProgress;
-                remoteDevicesData[serverIP_]!["progress"] = latestSentProgress;
-                remoteDevicesData[serverIP_]!["remoteDeviceWidgetKey"].currentState.setState((){});
-            } 
-            sink.add(data);
-          },
-          handleError: (error, stack, sink) {
+  try{
+    String filePath = filelistItem["originUri"]!;
+    File file = File(filePath); 
+    //request.headers.set(HttpHeaders.contentTypeHeader, "multipart/form-data");
+    //针对某些机型 比如redmi 12C 上莫名无法读取 /storage/emulator/0/下的文件 而且跟文件后缀有关 只有jpg等媒体文件可以读取 改成json或者其他后缀就无法读取
+    //暂时没有找到完美解决方案 只能先将其复制到私域空间得到类似/data/data/的地址来进行访问
+    //上述现象其实是没有授权所有文件访问权限引起
+    request.headers.set("baseName", Uri.encodeComponent(filelistItem["baseName"]!));
+    request.headers.set("content-length", filelistItem["fileSize"]!);
+    request.headers.set("client-hostname", deviceInfo["model"]);
 
-          },
-          handleDone: (sink) {
-            //文件发送完毕 重新初始化step indicator组件
-            remoteDevicesData[serverIP_]!["progress"] = 0;
-            remoteDevicesData[serverIP_]!["remoteDeviceWidgetKey"].currentState.setState((){});
-            sink.close();
-          },
-        ),
-      );
-      await request.addStream(sendStream);
+    Stream<List<int>> fileStream = file.openRead();
+    //已发送文件长度
+    int byteCount = 0;
+    //待发送文件总长度
+    int fileSize = int.parse(filelistItem["fileSize"]!);
+    //发送进度
+    int currentSentProgress = remoteDevicesData[serverIP_]!["progress"] ?? 0;
+    //fileStream添加interceptor
+    Stream<List<int>> sendStream = fileStream.transform(
+      StreamTransformer.fromHandlers(
+        handleData: (data, sink) {
+          byteCount += data.length;
+          int latestSentProgress = (byteCount * 100 / fileSize).ceil();
+          //log(latestSentProgress,StackTrace.current);
+          if(latestSentProgress != currentSentProgress){
+              currentSentProgress = latestSentProgress;
+              remoteDevicesData[serverIP_]!["progress"] = latestSentProgress;
+              remoteDevicesData[serverIP_]!["remoteDeviceWidgetKey"].currentState.setState((){});
+          } 
+          sink.add(data);
+        },
+        handleError: (error, stack, sink) {
 
-    } on FileSystemException {
-      //这里一定要关闭request 并重新打开一个request
-      request.close();
-      request = await client_.postUrl(uri);
-      request.headers.set("baseName", Uri.encodeComponent(filelist_[i]["baseName"]!));
-      request.headers.set("content-length", filelist_[i]["fileSize"]!);
-      const platform = MethodChannel("AndroidApi");
-      String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filelist_[i]["contentUri"], filelist_[i]["fileName"], filelist_[i]["extension"]]);
-      File newFile = File(newPrivatePath);
-      //log(newFile,StackTrace.current);
-      await request.addStream(newFile.openRead());
-    } catch(e,stack) {
-      print(e);
-      print(stack);
-      request.close();
-    }
+        },
+        handleDone: (sink) {
+          //文件发送完毕 重新初始化step indicator组件
+          remoteDevicesData[serverIP_]!["progress"] = 0;
+          remoteDevicesData[serverIP_]!["remoteDeviceWidgetKey"].currentState.setState((){});
+          sink.close();
+        },
+      ),
+    );
+    await request.addStream(sendStream);
+
+  } on FileSystemException {
+    //这里一定要关闭request 并重新打开一个request
+    request.close();
+    request = await client_.postUrl(uri);
+    request.headers.set("baseName", Uri.encodeComponent(filelistItem["baseName"]!));
+    request.headers.set("content-length", filelistItem["fileSize"]!);
+    const platform = MethodChannel("AndroidApi");
+    String newPrivatePath = await platform.invokeMethod("copyFileToPrivateSpace",[filelistItem["contentUri"], filelistItem["fileName"], filelistItem["extension"]]);
+    File newFile = File(newPrivatePath);
+    //log(newFile,StackTrace.current);
+    await request.addStream(newFile.openRead());
+  } catch(e,stack) {
+    print(e);
+    print(stack);
+    request.close();
   }
-  
 
   HttpClientResponse response = await request.close();
   String result = await response.transform(utf8.decoder).join();
