@@ -3,7 +3,7 @@
    <application
         android:label="无界闪传"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/logo"
         android:requestLegacyExternalStorage="true">
         <activity
             android:name=".MainActivity"
