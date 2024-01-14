@@ -199,6 +199,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, M
     request.headers.set("baseName", Uri.encodeComponent(filelistItem["baseName"]!));
     request.headers.set("content-length", filelistItem["fileSize"]!);
     request.headers.set("client-hostname", deviceInfo["model"]);
+    request.headers.set("client-lanip", deviceInfo["lanIP"]);
 
     Stream<List<int>> fileStream = file.openRead();
     //已发送文件长度

@@ -126,10 +126,12 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     if (deviceInfo['lanIP'].isEmpty) {
       deviceInfo['lanIP'] = "无法获取ip";
     }
-    if (deviceInfo['network']['type'] == 'wifi' && deviceInfo['lanIP'].isNotEmpty) {
-      startUDP();
-      startCleanTimer();
-    }
+    // if (deviceInfo['network']['type'] == 'wifi' && deviceInfo['lanIP'].isNotEmpty) {
+    //   startUDP();
+    //   startCleanTimer();
+    // }
+    startUDP();
+    startCleanTimer();
     //启动HTTP SERVER并传入key 便于在server类中获取context
     await Server.startServer(sendToAppBodyKey,receiveFilesLogKey);
   }
@@ -358,7 +360,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
       socket?.send(broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
     });
 
-    //print('${socket.address.address}:${socket.port}');
+    //print('${socket?.address.address}:${socket?.port}');
     socket?.listen((RawSocketEvent e) {
       switch (e) {
         case RawSocketEvent.read:

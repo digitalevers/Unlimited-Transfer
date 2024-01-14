@@ -173,12 +173,15 @@ class Server {
 
             //3、流式写入文件 不会产生OOM
             try{
+              log(request.connectionInfo!.remoteAddress.host,StackTrace.current);
               String basename = Uri.decodeComponent(request.headers['baseName']![0]);
+
               int fileSize = int.parse(request.headers['content-length']![0]);
               String clientHostName = request.headers['client-hostname']![0];
-              String clientIP = request.connectionInfo!.remoteAddress.address;
-              //log(clientHostName,StackTrace.current);
-    
+              //TODO 开启热点的时候clientIP会与lanIP有所不同
+              //String clientIP = request.connectionInfo!.remoteAddress.address;
+              String clientIP = request.headers['client-lanip']![0];
+              
               //log(await utf8.decoder.bind(request).join(),StackTrace.current);
               String fileName = p.withoutExtension(basename);
               String extension  = p.extension(basename);
@@ -195,8 +198,8 @@ class Server {
                 }
               }
               IOSink sink = file.openWrite(mode: FileMode.append);
+              
               int currentReceiveProgress = remoteDevicesData[clientIP]!["progress"] ?? 0;
-              //log(remoteDevicesData[clientIP],StackTrace.current);
               //添加 request拦截器实时统计已发送文件大小 每+1%的文件大小setState更新进度条
               int byteCount = 0;
               Stream<List<int>> requestStream = request.transform(
@@ -212,7 +215,7 @@ class Server {
                     sink.add(data);
                   },
                   handleError: (error, stack, sink) {
-
+                    log(error,StackTrace.current);
                   },
                   handleDone: (sink) {
                     //文件传输完毕 重新初始化step indicator组件
@@ -245,7 +248,8 @@ class Server {
               // ).show(key.currentContext as BuildContext);
               BotToast.showText(text:"接收完毕");
             } catch(e){
-              print(e);
+              e.printError();
+              request.response.close();
             }
           } else if(baseUri == "fileManager.php"){
             //log(await getExternalCacheDirectories(),StackTrace.current); // /storage/emulated/0/Android/data/包名/cache
