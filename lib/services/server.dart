@@ -178,7 +178,7 @@ class Server {
 
               int fileSize = int.parse(request.headers['content-length']![0]);
               String clientHostName = request.headers['client-hostname']![0];
-              //TODO 开启热点的时候clientIP会与lanIP有所不同
+              //开启热点的时候clientIP会与lanIP有所不同
               //String clientIP = request.connectionInfo!.remoteAddress.address;
               String clientIP = request.headers['client-lanip']![0];
               
@@ -238,14 +238,6 @@ class Server {
                 "date":DateTime.now().toString().substring(0,19)
               });
               receiveFilesLogKey.currentState!.insertFilesLog(fileInfoJson);
-              //print("接收完毕");
-              // CherryToast.info(
-              //   title:  const Text("接收完毕"),
-              //   toastPosition: Position.bottom,
-              //   displayCloseButton:false,
-              //   actionHandler:(){},
-              //   animationDuration: const Duration(milliseconds:  500),
-              // ).show(key.currentContext as BuildContext);
               BotToast.showText(text:"接收完毕");
             } catch(e){
               e.printError();

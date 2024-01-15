@@ -169,8 +169,12 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
       //preSendFile();
       if(fileList_.isNotEmpty){
         for(int i = 0; i < fileList_.length; i++){
-          sendFile(client_, serverIP_, serverPort_, fileList_[i]).then((value) {
-            BotToast.showText(text:"第$i个文件发送完毕");
+          sendFile(client_, serverIP_, serverPort_, fileList_[i], i, fileList_.length).then((value) {
+            // if(i < fileList_.length - 1){
+            //   BotToast.showText(text:"第${i+1}个文件发送完毕");
+            // } else {
+            //   BotToast.showText(text:"发送完毕");
+            // }
           });
         }
       } else {
@@ -184,11 +188,11 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
 }
 
 //发送单个文件
-Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, Map<String,String> filelistItem) async {
+//index 待发送文件在发送队列中的索引
+Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, Map<String,String> filelistItem, int index, int length) async {
   Uri uri = Uri(scheme: 'http', host: serverIP_, port: serverPort_, path: '/fileupload');
   HttpClientRequest request = await client_.postUrl(uri);
   //log(filelist_,StackTrace.current);
-
   try{
     String filePath = filelistItem["originUri"]!;
     File file = File(filePath); 
@@ -202,7 +206,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, M
     request.headers.set("client-lanip", deviceInfo["lanIP"]);
 
     Stream<List<int>> fileStream = file.openRead();
-    //已发送文件长度
+    //已发送长度
     int byteCount = 0;
     //待发送文件总长度
     int fileSize = int.parse(filelistItem["fileSize"]!);
@@ -219,7 +223,15 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, M
               currentSentProgress = latestSentProgress;
               remoteDevicesData[serverIP_]!["progress"] = latestSentProgress;
               remoteDevicesData[serverIP_]!["remoteDeviceWidgetKey"].currentState.setState((){});
-          } 
+          }
+          //发送完毕提示
+          if(latestSentProgress >= 100){
+            if(index < length - 1){
+              BotToast.showText(text:"第${index+1}个文件发送完毕");
+            } else {
+              BotToast.showText(text:"发送完毕");
+            }
+          }
           sink.add(data);
         },
         handleError: (error, stack, sink) {
