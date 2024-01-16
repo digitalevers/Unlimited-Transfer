@@ -169,13 +169,8 @@ Future<void> sendFileInfo(HttpClient client_, String serverIP_, int serverPort_,
       //preSendFile();
       if(fileList_.isNotEmpty){
         for(int i = 0; i < fileList_.length; i++){
-          sendFile(client_, serverIP_, serverPort_, fileList_[i], i, fileList_.length).then((value) {
-            // if(i < fileList_.length - 1){
-            //   BotToast.showText(text:"第${i+1}个文件发送完毕");
-            // } else {
-            //   BotToast.showText(text:"发送完毕");
-            // }
-          });
+          //若不使用await 则发送多文件时会并发进行从而会让进度条闪烁
+          await sendFile(client_, serverIP_, serverPort_, fileList_[i], i, fileList_.length);
         }
       } else {
         BotToast.showText(text:"无文件内容可发送");
@@ -226,6 +221,7 @@ Future<String> sendFile(HttpClient client_, String serverIP_, int serverPort_, M
           }
           //发送完毕提示
           if(latestSentProgress >= 100){
+            log(latestSentProgress,StackTrace.current);
             if(index < length - 1){
               BotToast.showText(text:"第${index+1}个文件发送完毕");
             } else {
