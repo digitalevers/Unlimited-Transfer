@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:bot_toast/bot_toast.dart';
+//import 'package:permission_handler/permission_handler.dart';
+//import 'package:bot_toast/bot_toast.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 //import 'package:step_progress_indicator/step_progress_indicator.dart';
@@ -20,15 +21,16 @@ import 'package:woniu/pages/modules/step_progress.dart';
 
 class SendToApp extends StatefulWidget {
   final GlobalKey _key;
-  SendToApp(this._key):super(key:_key);
+  SendToApp(this._key) : super(key: _key);
 
   @override
   State<SendToApp> createState() => _SendToAppState(_key);
 }
 
-class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMixin,WidgetsBindingObserver  {
+class _SendToAppState extends State<SendToApp>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final GlobalKey _key;
-  _SendToAppState(this._key){
+  _SendToAppState(this._key) {
     //log("_SendToAppState",StackTrace.current);
   }
   //UDP socket
@@ -49,7 +51,10 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   Size? remoteDeviceShowFlexibleSize;
 
   //水波纹动画Widget
-  static const SizedBox _waterRipple = SizedBox(height:double.infinity, width:double.infinity, child:WaterRipple(count: 5));
+  static const SizedBox _waterRipple = SizedBox(
+      height: double.infinity,
+      width: double.infinity,
+      child: WaterRipple(count: 5));
   // static DragTarget dt = DragTarget(onAccept: (data) {
   //               ;
   //             }, builder: (context,candidateData,rejectData){
@@ -65,7 +70,8 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   List<Widget> remoteDevicesWidgetPlus = <Widget>[_waterRipple];
 
   //远程设备的显示widget 的最大尺寸
-  Size remoteDevicesWidgetMaxSize = Size(remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight);
+  Size remoteDevicesWidgetMaxSize =
+      Size(remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight);
   //如果显示widget重叠了 尝试重新生成widget的次数
   int createWidgetCount = 2;
   //UDP广播频次间隔时间 sencond
@@ -77,7 +83,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   late AnimationController _animationController;
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state){
+  void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
         //debugPrint('应用程序可见并响应用户输入。');
@@ -102,7 +108,8 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
     ////////////////创建动画
-    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2000));
     Future.delayed(Duration.zero, () {
       _animationController.repeat();
     });
@@ -110,7 +117,8 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     //添加监听
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      RenderBox renderBox = remoteDevicesKey.currentContext?.findRenderObject() as RenderBox;
+      RenderBox renderBox =
+          remoteDevicesKey.currentContext?.findRenderObject() as RenderBox;
       remoteDevicesOffset = renderBox.localToGlobal(Offset.zero);
       //print(positionRed);
     });
@@ -133,7 +141,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     startUDP();
     startCleanTimer();
     //启动HTTP SERVER并传入key 便于在server类中获取context
-    await Server.startServer(sendToAppBodyKey,receiveFilesLogKey);
+    await Server.startServer(sendToAppBodyKey, receiveFilesLogKey);
   }
 
   @override
@@ -186,13 +194,13 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   }
 
   //从SharedPreferences中读取接收文件记录
-  List<String>? getReceiveFilesLog(){
+  List<String>? getReceiveFilesLog() {
     return prefs!.getStringList("key");
   }
 
   //根据remote deviceType显示不同的系统icon(android ios windows)
-  IconData getRemoteDeviceTypeIcon(String? deviceType){
-    switch(deviceType){
+  IconData getRemoteDeviceTypeIcon(String? deviceType) {
+    switch (deviceType) {
       case 'linux':
         return Icons.computer;
       case 'macos':
@@ -212,7 +220,8 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
 
   //将远程设备的item添加到显示区内
   void addRemoteDeviceToWidget(Map<String, dynamic> map) {
-    remoteDeviceShowFlexibleSize ??= remoteDeviceShowFlexible.currentContext?.size;
+    remoteDeviceShowFlexibleSize ??=
+        remoteDeviceShowFlexible.currentContext?.size;
     map['remoteDeviceKey'] = GlobalKey();
     map['remoteDeviceWidgetKey'] = GlobalKey();
     //约束在 district范围内随机生成top和left值 并尽可能不与之前的矩阵重叠
@@ -220,12 +229,28 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     double left_ = 0.0;
     for (int i = 0; i < createWidgetCount; i++) {
       //top > 10 以免紧贴窗口边缘渲染widget
-      top_ = randomInt(10,(remoteDeviceShowFlexibleSize!.height - 2 * remoteDevicesWidgetMaxSize.height).toInt()).toDouble();
-      left_ = randomInt(10,(remoteDeviceShowFlexibleSize!.width - remoteDevicesWidgetMaxSize.width).toInt()).toDouble();
+      top_ = randomInt(
+              10,
+              (remoteDeviceShowFlexibleSize!.height -
+                      2 * remoteDevicesWidgetMaxSize.height)
+                  .toInt())
+          .toDouble();
+      left_ = randomInt(
+              10,
+              (remoteDeviceShowFlexibleSize!.width -
+                      remoteDevicesWidgetMaxSize.width)
+                  .toInt())
+          .toDouble();
       bool inside = false;
       remoteDevicesData.forEach((key, value) {
-        if (rectInRect(Rectangle(left_, top_, remoteDevicesWidgetMaxSize.width, remoteDevicesWidgetMaxSize.height) as Rect,
-            Rectangle(value['left'].toInt() as int, value['top'].toInt() as int, remoteDevicesWidgetMaxSize.width, remoteDevicesWidgetMaxSize.height) as Rect)) {
+        if (rectInRect(
+            Rectangle(left_, top_, remoteDevicesWidgetMaxSize.width,
+                remoteDevicesWidgetMaxSize.height) as Rect,
+            Rectangle(
+                value['left'].toInt() as int,
+                value['top'].toInt() as int,
+                remoteDevicesWidgetMaxSize.width,
+                remoteDevicesWidgetMaxSize.height) as Rect)) {
           inside = true;
         }
       });
@@ -252,7 +277,9 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
         left: left_,
         key: map['remoteDeviceKey'],
         child: Container(
-            constraints: BoxConstraints( maxWidth: remoteDevicesWidgetMaxSize.width, maxHeight: remoteDevicesWidgetMaxSize.height),
+            constraints: BoxConstraints(
+                maxWidth: remoteDevicesWidgetMaxSize.width,
+                maxHeight: remoteDevicesWidgetMaxSize.height),
             //padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
             decoration: const BoxDecoration(
               color: Color.fromARGB(255, 255, 126, 90),
@@ -261,47 +288,47 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
               //borderRadius: BorderRadius.circular(16),
             ),
             child: Stack(children: [
-               Positioned(
-                left: 0,
-                top: 0,
-                child:
-                  // 因为StepProgressIndicator本身是 stateless 所以无法更新状态 需要自定义一个stateful封装StepProgressIndicator再进行更新
-                  StepProgress(map['lanIP'],key:map['remoteDeviceWidgetKey'])
-                ),
               Positioned(
-                left: 0,
-                top: 0, 
-                child: Row(
-                  children: [
-                    SizedBox(
-                      height: 32,
-                      width: 32,
-                      child: Icon(
-                        getRemoteDeviceTypeIcon(map['deviceType']),
-                        color: Colors.white,
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          map['deviceName'],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
+                  left: 0,
+                  top: 0,
+                  child:
+                      // 因为StepProgressIndicator本身是 stateless 所以无法更新状态 需要自定义一个stateful封装StepProgressIndicator再进行更新
+                      StepProgress(map['lanIP'],
+                          key: map['remoteDeviceWidgetKey'])),
+              Positioned(
+                  left: 0,
+                  top: 0,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 32,
+                        width: 32,
+                        child: Icon(
+                          getRemoteDeviceTypeIcon(map['deviceType']),
+                          color: Colors.white,
                         ),
-                        Text(
-                          map['lanIP'],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            map['deviceName'],
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
                           ),
-                        )
-                      ],
-                    ),
-                  ],
-                )),
+                          Text(
+                            map['lanIP'],
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  )),
             ])));
 
     // DragTarget remoteDeviceWidget_ = DragTarget(onAccept: (data) {
@@ -314,14 +341,14 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
 
   //在设备显示区内移除远程设备的item
   void removeRemoteDeviceFromWidget(GlobalKey remoteDeviceKey) {
-    for(int i = 0; i < remoteDevicesWidget.length; i++){
-      if(remoteDevicesWidget[i].key == remoteDeviceKey){
+    for (int i = 0; i < remoteDevicesWidget.length; i++) {
+      if (remoteDevicesWidget[i].key == remoteDeviceKey) {
         remoteDevicesWidget.removeAt(i);
         break;
       }
     }
-    for(int i = 0; i < remoteDevicesWidgetPlus.length; i++){
-      if(remoteDevicesWidgetPlus[i].key == remoteDeviceKey){
+    for (int i = 0; i < remoteDevicesWidgetPlus.length; i++) {
+      if (remoteDevicesWidgetPlus[i].key == remoteDeviceKey) {
         remoteDevicesWidgetPlus.removeAt(i);
         break;
       }
@@ -357,7 +384,14 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
     String broadJson = json.encode(broadMap);
     timer = Timer.periodic(timeout, (timer) {
       //[0x44, 0x48, 0x01, 0x01]
-      socket?.send(broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
+      if (Platform.isIOS) {
+        //TODO 需要动态获取子网地址前三段
+        socket?.send(
+            broadJson.codeUnits, InternetAddress("192.168.2.255"), udpPort);
+      } else {
+        socket?.send(
+            broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
+      }
     });
 
     //print('${socket?.address.address}:${socket?.port}');
@@ -370,25 +404,27 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
             var decoder = const Utf8Decoder();
             String msg = decoder.convert(udpData.data); // 将UTF8数据解码
             //String msg = String.fromCharCodes(udpData.data);
-            //print('收到来自${udpData.address.toString()}:${udpData.port}的数据：${udpData.data.length}字节数据 内容:$msg');
+            print(
+                '收到来自${udpData.address.toString()}:${udpData.port}的数据：${udpData.data.length}字节数据 内容:$msg');
             //print('Datagram from ${udpData.address.address}:${udpData.port}: ${msg.trim()}');
             //socket.send(msg.codeUnits, d.address, d.port);
 
             //解析UDP json数据
             // ignore: no_leading_underscores_for_local_identifiers
             Map<String, dynamic> _json = json.decode(msg);
-            if(_json['notifyType'] == 2){
+            if (_json['notifyType'] == 2) {
               //设备下线广播
               //log(_json,StackTrace.current);
-              remoteDevicesData.removeWhere((ip,remoteDeviceInfo){
-                if(ip == _json['lanIP']){
+              remoteDevicesData.removeWhere((ip, remoteDeviceInfo) {
+                if (ip == _json['lanIP']) {
                   setState(() {
-                    removeRemoteDeviceFromWidget(remoteDeviceInfo['remoteDeviceKey']);
-                  }); 
+                    removeRemoteDeviceFromWidget(
+                        remoteDeviceInfo['remoteDeviceKey']);
+                  });
                   return true;
                 } else {
                   return false;
-                } 
+                }
               });
             } else {
               if (_json['lanIP'] != deviceInfo['lanIP']) {
@@ -407,7 +443,8 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
                   });
                 } else {
                   //旧设备则更新毫秒时间戳
-                  remoteDevicesData[_json['lanIP']]!['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
+                  remoteDevicesData[_json['lanIP']]!['millTimeStamp'] =
+                      DateTime.now().millisecondsSinceEpoch;
                 }
               }
             }
@@ -415,24 +452,24 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
           break;
         case RawSocketEvent.write:
           {
-            log('RawSocketEvent.write',StackTrace.current);
+            log('RawSocketEvent.write', StackTrace.current);
           }
           break;
         case RawSocketEvent.readClosed:
           {
-            log('RawSocketEvent.readClosed',StackTrace.current);
+            log('RawSocketEvent.readClosed', StackTrace.current);
           }
           break;
         case RawSocketEvent.closed:
           {
-            log('RawSocketEvent.closed',StackTrace.current);
+            log('RawSocketEvent.closed', StackTrace.current);
             //进程在background太久 socket会被系统关闭 所以这里要手动关闭UDP广播 以便界面resume的时候重启UDP广播
             stopUDP();
           }
           break;
       }
     }, onError: (error) {
-      log(error,StackTrace.current);
+      log(error, StackTrace.current);
       stopUDP();
     }, onDone: () {
       socket?.close();
@@ -440,7 +477,7 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   }
 
   //发送一个设备下线通知广播
-  void sendOfflineNotify(){
+  void sendOfflineNotify() {
     Map offlineNotifyMap = {
       'notifyType': 2,
       'lanIP': deviceInfo['lanIP'],
@@ -448,7 +485,8 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
       'deviceType': deviceInfo['deviceType']
     };
     String offlineNotifyJson = json.encode(offlineNotifyMap);
-    socket?.send(offlineNotifyJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
+    socket?.send(offlineNotifyJson.codeUnits,
+        InternetAddress("255.255.255.255"), udpPort);
   }
 
   //停止UDP广播
@@ -461,10 +499,10 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
   }
 
   //启动"清理下线设备"定时器 每隔 cleanInternalTime 秒清理一次下线设备(注意毫秒单位)
-  void startCleanTimer(){
+  void startCleanTimer() {
     Duration timeout = Duration(seconds: cleanInternalTime);
     cleanTimer = Timer.periodic(timeout, (cleanTimer) {
-      if(remoteDevicesData.isNotEmpty){
+      if (remoteDevicesData.isNotEmpty) {
         int now = DateTime.now().millisecondsSinceEpoch;
         // 这样删除会引起 Concurrent modification during iteration
         // remoteDevicesData.forEach((key, value) {
@@ -473,28 +511,29 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
         //     remoteDevicesData.removeWhere(key);
         //   }
         // });
-        remoteDevicesData.removeWhere((ip,remoteDeviceInfo){
-          if(now - remoteDeviceInfo['millTimeStamp'] >= cleanInternalTime * 1000){
+        remoteDevicesData.removeWhere((ip, remoteDeviceInfo) {
+          if (now - remoteDeviceInfo['millTimeStamp'] >=
+              cleanInternalTime * 1000) {
             setState(() {
               removeRemoteDeviceFromWidget(remoteDeviceInfo['remoteDeviceKey']);
-            }); 
+            });
             return true;
           } else {
             return false;
-          }  
+          }
         });
       }
     });
   }
 
   //关闭"清理下线设备"定时器
-  void stopCleanTimer(){
+  void stopCleanTimer() {
     cleanTimer?.cancel();
   }
 
   //初始化"接收文件记录"数据
   //读取 SharedPreferences 中保存的接收文件数据 然后遍历目录查看文件是否存在 若不存在 则从记录中剔除
-  List getRceiveFilesLog(){
+  List getRceiveFilesLog() {
     prefs!.getStringList("receviceFilesLog");
     return [];
   }
@@ -553,20 +592,19 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
                     ),
                   ],
                 )),
-             Flexible(
-              flex: 10,
-              child: 
-                // ListView.builder(
-                //     key: receiveFilesLogKey,
-                //     itemCount: 1,
-                //     itemBuilder: (BuildContext context, int index) {
-                //       return const ListTile(
-                //         title: Text("接收文件记录"),
-                //       );
-                //     },
-                //   ),
-                ReceiveFilesLog(receiveFilesLogKey)
-            ),
+            Flexible(
+                flex: 10,
+                child:
+                    // ListView.builder(
+                    //     key: receiveFilesLogKey,
+                    //     itemCount: 1,
+                    //     itemBuilder: (BuildContext context, int index) {
+                    //       return const ListTile(
+                    //         title: Text("接收文件记录"),
+                    //       );
+                    //     },
+                    //   ),
+                    ReceiveFilesLog(receiveFilesLogKey)),
             Flexible(
               flex: 1,
               child: Container(
@@ -603,5 +641,3 @@ class _SendToAppState extends State<SendToApp> with SingleTickerProviderStateMix
         ));
   }
 }
-
-
