@@ -173,7 +173,6 @@ class Server {
 
             //3、流式写入文件 不会产生OOM
             try{
-              log(request.connectionInfo!.remoteAddress.host,StackTrace.current);
               String basename = Uri.decodeComponent(request.headers['baseName']![0]);
 
               int fileSize = int.parse(request.headers['content-length']![0]);
@@ -185,7 +184,8 @@ class Server {
               //log(await utf8.decoder.bind(request).join(),StackTrace.current);
               String fileName = p.withoutExtension(basename);
               String extension  = p.extension(basename);
-              String downloadDir = "/storage/emulated/0/Download/";
+              String downloadDir = await getDownloadDir();
+
               String filePath = downloadDir + basename;
               File file = File(filePath);
               //有同名文件 则在源文件后追加一个随机文件名生成一个新的文件名
@@ -241,6 +241,7 @@ class Server {
               BotToast.showText(text:"接收完毕");
             } catch(e){
               e.printError();
+              _serverStatus = ServerStatus.idle;
               request.response.close();
             }
           } else if(baseUri == "fileManager.php"){

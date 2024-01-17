@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   path_provider: ^2.0.14
+  external_path: ^1.0.3
   device_info_plus: ^8.2.0
   network_info_plus: ^3.0.2
   permission_handler: ^10.2.0  #编译 Windows版本必须注释�? 否则会报�? Nuget.exe not found 并卡�?

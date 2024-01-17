@@ -7,9 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 import 'package:woniu/controllers/controllers.dart';
 import 'package:path/path.dart' as p;
+import 'package:external_path/external_path.dart';
 
 import 'commclass.dart';
 import 'config.dart';
@@ -308,6 +310,18 @@ ContentType getHeaderContentType(String extension){
       break;
   }
   return ct;
+}
+
+//获取下载目录
+//TODO iOS下载目录
+Future<String> getDownloadDir() {
+  if(Platform.isAndroid){
+    return ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS);
+  } else {
+    return getDownloadsDirectory().then((value){
+      return value!.path;
+    });
+  }
 }
 
 // getEstimatedTime(receivedBits, totalBits, currentSpeed) {

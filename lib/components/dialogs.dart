@@ -358,7 +358,7 @@ credits(context) async {
 
 Future<ServerIfReceiveFile> ifReceiveFile(context,fileCount,fileSize) async {
   String formatedFileSize = fommatFileSize(fileSize);
-  var res = await showCupertinoDialog(
+  ServerIfReceiveFile res = await showCupertinoDialog(
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(

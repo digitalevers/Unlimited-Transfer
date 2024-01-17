@@ -47,7 +47,7 @@ class _nameState extends State<SendToBrowser> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  "请在PC浏览器上打开\nhttp://" + deviceInfo['lanIP'] + ":8888",
+                                  "请在对方PC浏览器上打开\nhttp://" + deviceInfo['lanIP'] + ":8888",
                                   style: const TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.normal),
                                   textAlign: TextAlign.left,
                                 )

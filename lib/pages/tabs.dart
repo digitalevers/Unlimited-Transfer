@@ -162,7 +162,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
         prefs?.setBool("newer", false);
         return Showcase(
                   key: _one,
-                  title:'点击选择文件',
+                  title:'点击选择文件(长按文件可多选)',
                   description: '然后将文件拖拽至目标设备上',
                   targetShapeBorder: const CircleBorder(),
                   child:getFloatingActionButton()
@@ -172,10 +172,8 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
       }
   }
 
-// ignore: slash_for_doc_comments
-/**
- * 获取 floatingActionButton 位置的控件
- */
+
+  //获取 floatingActionButton 位置的控件
   Widget getFloatingActionButton(){
     return chooseFiles.isNotEmpty ? 
             Draggable(data: '',
@@ -220,18 +218,19 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                                     //选择文件
                                     chooseFiles = [];
                                     List<Map<String,String>> path = await Sender.share(context);
-                                    //print(path);
                                     chooseFiles.addAll(path);
-                                    showShortFileName = getShortFileName(chooseFiles[0]["originUri"]!);
-                                    setState(() {
-                                      //isLoading = false;
-                                      // ignore: prefer_is_empty
-                                      if ((chooseFiles.length) > 0) {
-                                        _FloatingActionButtonIcon = const Icon(Icons.file_copy, color: Colors.white);
-                                      } else {
-                                        _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
-                                      }
-                                    });
+                                    if(chooseFiles.isNotEmpty){
+                                      showShortFileName = getShortFileName(chooseFiles[0]["originUri"]!);
+                                      setState(() {
+                                        //isLoading = false;
+                                        // ignore: prefer_is_empty
+                                        if ((chooseFiles.length) > 0) {
+                                          _FloatingActionButtonIcon = const Icon(Icons.file_copy, color: Colors.white);
+                                        } else {
+                                          _FloatingActionButtonIcon = const Icon(Icons.add, color: Colors.white);
+                                        }
+                                      });
+                                    }
                                   },
                                   icon: _FloatingActionButtonIcon
                               ),
@@ -247,9 +246,10 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                 width: 60,
                 height: 60,
                 padding: const EdgeInsets.all(5),
-                //margin: const EdgeInsets.only(top: 5),
+                margin: const EdgeInsets.only(top: 5),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
                 child: Stack(
+                  alignment: Alignment.center,
                   children: [
                     buildRotationTransition(),
                     IconButton(
@@ -257,6 +257,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                           try{
                             //选择文件
                             List<Map<String,String>> path = await Sender.share(context);
+                            //log(path,StackTrace.current);
                             chooseFiles.addAll(path);
                             setState(() {
                               //isLoading = false;

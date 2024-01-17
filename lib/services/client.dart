@@ -44,20 +44,18 @@ class Sender{
       //分享意图
       if(Platform.isIOS){
         //TODO iOS分享意图
+
       } else if(Platform.isAndroid){
         List<SharedMediaFile> sharedMediaFiles = await ReceiveSharingIntent.getInitialMedia();
         fileList = transformList(sharedMediaFiles.map((e) => e.path).toList());
       }
     } else {
       //主动选择
-      if(Platform.isIOS){
-        //TODO iOS文件选择
-
-      } else if(Platform.isAndroid){
+      if(Platform.isAndroid){
         fileList  = transformList(await FileMethods.pickFiles());
         //log(fileList,StackTrace.current);
         for(int i = 0; i < fileList.length; i++){
-          //第一种方式 使用插件试图转换成 /data/data 开头的内部链接 但是会将文件复制一份放到 "/data/data/0/包名" 的内部空间中 如果文件很大造成空间浪费而且复制会特别耗时
+          //第一种方式 使用 uri_to_file 插件试图转换成 /data/data 开头的内部链接 但是会将文件复制一份放到 "/data/data/0/包名" 的内部空间中 如果文件很大造成空间浪费而且复制会特别耗时
           //fileList![i] = (await toFile(fileList![i]!)).path;
           //print(fileList![i]);
 
@@ -80,11 +78,23 @@ class Sender{
           fileList[i]["extension"] = getFileInfo(originFilePath)["extension"]!;
           fileList[i]["fileSize"] = getFileInfo(originFilePath)["fileSize"]!;
         }
+      } else{
+        //iOS、Windows and so on
+        fileList  = transformList(await FileMethods.pickFiles());
+        for(int i = 0 ;i < fileList.length; i++){
+          //获取文件基本信息
+          fileList[i]['originUri'] = fileList[i]['contentUri']!;
+          Map fileInfo = getFileInfo(fileList[i]['originUri']!);
+          fileList[i]["baseName"] = fileInfo["baseName"]!;
+          fileList[i]["fileName"] = fileInfo["fileName"]!;
+          fileList[i]["shortFileName"] = fileInfo["shortFileName"]!;
+          fileList[i]["extension"] = fileInfo["extension"]!;
+          fileList[i]["fileSize"] = fileInfo["fileSize"]!;
+        }
       }
     }
   
-    //log(fileList,StackTrace.current);
+    log(fileList,StackTrace.current);
     return fileList;
   }
-
 }

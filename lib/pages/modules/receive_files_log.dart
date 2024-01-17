@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../common/global_variable.dart';
@@ -9,6 +10,7 @@ import 'package:path/path.dart' as p;
 import 'package:woniu/common/func.dart';
 
 import 'package:open_file/open_file.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 //组件单独放在一个文件里则无法访问到 _ReceiveFilesLogState 该类为文件私有
@@ -118,14 +120,32 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                             ),
                             const SizedBox(width: 20),
                             InkWell(
-                            onTap: () {
-                              //call your onpressed function here
-                              OpenFile.open(receviceFilesLog[index]["fileFullPath"]!).then(
-                                (value) => 
-                                log(value.message,StackTrace.current)
-                              );
-                            },
-                            child: const Icon(Icons.file_open),
+                              onTap: () {
+                                Permission.manageExternalStorage.request().then((value){
+                                  if(value == PermissionStatus.granted){
+                                    //检测是否为apk文件
+                                    if(p.extension(receviceFilesLog[index]["fileFullPath"]) == '.apk'){
+                                      log("这是apk",StackTrace.current);
+                                      Permission.requestInstallPackages.request().then((value){
+                                        if(value == PermissionStatus.granted){
+                                          OpenFile.open(receviceFilesLog[index]["fileFullPath"]!).then(
+                                            (value){
+                                              //log(value.message,StackTrace.current);
+                                            } 
+                                          ); 
+                                        }
+                                      });
+                                    } else {
+                                      OpenFile.open(receviceFilesLog[index]["fileFullPath"]!).then(
+                                        (value){
+                                          //log(value.message,StackTrace.current);
+                                        } 
+                                      ); 
+                                    }
+                                  }
+                                });
+                              },
+                              child: const Icon(Icons.file_open),
                             ),
                             const SizedBox(width: 20),
                             InkWell(
