@@ -386,11 +386,10 @@ class _SendToAppState extends State<SendToApp>
       //[0x44, 0x48, 0x01, 0x01]
       if (Platform.isIOS) {
         //TODO 需要动态获取子网地址前三段
-        socket?.send(
-            broadJson.codeUnits, InternetAddress("192.168.2.255"), udpPort);
+        log(deviceInfo['lanIP'],StackTrace.current);
+        socket?.send(broadJson.codeUnits, InternetAddress("192.168.2.255"), udpPort);
       } else {
-        socket?.send(
-            broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
+        socket?.send(broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
       }
     });
 
