@@ -256,7 +256,7 @@ credits(context) async {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       decoration: TextDecoration.underline,
-                      color: Colors.blue,
+                      color: Colors.blue, //#2196f3
                     ),
                   ),
                 ),
@@ -330,7 +330,7 @@ credits(context) async {
 // Future<ServerIfReceiveFile> ifReceiveFile(context,fileCount,fileSize) async {
 //   ServerIfReceiveFile res = await showDialog(
 //     barrierDismissible:false, //false 模态对话框
-//     context: context, 
+//     context: context,
 //     builder: (context){
 //     return AlertDialog(
 //       //title: const Text("新文件"),
@@ -356,7 +356,7 @@ credits(context) async {
 //   return res;
 // }
 
-Future<ServerIfReceiveFile> ifReceiveFile(context,fileCount,fileSize) async {
+Future<ServerIfReceiveFile> ifReceiveFile(context, fileCount, fileSize) async {
   String formatedFileSize = fommatFileSize(fileSize);
   ServerIfReceiveFile res = await showCupertinoDialog(
       context: context,
