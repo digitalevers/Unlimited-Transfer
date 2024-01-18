@@ -1,17 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../../common/global_variable.dart';
+//import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
+
 import 'package:woniu/common/func.dart';
-
-import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
-
+import 'package:woniu/common/global_variable.dart';
+import 'package:woniu/diff/receive_files_log_diff.dart';
 
 //组件单独放在一个文件里则无法访问到 _ReceiveFilesLogState 该类为文件私有
 class ReceiveFilesLog extends StatefulWidget {
@@ -19,10 +15,7 @@ class ReceiveFilesLog extends StatefulWidget {
 
   @override
   State<ReceiveFilesLog> createState() => _ReceiveFilesLogState();
-  
 }
-
-
 
 // ignore: camel_case_types
 class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
@@ -105,57 +98,7 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
                       trailing: SizedBox(
                         width: 120,
                         child: Row(
-                          children: [
-                            InkWell(
-                            onTap: () async {
-                              //call your onpressed function here
-                              if(Platform.isAndroid){
-                                const platform = MethodChannel("AndroidApi");
-                                bool openResult = await platform.invokeMethod("openDir",["/Download"]);
-                              } else {
-                                //TODO 预留iOS打开指定文件夹
-                              }
-                            },
-                            child: const Icon(Icons.drive_file_move_rounded),
-                            ),
-                            const SizedBox(width: 20),
-                            InkWell(
-                              onTap: () {
-                                Permission.manageExternalStorage.request().then((value){
-                                  if(value == PermissionStatus.granted){
-                                    //检测是否为apk文件
-                                    if(p.extension(receviceFilesLog[index]["fileFullPath"]) == '.apk'){
-                                      log("这是apk",StackTrace.current);
-                                      Permission.requestInstallPackages.request().then((value){
-                                        if(value == PermissionStatus.granted){
-                                          OpenFile.open(receviceFilesLog[index]["fileFullPath"]!).then(
-                                            (value){
-                                              //log(value.message,StackTrace.current);
-                                            } 
-                                          ); 
-                                        }
-                                      });
-                                    } else {
-                                      OpenFile.open(receviceFilesLog[index]["fileFullPath"]!).then(
-                                        (value){
-                                          //log(value.message,StackTrace.current);
-                                        } 
-                                      ); 
-                                    }
-                                  }
-                                });
-                              },
-                              child: const Icon(Icons.file_open),
-                            ),
-                            const SizedBox(width: 20),
-                            InkWell(
-                              onTap: () {
-                                // ignore: unnecessary_this
-                                this.delFilesLog(receviceFilesLog[index]["fileFullPath"]);
-                              },
-                              child: const Icon(Icons.delete),
-                            ),
-                          ],
+                          children: diffGetButtons(receviceFilesLog, index, delFilesLog),
                       )
                       )
                     )
@@ -235,4 +178,6 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
     }
     return baseNameFilesLog;
   }
+
+  
 }

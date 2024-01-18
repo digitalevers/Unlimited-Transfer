@@ -442,8 +442,7 @@ class _SendToAppState extends State<SendToApp>
                   });
                 } else {
                   //旧设备则更新毫秒时间戳
-                  remoteDevicesData[_json['lanIP']]!['millTimeStamp'] =
-                      DateTime.now().millisecondsSinceEpoch;
+                  remoteDevicesData[_json['lanIP']]!['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
                 }
               }
             }

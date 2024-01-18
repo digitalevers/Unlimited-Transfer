@@ -19,8 +19,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'global_variable.dart';
-import 'package:cherry_toast/cherry_toast.dart';
-import 'package:cherry_toast/resources/arrays.dart';
 import 'package:bot_toast/bot_toast.dart';
 
 

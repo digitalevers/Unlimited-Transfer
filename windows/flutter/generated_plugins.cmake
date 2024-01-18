@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   network_info_plus
+  open_dir_windows
   permission_handler_windows
   url_launcher_windows
 )

@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:cherry_toast/cherry_toast.dart';
-import 'package:cherry_toast/resources/arrays.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -93,8 +91,7 @@ class Server {
             await for (var data in request) {
               dataBytes.addAll(data);
             }
-            String? boundary =
-                request.headers.contentType!.parameters['boundary'];
+            String? boundary = request.headers.contentType!.parameters['boundary'];
             final transformer = MimeMultipartTransformer(boundary!);
             final bodyStream = Stream.fromIterable([dataBytes]);
             final parts = await transformer.bind(bodyStream).toList();
@@ -181,8 +178,7 @@ class Server {
 
             //3、流式写入文件 不会产生OOM
             try {
-              String basename =
-                  Uri.decodeComponent(request.headers['baseName']![0]);
+              String basename = Uri.decodeComponent(request.headers['baseName']![0]);
 
               int fileSize = int.parse(request.headers['content-length']![0]);
               String clientHostName = request.headers['client-hostname']![0];
@@ -200,20 +196,16 @@ class Server {
               File file = File(filePath);
               //有同名文件 则在源文件后追加一个随机文件名生成一个新的文件名
               if (file.existsSync()) {
-                String randomFileSuffix =
-                    (100 + Random().nextInt(999 - 100)).toString();
-                filePath =
-                    "$downloadDir${fileName}_$randomFileSuffix$extension";
+                String randomFileSuffix = (100 + Random().nextInt(999 - 100)).toString();
+                filePath ="$downloadDir${fileName}_$randomFileSuffix$extension";
                 file = File(filePath);
                 if (file.existsSync()) {
-                  throw const FileSystemException(
-                      "The file have exist already");
+                  throw const FileSystemException("The file have exist already");
                 }
               }
               IOSink sink = file.openWrite(mode: FileMode.append);
 
-              int currentReceiveProgress =
-                  remoteDevicesData[clientIP]!["progress"] ?? 0;
+              int currentReceiveProgress = remoteDevicesData[clientIP]!["progress"] ?? 0;
               //添加 request拦截器实时统计已发送文件大小 每+1%的文件大小setState更新进度条
               int byteCount = 0;
               Stream<List<int>> requestStream = request.transform(
@@ -224,11 +216,8 @@ class Server {
                         (byteCount * 100 / fileSize).ceil();
                     if (latestTransferProgress != currentReceiveProgress) {
                       currentReceiveProgress = latestTransferProgress;
-                      remoteDevicesData[clientIP]!["progress"] =
-                          latestTransferProgress;
-                      remoteDevicesData[clientIP]!["remoteDeviceWidgetKey"]
-                          .currentState
-                          .setState(() {});
+                      remoteDevicesData[clientIP]!["progress"] = latestTransferProgress;
+                      remoteDevicesData[clientIP]!["remoteDeviceWidgetKey"].currentState.setState(() {});
                     }
                     sink.add(data);
                   },

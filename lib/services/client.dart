@@ -9,8 +9,6 @@ import 'package:woniu/common/func.dart';
 //import 'package:woniu/models/share_error_model.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 //import 'package:hive/hive.dart';
-import 'package:cherry_toast/cherry_toast.dart';
-import 'package:cherry_toast/resources/arrays.dart';
 import 'package:woniu/controllers/controllers.dart';
 
 //import 'package:woniu/components/dialogs.dart';
