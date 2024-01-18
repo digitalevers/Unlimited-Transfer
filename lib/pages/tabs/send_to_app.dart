@@ -385,9 +385,10 @@ class _SendToAppState extends State<SendToApp>
     timer = Timer.periodic(timeout, (timer) {
       //[0x44, 0x48, 0x01, 0x01]
       if (Platform.isIOS) {
-        //TODO 需要动态获取子网地址前三段
-        log(deviceInfo['lanIP'],StackTrace.current);
-        socket?.send(broadJson.codeUnits, InternetAddress("192.168.2.255"), udpPort);
+        //动态获取子网地址前三段
+        List<String> ipList = deviceInfo['lanIP'].toString().split(".");
+        ipList[ipList.length - 1] = "255";
+        socket?.send(broadJson.codeUnits, InternetAddress(ipList.join(".")), udpPort);
       } else {
         socket?.send(broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
       }

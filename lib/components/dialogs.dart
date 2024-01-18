@@ -9,7 +9,6 @@ import 'package:url_launcher/url_launcher.dart' as ulaunch;
 
 import 'package:woniu/controllers/controllers.dart';
 import 'package:woniu/common/global_variable.dart';
-
 import '../common/func.dart';
 
 void privacyPolicyDialog(BuildContext context, String data) async {
