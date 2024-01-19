@@ -18,9 +18,7 @@ List<Widget> diffGetButtons(List<Map<String, dynamic>> receviceFilesLog,
     return [
       InkWell(
         onTap: () async {
-          String path = Platform.isMacOS
-              ? receviceFilesLog[index]["fileFullPath"]
-              : p.dirname(receviceFilesLog[index]["fileFullPath"]!);
+          String path = Platform.isMacOS ? receviceFilesLog[index]["fileFullPath"] : p.dirname(receviceFilesLog[index]["fileFullPath"]!);
           OpenDir().openNativeDir(path: path).then((value) {
             if(value != true){
               BotToast.showText(text: "无法打开该文件夹");
