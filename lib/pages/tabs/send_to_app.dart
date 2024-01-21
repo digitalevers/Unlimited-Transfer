@@ -126,6 +126,7 @@ class _SendToAppState extends State<SendToApp>
 
   Future<void> initEnv() async {
     deviceInfo = await initGetInfo(listenConnectivityChanged);
+    //log(deviceInfo, StackTrace.current);
     if (deviceInfo['network']['type'] == 'nowifi') {
       deviceInfo['networkText'] = '未接入WiFi';
     } else {
@@ -171,6 +172,7 @@ class _SendToAppState extends State<SendToApp>
    */
   Future<void> listenConnectivityChanged(ConnectivityResult result) async {
     Map result_ = await DeviceInfoApi.parseNetworkInfoResult(result);
+    //log(result_, StackTrace.current);
     String networkText, lanIP;
     if (result_['type'] == 'nowifi') {
       networkText = '未接入WiFi';
@@ -358,7 +360,8 @@ class _SendToAppState extends State<SendToApp>
   //初始化获取设备和wifi信息
   Future<Map> initGetInfo(Function func) async {
     Map deviceInfo_ = await DeviceInfoApi.getDeviceInfo();
-    //print(deviceInfo_);
+    //log(deviceInfo_, StackTrace.current);
+    deviceInfo_['model'] ??= deviceInfo_['prettyName']; //linux
     deviceInfo_['lanIP'] = await DeviceInfoApi.getDeviceLocalIP();
     deviceInfo_['network'] = await DeviceInfoApi.getNetworkInfo(func);
     deviceInfo_['deviceType'] = Platform.operatingSystem;
@@ -388,9 +391,11 @@ class _SendToAppState extends State<SendToApp>
         //动态获取子网地址前三段
         List<String> ipList = deviceInfo['lanIP'].toString().split(".");
         ipList[ipList.length - 1] = "255";
-        socket?.send(broadJson.codeUnits, InternetAddress(ipList.join(".")), udpPort);
+        socket?.send(
+            broadJson.codeUnits, InternetAddress(ipList.join(".")), udpPort);
       } else {
-        socket?.send(broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
+        socket?.send(
+            broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
       }
     });
 
@@ -442,7 +447,8 @@ class _SendToAppState extends State<SendToApp>
                   });
                 } else {
                   //旧设备则更新毫秒时间戳
-                  remoteDevicesData[_json['lanIP']]!['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
+                  remoteDevicesData[_json['lanIP']]!['millTimeStamp'] =
+                      DateTime.now().millisecondsSinceEpoch;
                 }
               }
             }

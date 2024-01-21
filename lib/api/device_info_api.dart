@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:network_info_plus/network_info_plus.dart';
@@ -10,6 +11,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 class DeviceInfoApi {
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   static final NetworkInfo _networkInfo = NetworkInfo();
+
   static String? _lanIPv4 = "";
 
   static Future<Map<String, dynamic>> getDeviceInfo() async {
@@ -19,7 +21,8 @@ class DeviceInfoApi {
         deviceData = _readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
       } else {
         if (Platform.isAndroid) {
-          deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+          deviceData =
+              _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
         } else if (Platform.isIOS) {
           deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
         } else if (Platform.isLinux) {
@@ -27,7 +30,8 @@ class DeviceInfoApi {
         } else if (Platform.isMacOS) {
           deviceData = _readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
         } else if (Platform.isWindows) {
-          deviceData = _readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
+          deviceData =
+              _readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
         }
       }
     } on PlatformException {
@@ -40,23 +44,24 @@ class DeviceInfoApi {
 
   //Android 10使用NetworkInterface无法获取ipv4地址?！ 使用network_info_plus则可以获取ipv4地址
   static Future getDeviceLocalIP() async {
-    RegExp ipv4Exp = RegExp(r"((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}"); //正则匹配ipv4地址
-    await NetworkInterface.list(includeLoopback: false, type: InternetAddressType.any).then(
-      (List<NetworkInterface> interfaces) {
+    RegExp ipv4Exp = RegExp(
+        r"((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}"); //正则匹配ipv4地址
+    await NetworkInterface.list(
+            includeLoopback: false, type: InternetAddressType.any)
+        .then((List<NetworkInterface> interfaces) {
       for (var interface in interfaces) {
         //print(interface.name);
         //if (interface.name == 'wlan0') {
-          for (var addresses in interface.addresses) {
-            if (ipv4Exp.hasMatch(addresses.address)) {
-              _lanIPv4 = addresses.address;
-              break;
-            }
-            //print(addresses.address);
+        for (var addresses in interface.addresses) {
+          if (ipv4Exp.hasMatch(addresses.address)) {
+            _lanIPv4 = addresses.address;
+            break;
           }
+          //print(addresses.address);
+        }
         //}
       }
-    }
-    );
+    });
     if (_lanIPv4!.isEmpty) {
       _lanIPv4 = await _networkInfo.getWifiIP();
     }
@@ -71,35 +76,38 @@ class DeviceInfoApi {
     //判断网络类型
     final Connectivity connectivity = Connectivity();
     ConnectivityResult result = await connectivity.checkConnectivity();
-    //StreamSubscription<ConnectivityResult> connectivitySubscription = 
+    //StreamSubscription<ConnectivityResult> connectivitySubscription =
     connectivity.onConnectivityChanged.listen(func as void Function(ConnectivityResult event)?);
     //print(result.toString());
     return parseNetworkInfoResult(result);
   }
 
-  static Future<Map> parseNetworkInfoResult(ConnectivityResult result) async{
-    if(result != ConnectivityResult.wifi){
-          //未连接wifi
-          return {'type':'nowifi'};
-        } else {
-          //已连接wifi
-          String? wifiName = "已接入WiFi";
-          try{
-            //判断是否获取 location 权限
-            // PermissionStatus permission = await Permission.location.status;
-            // if(permission == PermissionStatus.denied){
-            //   //await Permission.location.request();
-            //   //wifiName = '点击定位授权';
-            // } else {
-            //   wifiName = await _networkInfo.getWifiName();
-            // }
-            //print('permission request');
-            // ignore: unused_catch_clause
-          }  on PlatformException catch (e) {
-            wifiName = '无法获取wifiName';
-          }
-          return {'type':'wifi','wifiName':wifiName};
-        }
+  static Future<Map> parseNetworkInfoResult(ConnectivityResult result) async {
+    if (result == ConnectivityResult.ethernet) {
+      //print(result);
+      //未连接wifi
+      return {'type': 'ethernet', 'wifiName': "局域网"};
+    } else if (result == ConnectivityResult.wifi) {
+      //已连接wifi
+      String? wifiName = "已接入WiFi";
+      try {
+        //判断是否获取 location 权限
+        // PermissionStatus permission = await Permission.location.status;
+        // if(permission == PermissionStatus.denied){
+        //   //await Permission.location.request();
+        //   //wifiName = '点击定位授权';
+        // } else {
+        //   wifiName = await _networkInfo.getWifiName();
+        // }
+        //print('permission request');
+        // ignore: unused_catch_clause
+      } on PlatformException catch (e) {
+        wifiName = '无法获取wifiName';
+      }
+      return {'type': 'wifi', 'wifiName': wifiName};
+    } else {
+      return {'type': 'nowifi'};
+    }
   }
 
   static Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
