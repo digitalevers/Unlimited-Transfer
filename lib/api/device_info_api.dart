@@ -50,7 +50,7 @@ class DeviceInfoApi {
             includeLoopback: false, type: InternetAddressType.any)
         .then((List<NetworkInterface> interfaces) {
       for (var interface in interfaces) {
-        //print(interface.name);
+        //print(interface.addresses);
         //if (interface.name == 'wlan0') {
         for (var addresses in interface.addresses) {
           if (ipv4Exp.hasMatch(addresses.address)) {

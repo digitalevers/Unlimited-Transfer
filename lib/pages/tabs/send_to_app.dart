@@ -7,6 +7,7 @@ import 'dart:math';
 //import 'package:bot_toast/bot_toast.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 //import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:woniu/api/device_info_api.dart';
 import 'package:woniu/common/func.dart';
@@ -391,11 +392,9 @@ class _SendToAppState extends State<SendToApp>
         //动态获取子网地址前三段
         List<String> ipList = deviceInfo['lanIP'].toString().split(".");
         ipList[ipList.length - 1] = "255";
-        socket?.send(
-            broadJson.codeUnits, InternetAddress(ipList.join(".")), udpPort);
+        socket?.send(broadJson.codeUnits, InternetAddress(ipList.join(".")), udpPort);
       } else {
-        socket?.send(
-            broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
+        socket?.send(broadJson.codeUnits, InternetAddress("10.7.0.255"), udpPort);
       }
     });
 
@@ -409,7 +408,7 @@ class _SendToAppState extends State<SendToApp>
             var decoder = const Utf8Decoder();
             String msg = decoder.convert(udpData.data); // 将UTF8数据解码
             //String msg = String.fromCharCodes(udpData.data);
-            //print('收到来自${udpData.address.toString()}:${udpData.port}的数据：${udpData.data.length}字节数据 内容:$msg');
+            print('收到来自${udpData.address.toString()}:${udpData.port}的数据：${udpData.data.length}字节数据 内容:$msg');
             //print('Datagram from ${udpData.address.address}:${udpData.port}: ${msg.trim()}');
             //socket.send(msg.codeUnits, d.address, d.port);
 
