@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:woniu/pages/modules/privacy_page.dart';
+import 'package:tuotu/pages/modules/privacy_page.dart';
 import 'pages/tabs.dart';
 
 import 'common/config.dart';
@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
     log("启动MyApp");
     return MaterialApp(
       navigatorKey: nav,
-      title: '无界闪传',
+      title: '脱兔闪传',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

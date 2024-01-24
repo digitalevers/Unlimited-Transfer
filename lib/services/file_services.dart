@@ -11,8 +11,8 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart' as path;
 //import 'package:path_provider/path_provider.dart';
 
-import 'package:woniu/models/file_model.dart';
-import 'package:woniu/models/sender_model.dart';
+import 'package:tuotu/models/file_model.dart';
+import 'package:tuotu/models/sender_model.dart';
 
 class FileMethods {
   //todo implement separate file picker for android to avoid caching

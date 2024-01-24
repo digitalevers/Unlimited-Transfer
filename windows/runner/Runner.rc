@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.digitalevers" "\0"
-            VALUE "FileDescription", "unlimited_transfer" "\0"
+            VALUE "FileDescription", "tuotu" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "unlimited_transfer" "\0"
+            VALUE "InternalName", "tuotu" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.digitalevers. All rights reserved." "\0"
-            VALUE "OriginalFilename", "unlimited_transfer.exe" "\0"
-            VALUE "ProductName", "unlimited_transfer" "\0"
+            VALUE "OriginalFilename", "tuotu.exe" "\0"
+            VALUE "ProductName", "tuotu" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

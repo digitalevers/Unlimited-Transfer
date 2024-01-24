@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 //import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:woniu/common/func.dart';
-import 'package:woniu/common/global_variable.dart';
-import 'package:woniu/diff/receive_files_log_diff.dart';
+import 'package:tuotu/common/func.dart';
+import 'package:tuotu/common/global_variable.dart';
+import 'package:tuotu/diff/receive_files_log_diff.dart';
 
 //组件单独放在一个文件里则无法访问到 _ReceiveFilesLogState 该类为文件私有
 class ReceiveFilesLog extends StatefulWidget {

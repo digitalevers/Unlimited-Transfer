@@ -9,7 +9,7 @@ import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
-import 'package:woniu/controllers/controllers.dart';
+import 'package:tuotu/controllers/controllers.dart';
 import 'package:path/path.dart' as p;
 import 'package:external_path/external_path.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
-import 'package:woniu/common/config.dart';
-import 'package:woniu/common/global_variable.dart';
+import 'package:tuotu/common/config.dart';
+import 'package:tuotu/common/global_variable.dart';
 
 
 //自定义一个 StatefulWidget 来封装 StepProgressIndicator

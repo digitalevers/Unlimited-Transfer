@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:woniu/common/func.dart';
+import 'package:tuotu/common/func.dart';
 
 class Instruction extends StatefulWidget {
   Instruction({super.key}){

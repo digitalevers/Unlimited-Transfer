@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:woniu/common/global_variable.dart';
+import 'package:tuotu/common/global_variable.dart';
 // Import for Android features.
 //import 'package:webview_flutter_android/webview_flutter_android.dart';
 // Import for iOS features.
 //import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
-import 'package:woniu/pages/modules/privacy_view.dart';
+import 'package:tuotu/pages/modules/privacy_view.dart';
 
 class PrivacyPage extends StatefulWidget {
 
@@ -19,9 +19,9 @@ class PrivacyPage extends StatefulWidget {
 class _PrivacyPageState extends State<PrivacyPage> {
 
   
-  final String _data = "亲爱的用户，感谢您信任并使用无界闪传APP\n" +
+  final String _data = "亲爱的用户，感谢您信任并使用脱兔闪传APP\n" +
       " \n" +
-      "无界闪传十分重视用户权利及隐私政策并严格按照相关法律法规的要求，对《用户协议》和《隐私政策》进行了更新,特向您说明如下：\n\n" +
+      "脱兔闪传十分重视用户权利及隐私政策并严格按照相关法律法规的要求，对《用户协议》和《隐私政策》进行了更新,特向您说明如下：\n\n" +
       "1.为向您提供更优质的服务，我们会收集、使用必要的信息，并会采取业界先进的安全措施保护您的信息安全；\n\n" +
       "2.基于您的明示授权，我们后续可能会获取设备号信息、包括：设备型号、操作系统版本、设备设置、设备标识符、MAC（媒体访问控制）地址、IMEI（移动设备国际身份码）、广告标识符（\"IDFA\"与\"IDFV\"）。我们将使用量U SDK统计使用我们产品的设备数量并进行设备机型数据分析与设备适配性分析。您有权拒绝或取消授权；\n\n" +
       "3.您可灵活设置伴伴账号的功能内容和互动权限，您可在《隐私政策》中了解到权限的详细应用说明；\n\n" +

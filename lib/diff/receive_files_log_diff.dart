@@ -9,7 +9,7 @@ import 'package:path/path.dart' as p;
 import 'package:open_file/open_file.dart';
 import 'package:open_dir/open_dir.dart';
 
-import 'package:woniu/common/func.dart';
+import 'package:tuotu/common/func.dart';
 
 List<Widget> diffGetButtons(List<Map<String, dynamic>> receviceFilesLog,
     int index, Function delAction) {

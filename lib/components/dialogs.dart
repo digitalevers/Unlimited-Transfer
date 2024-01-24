@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get_it/get_it.dart';
-import 'package:woniu/main.dart';
+import 'package:tuotu/main.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart' as ulaunch;
 
-import 'package:woniu/controllers/controllers.dart';
-import 'package:woniu/common/global_variable.dart';
+import 'package:tuotu/controllers/controllers.dart';
+import 'package:tuotu/common/global_variable.dart';
 import '../common/func.dart';
 
 void privacyPolicyDialog(BuildContext context, String data) async {

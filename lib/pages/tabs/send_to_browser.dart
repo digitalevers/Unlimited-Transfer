@@ -2,8 +2,8 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:woniu/common/func.dart';
-import 'package:woniu/common/global_variable.dart';
+import 'package:tuotu/common/func.dart';
+import 'package:tuotu/common/global_variable.dart';
 
 class SendToBrowser extends StatefulWidget {
   SendToBrowser({super.key}){

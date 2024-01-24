@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/routes/default_transitions.dart';
-import 'package:woniu/common/func.dart';
+import 'package:tuotu/common/func.dart';
 
 class About extends StatefulWidget {
   About({super.key}){
@@ -24,7 +24,7 @@ class _nameState extends State<About> {
           crossAxisAlignment:CrossAxisAlignment.start,
           children: const <Widget>[
             SizedBox(
-              child: Text("无界闪传",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
+              child: Text("脱兔闪传",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18)),
             ),
             SizedBox(height: 5),
             SizedBox(

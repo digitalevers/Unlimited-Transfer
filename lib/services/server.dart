@@ -11,19 +11,19 @@ import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:woniu/models/sender_model.dart';
-import 'package:woniu/pages/tabs/send_to_app.dart';
-import 'package:woniu/services/fileManager.dart';
-import 'package:woniu/services/file_services.dart';
-import 'package:woniu/controllers/controllers.dart';
+import 'package:tuotu/models/sender_model.dart';
+import 'package:tuotu/pages/tabs/send_to_app.dart';
+import 'package:tuotu/services/fileManager.dart';
+import 'package:tuotu/services/file_services.dart';
+import 'package:tuotu/controllers/controllers.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_it/get_it.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
-import 'package:woniu/common/func.dart';
-import 'package:woniu/components/dialogs.dart';
-import 'package:woniu/common/global_variable.dart';
-import 'package:woniu/common/config.dart';
+import 'package:tuotu/common/func.dart';
+import 'package:tuotu/components/dialogs.dart';
+import 'package:tuotu/common/global_variable.dart';
+import 'package:tuotu/common/config.dart';
 import 'package:bot_toast/bot_toast.dart';
 
 class Server {

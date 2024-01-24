@@ -9,17 +9,17 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 //import 'package:step_progress_indicator/step_progress_indicator.dart';
-import 'package:woniu/api/device_info_api.dart';
-import 'package:woniu/common/func.dart';
-import 'package:woniu/pages/modules/water_ripple.dart';
-import 'package:woniu/services/server.dart';
+import 'package:tuotu/api/device_info_api.dart';
+import 'package:tuotu/common/func.dart';
+import 'package:tuotu/pages/modules/water_ripple.dart';
+import 'package:tuotu/services/server.dart';
 
-import 'package:woniu/common/config.dart';
-import 'package:woniu/common/global_variable.dart';
+import 'package:tuotu/common/config.dart';
+import 'package:tuotu/common/global_variable.dart';
 
-import 'package:woniu/pages/modules/receive_files_log.dart';
-import 'package:woniu/pages/modules/step_progress.dart';
-import 'package:woniu/common/customIcons.dart';
+import 'package:tuotu/pages/modules/receive_files_log.dart';
+import 'package:tuotu/pages/modules/step_progress.dart';
+import 'package:tuotu/common/customIcons.dart';
 
 class SendToApp extends StatefulWidget {
   final GlobalKey _key;

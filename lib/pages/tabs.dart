@@ -1,17 +1,17 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:woniu/pages/modules/privacy_page.dart';
+import 'package:tuotu/pages/modules/privacy_page.dart';
 import 'tabs/send_to_app.dart';
 import 'tabs/send_to_browser.dart';
 import 'tabs/choose_file.dart';
 import './tabs/instruction.dart';
 import './tabs/about.dart';
-import 'package:woniu/services/client.dart';
+import 'package:tuotu/services/client.dart';
 
-import 'package:woniu/common/config.dart';
-import 'package:woniu/common/func.dart';
-import 'package:woniu/common/global_variable.dart';
+import 'package:tuotu/common/config.dart';
+import 'package:tuotu/common/func.dart';
+import 'package:tuotu/common/global_variable.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 
