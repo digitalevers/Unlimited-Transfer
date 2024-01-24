@@ -5,6 +5,7 @@ import 'dart:math';
 
 //import 'package:permission_handler/permission_handler.dart';
 //import 'package:bot_toast/bot_toast.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -346,6 +347,7 @@ class _SendToAppState extends State<SendToApp>
   Future<Map> initGetInfo(Function func) async {
     Map deviceInfo_ = await DeviceInfoApi.getDeviceInfo();
     //log(deviceInfo_, StackTrace.current);
+
     deviceInfo_['model'] ??= deviceInfo_['prettyName']; //linux
     deviceInfo_['lanIP'] = await DeviceInfoApi.getDeviceLocalIP();
     deviceInfo_['network'] = await DeviceInfoApi.getNetworkInfo(func);
@@ -355,7 +357,7 @@ class _SendToAppState extends State<SendToApp>
 
   /// 启动UDP广播 ———— 需要加一个启动锁 多次重复启动 会出现bug
   void startUDP() async {
-    if (startUDPLock == true) {
+    if (startUDPLock == true || deviceInfo['lanIP'].isEmpty) {
       return;
     }
     startUDPLock = true;
@@ -363,6 +365,7 @@ class _SendToAppState extends State<SendToApp>
     socket?.broadcastEnabled = true;
     log('UDP Echo ready to receive', StackTrace.current);
     Duration timeout = Duration(seconds: udpBroadInternalTime);
+    
     //构造广播json数据
     Map broadMap = {
       'lanIP': deviceInfo['lanIP'],
@@ -370,6 +373,7 @@ class _SendToAppState extends State<SendToApp>
       'deviceType': deviceInfo['deviceType']
     };
     String broadJson = json.encode(broadMap);
+    
     timer = Timer.periodic(timeout, (timer) {
       //[0x44, 0x48, 0x01, 0x01]
       if (Platform.isIOS) {
@@ -405,8 +409,7 @@ class _SendToAppState extends State<SendToApp>
               remoteDevicesData.removeWhere((ip, remoteDeviceInfo) {
                 if (ip == _json['lanIP']) {
                   setState(() {
-                    removeRemoteDeviceFromWidget(
-                        remoteDeviceInfo['remoteDeviceKey']);
+                    removeRemoteDeviceFromWidget(remoteDeviceInfo['remoteDeviceKey']);
                   });
                   return true;
                 } else {
@@ -430,8 +433,7 @@ class _SendToAppState extends State<SendToApp>
                   });
                 } else {
                   //旧设备则更新毫秒时间戳
-                  remoteDevicesData[_json['lanIP']]!['millTimeStamp'] =
-                      DateTime.now().millisecondsSinceEpoch;
+                  remoteDevicesData[_json['lanIP']]!['millTimeStamp'] = DateTime.now().millisecondsSinceEpoch;
                 }
               }
             }
