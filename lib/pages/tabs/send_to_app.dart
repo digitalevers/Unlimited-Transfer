@@ -72,8 +72,7 @@ class _SendToAppState extends State<SendToApp>
   List<Widget> remoteDevicesWidgetPlus = <Widget>[_waterRipple];
 
   //远程设备的显示widget 的最大尺寸
-  Size remoteDevicesWidgetMaxSize =
-      Size(remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight);
+  Size remoteDevicesWidgetMaxSize = Size(remoteDevicesWidgetMaxSizeWidth, remoteDevicesWidgetMaxSizeHeight);
   //如果显示widget重叠了 尝试重新生成widget的次数
   int createWidgetCount = 2;
   //UDP广播频次间隔时间 sencond
@@ -268,9 +267,7 @@ class _SendToAppState extends State<SendToApp>
         left: left_,
         key: map['remoteDeviceKey'],
         child: Container(
-            constraints: BoxConstraints(
-                maxWidth: remoteDevicesWidgetMaxSize.width,
-                maxHeight: remoteDevicesWidgetMaxSize.height),
+            constraints: BoxConstraints(maxWidth: remoteDevicesWidgetMaxSize.width, maxHeight: remoteDevicesWidgetMaxSize.height),
             //padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
             decoration: const BoxDecoration(
               color: Color.fromARGB(255, 255, 126, 90),
@@ -284,8 +281,7 @@ class _SendToAppState extends State<SendToApp>
                   top: 0,
                   child:
                       // 因为StepProgressIndicator本身是 stateless 所以无法更新状态 需要自定义一个stateful封装StepProgressIndicator再进行更新
-                      StepProgress(map['lanIP'],
-                          key: map['remoteDeviceWidgetKey'])),
+                      StepProgress(map['lanIP'],key: map['remoteDeviceWidgetKey'])),
               Positioned(
                   left: 0,
                   top: 0,

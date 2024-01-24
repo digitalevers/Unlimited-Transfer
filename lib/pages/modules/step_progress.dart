@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
+import 'package:woniu/common/config.dart';
 import 'package:woniu/common/global_variable.dart';
 
 
@@ -25,7 +26,7 @@ class _StepProgressState extends State<StepProgress> {
   @override
   Widget build(BuildContext context) {
     return StepProgressIndicator(
-      fallbackLength: 120,
+      fallbackLength: remoteDevicesWidgetMaxSizeWidth,
       totalSteps: 100,
       currentStep: remoteDevicesData[_ip]!["progress"],
       size: 32,        //进度指示条的高度
