@@ -94,7 +94,7 @@ class _ReceiveFilesLogState extends State<ReceiveFilesLog> {
 
                       isThreeLine: false,
                       title: Text(getShortFileName(p.basename(receviceFilesLog[index]["fileFullPath"]!),15)),
-                      subtitle: Text("From ${receviceFilesLog[index]["from"]!}\nDate ${receviceFilesLog[index]["date"]!}",style: const TextStyle(fontSize:10.0,color: Color.fromARGB(255, 250, 250, 250))),
+                      subtitle: Text("来自 ${receviceFilesLog[index]["from"]!}\n日期 ${receviceFilesLog[index]["date"]!}",style: const TextStyle(fontSize:10.0,color: Color.fromARGB(255, 250, 250, 250))),
                       trailing: SizedBox(
                         width: 120,
                         child: Row(
