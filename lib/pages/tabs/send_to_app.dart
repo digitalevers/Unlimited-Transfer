@@ -19,6 +19,7 @@ import 'package:woniu/common/global_variable.dart';
 
 import 'package:woniu/pages/modules/receive_files_log.dart';
 import 'package:woniu/pages/modules/step_progress.dart';
+import 'package:woniu/common/customIcons.dart';
 
 class SendToApp extends StatefulWidget {
   final GlobalKey _key;
@@ -205,7 +206,7 @@ class _SendToAppState extends State<SendToApp>
   IconData getRemoteDeviceTypeIcon(String? deviceType) {
     switch (deviceType) {
       case 'linux':
-        return Icons.computer;
+        return const Icon(CustomIcons.linux).icon!;
       case 'macos':
         return Icons.laptop_mac;
       case 'windows':
@@ -223,43 +224,29 @@ class _SendToAppState extends State<SendToApp>
 
   //将远程设备的item添加到显示区内
   void addRemoteDeviceToWidget(Map<String, dynamic> map) {
-    remoteDeviceShowFlexibleSize ??=
-        remoteDeviceShowFlexible.currentContext?.size;
+    remoteDeviceShowFlexibleSize ??= remoteDeviceShowFlexible.currentContext?.size;
     map['remoteDeviceKey'] = GlobalKey();
     map['remoteDeviceWidgetKey'] = GlobalKey();
     //约束在 district范围内随机生成top和left值 并尽可能不与之前的矩阵重叠
     double top_ = 0.0;
     double left_ = 0.0;
-    for (int i = 0; i < createWidgetCount; i++) {
-      //top > 10 以免紧贴窗口边缘渲染widget
-      top_ = randomInt(
-              10,
-              (remoteDeviceShowFlexibleSize!.height -
-                      2 * remoteDevicesWidgetMaxSize.height)
-                  .toInt())
-          .toDouble();
-      left_ = randomInt(
-              10,
-              (remoteDeviceShowFlexibleSize!.width -
-                      remoteDevicesWidgetMaxSize.width)
-                  .toInt())
-          .toDouble();
-      bool inside = false;
-      remoteDevicesData.forEach((key, value) {
-        if (rectInRect(
-            Rectangle(left_, top_, remoteDevicesWidgetMaxSize.width,
-                remoteDevicesWidgetMaxSize.height) as Rect,
-            Rectangle(
-                value['left'].toInt() as int,
-                value['top'].toInt() as int,
-                remoteDevicesWidgetMaxSize.width,
-                remoteDevicesWidgetMaxSize.height) as Rect)) {
-          inside = true;
+    try{
+      for (int i = 0; i < createWidgetCount; i++) {
+        //top > 10 以免紧贴窗口边缘渲染widget
+        top_ = randomInt(10,(remoteDeviceShowFlexibleSize!.height - 2 * remoteDevicesWidgetMaxSize.height).toInt()).toDouble();
+        left_ = randomInt(10,(remoteDeviceShowFlexibleSize!.width -remoteDevicesWidgetMaxSize.width).toInt()).toDouble();
+        bool inside = false;
+        remoteDevicesData.forEach((key, value) {
+          if (rectInRect(Rectangle(left_, top_, remoteDevicesWidgetMaxSize.width,remoteDevicesWidgetMaxSize.height) as Rect,Rectangle(value['left'].toInt() as int,value['top'].toInt() as int,remoteDevicesWidgetMaxSize.width,remoteDevicesWidgetMaxSize.height) as Rect)) {
+            inside = true;
+          }
+        });
+        if (inside == false) {
+          break;
         }
-      });
-      if (inside == false) {
-        break;
       }
+    } catch(e){
+      e.printError();
     }
     //print(top_);
     //print(left_);
@@ -394,7 +381,7 @@ class _SendToAppState extends State<SendToApp>
         ipList[ipList.length - 1] = "255";
         socket?.send(broadJson.codeUnits, InternetAddress(ipList.join(".")), udpPort);
       } else {
-        socket?.send(broadJson.codeUnits, InternetAddress("10.7.0.255"), udpPort);
+        socket?.send(broadJson.codeUnits, InternetAddress("255.255.255.255"), udpPort);
       }
     });
 
