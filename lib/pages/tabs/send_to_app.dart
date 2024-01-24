@@ -356,6 +356,7 @@ class _SendToAppState extends State<SendToApp>
   }
 
   /// 启动UDP广播 ———— 需要加一个启动锁 多次重复启动 会出现bug
+  /// 2024.01.24 添加 "deviceInfo['lanIP'].isEmpty"判断条件修复linux release包下deviceInfo未初始化就启动UDP广播的错误
   void startUDP() async {
     if (startUDPLock == true || deviceInfo['lanIP'].isEmpty) {
       return;
