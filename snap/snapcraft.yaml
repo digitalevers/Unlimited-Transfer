@@ -1,0 +1,28 @@
+name: tuotu
+version: "1.0"
+summary: tuotu
+description: A new CrossPlatform FileTransfer Tool!
+
+confinement: strict
+base: core22
+grade: stable
+
+slots:
+  dbus-tuotu: # adjust accordingly to your app name
+    interface: dbus
+    bus: session
+    name: com.digitalevers.sc # adjust accordingly to your app name and
+    
+apps:
+  tuotu:
+    command: tuotu
+    extensions: [gnome] # gnome includes the libraries required by flutter
+    plugs:
+    - network
+    slots:
+      - dbus-tuotu
+parts:
+  tuotu:
+    source: .
+    plugin: flutter
+    flutter-target: lib/main.dart # The main entry-point file of the application
