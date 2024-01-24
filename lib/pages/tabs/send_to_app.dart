@@ -171,6 +171,7 @@ class _SendToAppState extends State<SendToApp>
   /**
    * 监听网络类型的改变
    * 改变ip和wifi接入情况
+   * ethernet wifi mobile none
    */
   Future<void> listenConnectivityChanged(ConnectivityResult result) async {
     Map result_ = await DeviceInfoApi.parseNetworkInfoResult(result);
@@ -184,7 +185,7 @@ class _SendToAppState extends State<SendToApp>
 
     //由移动网络切换到WiFi下继续启动UDP广播
     lanIP = await DeviceInfoApi.getDeviceLocalIP();
-    if (result_['type'] == 'wifi' && lanIP.isNotEmpty) {
+    if ((result_['type'] == 'wifi' || result_['type'] == 'ethernet') && lanIP.isNotEmpty) {
       startUDP();
     } else {
       //由WiFi切换到移动网络下关闭UDP广播

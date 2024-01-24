@@ -86,7 +86,7 @@ class DeviceInfoApi {
     if (result == ConnectivityResult.ethernet) {
       //print(result);
       //未连接wifi
-      return {'type': 'ethernet', 'wifiName': "局域网"};
+      return {'type': 'ethernet', 'wifiName': "以太网"};
     } else if (result == ConnectivityResult.wifi) {
       //已连接wifi
       String? wifiName = "已接入WiFi";
@@ -105,6 +105,8 @@ class DeviceInfoApi {
         wifiName = '无法获取wifiName';
       }
       return {'type': 'wifi', 'wifiName': wifiName};
+    } else if(result == ConnectivityResult.mobile){
+      return {'type': 'mobile', 'wifiName': "移动网络"};
     } else {
       return {'type': 'nowifi'};
     }
