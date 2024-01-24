@@ -396,7 +396,7 @@ class _SendToAppState extends State<SendToApp>
             var decoder = const Utf8Decoder();
             String msg = decoder.convert(udpData.data); // 将UTF8数据解码
             //String msg = String.fromCharCodes(udpData.data);
-            print('收到来自${udpData.address.toString()}:${udpData.port}的数据：${udpData.data.length}字节数据 内容:$msg');
+            //print('收到来自${udpData.address.toString()}:${udpData.port}的数据：${udpData.data.length}字节数据 内容:$msg');
             //print('Datagram from ${udpData.address.address}:${udpData.port}: ${msg.trim()}');
             //socket.send(msg.codeUnits, d.address, d.port);
 
