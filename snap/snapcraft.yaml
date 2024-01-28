@@ -12,7 +12,7 @@ apps:
     command: tuotu
     extensions: [gnome] # gnome includes the libraries required by flutter
     plugs:
-      - network-manager
+      nmcli: network-manager
       - desktop
       - network
     #- network-manager
@@ -21,13 +21,14 @@ apps:
     slots:
       - dbus-tuotu
 
-plugs:
-  network-manager:
-    interface: network-manager
-    allow-auto-connection: true
+#plugs:
+  #network-manager:
+    #interface: network-manager
+    #auto-connection: true
 
 
 slots:
+  service: network-manager
   dbus-tuotu: # adjust accordingly to your app name
     interface: dbus
     bus: session
