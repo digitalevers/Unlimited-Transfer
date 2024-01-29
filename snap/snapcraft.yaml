@@ -8,23 +8,8 @@ base: core22
 grade: stable
  
 apps:
-  nmcli:
-    command: usr/bin/nmcli
-    plugs: [nmcli]
-  nmtui:
-    command: usr/bin/nmtui
-    plugs: [nmcli]
-  nmtui-connect:
-    command: usr/bin/nmtui-connect
-    plugs: [nmcli]
-  nmtui-edit:
-    command: usr/bin/nmtui-edit
-    plugs: [nmcli]
-  nmtui-hostname:
-    command: usr/bin/nmtui-hostname
-    plugs: [nmcli]
   tuotu:
-    command: bin/tuotu
+    command: tuotu
     extensions: [gnome] # gnome includes the libraries required by flutter
     plugs:
       - desktop
@@ -33,11 +18,6 @@ apps:
     slots:
       - service
       - dbus-tuotu
-
-#plugs:
-  #network-manager:
-    #interface: network-manager
-    #auto-connection: true
 plugs:
   nmcli: network-manager
 
