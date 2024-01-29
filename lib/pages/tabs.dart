@@ -205,11 +205,11 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                 height: 60,
                 padding: const EdgeInsets.all(0),
                 margin: const EdgeInsets.only(top: 5),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
+                decoration: BoxDecoration(color: Color(0xffFC6621), borderRadius: BorderRadius.circular(30)),
                 child: Stack(
                   alignment: Alignment.bottomCenter,
                   children: [
-                    buildRotationTransition(),
+                    //buildRotationTransition(),
                     Container(margin: const EdgeInsets.only(bottom: 5), 
                               child: 
                                 IconButton(
@@ -247,11 +247,11 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                 height: 60,
                 padding: const EdgeInsets.all(5),
                 margin: const EdgeInsets.only(top: 5),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
+                decoration: BoxDecoration(color: Color(0xffFC6621), borderRadius: BorderRadius.circular(30)),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    buildRotationTransition(),
+                    //buildRotationTransition(),
                     IconButton(
                         onPressed: () async {
                           try{
