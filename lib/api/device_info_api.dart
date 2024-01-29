@@ -46,17 +46,17 @@ class DeviceInfoApi {
   static Future getDeviceLocalIP() async {
     RegExp ipv4Exp = RegExp(r"((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}"); //正则匹配ipv4地址
     await NetworkInterface.list(includeLoopback: false, type: InternetAddressType.any).then((List<NetworkInterface> interfaces) {
-        for (var interface in interfaces) {
-          print(interface);
-          //if (interface.name == 'wlan0') {
-          for (var addresses in interface.addresses) {
+        for (NetworkInterface interface in interfaces) {
+          //print(interface); //过滤网桥ip
+          if (!interface.name.contains("br")) {
+          for (InternetAddress addresses in interface.addresses) {
             if (ipv4Exp.hasMatch(addresses.address)) {
               _lanIPv4 = addresses.address;
               break;
             }
             //print(addresses.address);
           }
-          //}
+          }
         }
       }
     );
