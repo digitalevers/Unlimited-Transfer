@@ -248,7 +248,7 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                 width: 60,
                 height: 60,
                 padding: const EdgeInsets.all(5),
-                margin: const EdgeInsets.only(top: 5),
+                //margin: const EdgeInsets.only(top: 5),
                 decoration: BoxDecoration(color: Color(0xffFC6621), borderRadius: BorderRadius.circular(30)),
                 child: Stack(
                   alignment: Alignment.center,
