@@ -126,6 +126,8 @@ class Server {
                   await sink.addStream(Stream.fromIterable(content));
                   await sink.flush();
                   await sink.close();
+
+                  
                 }
                 // if (!Directory(uploadDirectory).existsSync()) {
                 //   await Directory(uploadDirectory).create();
@@ -223,6 +225,7 @@ class Server {
                   },
                   handleError: (error, stack, sink) {
                     log(error, StackTrace.current);
+                    sink.close();
                   },
                   handleDone: (sink) {
                     //文件传输完毕 重新初始化step indicator组件
@@ -237,7 +240,7 @@ class Server {
 
               await sink.addStream(requestStream);
               await sink.flush();
-              //await sink.close();
+              await sink.close();
               //文件传输完毕 服务器置为空闲状态 并弹窗接收完成提示
               _serverStatus = ServerStatus.idle;
               // 更新接收文件记录显示区的UI界面

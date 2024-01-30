@@ -194,6 +194,8 @@ class _nameState extends State<Tabs> with SingleTickerProviderStateMixin {
                     BotToast.showText(text:"等待对方接收");
                     sendFileInfo(client, key, httpServerPort, fileList, myContext);
                     break;
+                  } else {
+                    log("未拖入设备方框",StackTrace.current);
                   }
                 }
               },
