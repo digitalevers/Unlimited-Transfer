@@ -2,7 +2,7 @@
 Name=tuotu
 Comment=A new CrossPlatform FileTransfer Tool
 Exec=tuotu
-Icon=/root/Downloads/Unlimited-Transfer/tuotu.png
+Icon=${SNAP}/meta/gui/tuotu.png
 Terminal=false
 Type=Application
 Categories=Utilities

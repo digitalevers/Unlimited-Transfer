@@ -15,15 +15,16 @@ apps:
     plugs:
       - desktop
       - network
+      - network-manager ###
       - home
     slots:
-      - service
+      #- service
       - dbus-tuotu
-plugs:
-  nmcli: network-manager
+#plugs:
+  #nmcli: network-manager
 
 slots:
-  service: network-manager
+  #service: network-manager
   dbus-tuotu: # adjust accordingly to your app name
     interface: dbus
     bus: session
