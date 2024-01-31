@@ -48,7 +48,7 @@ class DeviceInfoApi {
     await NetworkInterface.list(includeLoopback: false, type: InternetAddressType.any).then((List<NetworkInterface> interfaces) {
         for (NetworkInterface interface in interfaces) {
           //print(interface); //过滤网桥ip
-          if (!interface.name.contains("br")) {
+          if (!interface.name.toLowerCase().contains("lxdbr") && !interface.name.toLowerCase().contains("docker") && !interface.name.toLowerCase().contains("lo")) {
           for (InternetAddress addresses in interface.addresses) {
             if (ipv4Exp.hasMatch(addresses.address)) {
               _lanIPv4 = addresses.address;
