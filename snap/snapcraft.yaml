@@ -2,6 +2,7 @@ name: tuotu
 version: "1.0"
 summary: tuotu
 description: A new CrossPlatform FileTransfer Tool!
+icon: tuotu.png
 
 confinement: strict
 base: core22
