@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/home/digitalevers/Downloads/flutter"
-export "FLUTTER_APPLICATION_PATH=/home/digitalevers/Downloads/unlimited_transfer"
+export "FLUTTER_ROOT=D:\flutterSDK3.22.2"
+export "FLUTTER_APPLICATION_PATH=D:\star_sea\flutter_project\unlimited_transfer"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
